@@ -17,4 +17,4 @@ jobs:
           message: ":warning: Secrets found in repository ${{ inputs.repo-name }}"
           slack-url: ${{ secrets.SLACK_WEBHOOK }}
       - name: Run tests
-        run: sbt test
+        run: sbt scalafmtCheckAll test
