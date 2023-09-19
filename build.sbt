@@ -1,7 +1,6 @@
 import Dependencies._
 import sbt.url
-import sbtrelease.ReleaseStateTransformations.{checkSnapshotDependencies, commitNextVersion, commitReleaseVersion, inquireVersions, pushChanges, runClean, runTest, setNextVersion, setReleaseVersion, tagRelease}
-
+import sbtrelease.ReleaseStateTransformations._
 
 ThisBuild / organization := "uk.gov.nationalarchives"
 ThisBuild / organizationName := "National Archives"
@@ -26,7 +25,7 @@ developers := List(
   )
 )
 
-ThisBuild / description := "A library to validate input metadata for the Transfer Digital Records"
+ThisBuild / description := "A library to validate input metadata for Transfer Digital Records"
 ThisBuild / licenses := List("MIT" -> new URL("https://choosealicense.com/licenses/mit/"))
 ThisBuild / homepage := Some(url("https://github.com/nationalarchives/tdr-metadata-validation"))
 

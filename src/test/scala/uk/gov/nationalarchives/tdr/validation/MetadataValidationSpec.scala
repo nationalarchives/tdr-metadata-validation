@@ -7,7 +7,7 @@ import uk.gov.nationalarchives.tdr.validation.MetadataProperty.closureType
 
 class MetadataValidationSpec extends AnyFlatSpec {
 
-  "validateClosureMetadata" should "validate closure metadata with valid values" in {
+  "validateClosureMetadata" should "validate closure metadata" in {
 
     val dependentMetadataCriteria = List(
       MetadataCriteria("Property1", Boolean, true, false, false, List("yes", "no"), None, None),
@@ -57,7 +57,7 @@ class MetadataValidationSpec extends AnyFlatSpec {
     error should be(List(Error(closureType, CLOSURE_STATUS_IS_MISSING)))
   }
 
-  "validateClosureMetadata" should "not return any error if closure status is open and closure metadata has empty or default value" in {
+  "validateClosureMetadata" should "not return any errors if closure status is open and closure metadata has empty or default values" in {
 
     val dependentMetadataCriteria = List(
       MetadataCriteria("Property1", Boolean, true, false, false, List("yes", "no"), defaultValue = Some("no")),
@@ -153,7 +153,7 @@ class MetadataValidationSpec extends AnyFlatSpec {
     )
   }
 
-  "validateClosureMetadata" should "not return an error if a closure metadata dependent by a descriptive metadata which is empty" in {
+  "validateClosureMetadata" should "not return an error if closure metadata is dependent on descriptive metadata which is empty" in {
 
     val dependentMetadataCriteria = List(
       MetadataCriteria(
@@ -179,7 +179,7 @@ class MetadataValidationSpec extends AnyFlatSpec {
     error should be(Nil)
   }
 
-  "validateDescriptiveMetadata" should "validate descriptive metadata with valid values" in {
+  "validateDescriptiveMetadata" should "validate descriptive metadata" in {
 
     val descriptiveMetadataCriteria = List(
       MetadataCriteria("Property1", Text, false, false, false, Nil, None, None),
@@ -197,7 +197,7 @@ class MetadataValidationSpec extends AnyFlatSpec {
     error should be(Nil)
   }
 
-  "validateMetadata" should "validate closure & descriptive metadata" in {
+  "validateMetadata" should "validate closure and descriptive metadata" in {
 
     val descriptiveMetadataCriteria = List(
       MetadataCriteria("Property21", Text, false, false, false, Nil, None, None),

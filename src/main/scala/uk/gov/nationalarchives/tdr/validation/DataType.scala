@@ -5,9 +5,9 @@ import uk.gov.nationalarchives.tdr.validation.ErrorCode._
 import java.time.{LocalDateTime, Year}
 import scala.util.control.Exception.allCatch
 
-sealed trait DataType extends AnyRef
+sealed trait DataType
 
-case object Integer extends AnyRef with DataType with Product with Serializable {
+case object Integer extends DataType with Product with Serializable {
   def checkValue(value: String, criteria: MetadataCriteria): Option[String] = {
     value match {
       case "" if criteria.required            => Some(EMPTY_VALUE_ERROR)
@@ -18,14 +18,18 @@ case object Integer extends AnyRef with DataType with Product with Serializable 
   }
 }
 
-case object DateTime extends AnyRef with DataType with Product with Serializable {
+case object DateTime extends DataType with Product with Serializable {
   def checkValue(value: String, criteria: MetadataCriteria): Option[String] = {
     value match {
       case "" if criteria.required  => Some(EMPTY_VALUE_ERROR)
       case "" if !criteria.required => None
       case v =>
         val date = v.replace("T", "-").split("[-:]")
-        validate(date(2), date(1), date(0), criteria)
+        if (date.length < 6) {
+          Some(INVALID_DATE_FORMAT_ERROR)
+        } else {
+          validate(date(2), date(1), date(0), criteria)
+        }
     }
   }
 
@@ -110,7 +114,7 @@ case object DateTime extends AnyRef with DataType with Product with Serializable
     }
 }
 
-case object Text extends AnyRef with DataType with Product with Serializable {
+case object Text extends DataType with Product with Serializable {
 
   def checkValue(value: String, criteria: MetadataCriteria): Option[String] = {
     val definedValues = criteria.definedValues
@@ -123,7 +127,7 @@ case object Text extends AnyRef with DataType with Product with Serializable {
   }
 }
 
-case object Boolean extends AnyRef with DataType with Product with Serializable {
+case object Boolean extends DataType with Product with Serializable {
   def checkValue(value: String, criteria: MetadataCriteria, requiredMetadata: Option[Metadata]): Option[String] = {
     value match {
       case "" if criteria.required =>
@@ -142,7 +146,7 @@ case object Boolean extends AnyRef with DataType with Product with Serializable 
     criteria.requiredProperty.isDefined && requiredMetadata.exists(_.value.isEmpty)
   }
 }
-case object Decimal extends AnyRef with DataType with Product with Serializable
+case object Decimal extends DataType with Product with Serializable
 
 object DataType {
   def get(dataType: String): DataType = {
