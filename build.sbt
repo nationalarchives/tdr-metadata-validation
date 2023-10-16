@@ -5,9 +5,8 @@ import sbtrelease.ReleaseStateTransformations._
 ThisBuild / organization := "uk.gov.nationalarchives"
 ThisBuild / organizationName := "National Archives"
 
-scalaVersion := "2.13.11"
+scalaVersion := "2.13.12"
 version := version.value
-
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -18,10 +17,10 @@ ThisBuild / scmInfo := Some(
 
 developers := List(
   Developer(
-    id    = "tna-digital-archiving-jenkins",
-    name  = "TNA Digital Archiving",
+    id = "tna-digital-archiving-jenkins",
+    name = "TNA Digital Archiving",
     email = "digitalpreservation@nationalarchives.gov.uk",
-    url   = url("https://github.com/nationalarchives/tdr-metadata-validation")
+    url = url("https://github.com/nationalarchives/tdr-metadata-validation")
   )
 )
 
@@ -56,6 +55,6 @@ lazy val root = (project in file("."))
     name := "tdr-metadata-validation",
     libraryDependencies ++= Seq(
       commonsLang3,
-      scalaTest % Test,
+      scalaTest % Test
     )
   )
