@@ -110,7 +110,7 @@ class DataTypeSpec extends AnyWordSpec {
     }
 
     "checkValue should return an error if the length of the value is greater than the defined character limit" in {
-      Text.checkValue("123456", criteria) should be(Some(TOO_LONG_INPUT_ERROR))
+      Text.checkValue("123456", criteria) should be(Some(MAX_CHARACTER_LIMIT_INPUT_ERROR))
     }
   }
 
