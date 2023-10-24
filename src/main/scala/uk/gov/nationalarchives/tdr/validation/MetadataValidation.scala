@@ -7,7 +7,7 @@ import uk.gov.nationalarchives.tdr.validation.MetadataProperty._
 case class FileRow(fileName: String, metadata: List[Metadata])
 case class Error(propertyName: String, errorCode: String)
 
-class MetadataValidation(closureMetadataCriteria: MetadataCriteria, descriptiveMetadataCriteria: List[MetadataCriteria]) {
+class MetadataValidation(closureMetadataCriteria: MetadataCriteria, descriptiveMetadataCriteria: List[MetadataCriteria]) extends scala.Serializable {
 
   def validateMetadata(fileRows: List[FileRow]): Map[String, List[Error]] = {
     fileRows.map(row => row.fileName -> (validateClosureMetadata(row.metadata) ++ validateDescriptiveMetadata(row.metadata))).toMap

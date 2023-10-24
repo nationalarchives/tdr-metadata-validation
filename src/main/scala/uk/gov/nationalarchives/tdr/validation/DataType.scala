@@ -120,6 +120,7 @@ case object Text extends DataType with Product with Serializable {
     val definedValues = criteria.definedValues
     value match {
       case "" if criteria.required                                                                 => Some(EMPTY_VALUE_ERROR)
+      case v if criteria.characterLimit.exists(v.length > _)                                       => Some(MAX_CHARACTER_LIMIT_INPUT_ERROR)
       case v if definedValues.nonEmpty && !criteria.isMultiValueAllowed && v.split(",").length > 1 => Some(MULTI_VALUE_ERROR)
       case v if definedValues.nonEmpty && !v.split(",").toList.forall(definedValues.contains)      => Some(UNDEFINED_VALUE_ERROR)
       case _                                                                                       => None

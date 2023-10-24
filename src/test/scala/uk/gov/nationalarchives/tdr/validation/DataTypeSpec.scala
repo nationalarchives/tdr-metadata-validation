@@ -83,7 +83,7 @@ class DataTypeSpec extends AnyWordSpec {
 
   "Text" should {
 
-    val criteria = MetadataCriteria("Property1", Text, required = true, isFutureDateAllowed = false, isMultiValueAllowed = false, Nil, None, None)
+    val criteria = MetadataCriteria("Property1", Text, required = true, isFutureDateAllowed = false, isMultiValueAllowed = false, Nil, None, None, None, Some(5))
 
     "checkValue should not return any errors if the value is valid" in {
       Text.checkValue("hello", criteria) should be(None)
@@ -107,6 +107,10 @@ class DataTypeSpec extends AnyWordSpec {
 
     "checkValue should return an error if the value is not matching its defined values" in {
       Text.checkValue("22,44", criteria.copy(definedValues = List("22", "33"), isMultiValueAllowed = true)) should be(Some(UNDEFINED_VALUE_ERROR))
+    }
+
+    "checkValue should return an error if the length of the value is greater than the defined character limit" in {
+      Text.checkValue("123456", criteria) should be(Some(MAX_CHARACTER_LIMIT_INPUT_ERROR))
     }
   }
 

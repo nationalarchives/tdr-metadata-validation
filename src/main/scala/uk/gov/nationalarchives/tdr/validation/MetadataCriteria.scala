@@ -10,7 +10,8 @@ case class MetadataCriteria(
     definedValues: List[String],
     requiredProperty: Option[String] = None,
     dependencies: Option[Map[String, List[MetadataCriteria]]] = None,
-    defaultValue: Option[String] = None
+    defaultValue: Option[String] = None,
+    characterLimit: Option[Int] = Some(8000)
 )
 
 object MetadataProperty {
@@ -43,4 +44,5 @@ object ErrorCode {
   val MULTI_VALUE_ERROR = "MULTI_VALUE_ERROR"
   val UNDEFINED_VALUE_ERROR = "UNDEFINED_VALUE_ERROR"
   val REQUIRED_PROPERTY_IS_EMPTY = "REQUIRED_PROPERTY_IS_EMPTY"
+  val MAX_CHARACTER_LIMIT_INPUT_ERROR = "MAX_CHARACTER_LIMIT_INPUT_ERROR"
 }
