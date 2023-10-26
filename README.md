@@ -1,6 +1,6 @@
 # TDR Metadata Validation
 
-This validation library is used to validate closure & descriptive metadata as per the provided metadata criteria.
+This validation library is used to validate closure and descriptive metadata as per the provided metadata criteria.
 If the input values have any errors then it will return a list of error codes. You can use the error codes to render the client's specific error messages.
 
 ## How to use?
