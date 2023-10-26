@@ -5,7 +5,7 @@ import sbtrelease.ReleaseStateTransformations._
 ThisBuild / organization := "uk.gov.nationalarchives"
 ThisBuild / organizationName := "National Archives"
 
-scalaVersion := "2.13.11"
+scalaVersion := "2.13.12"
 version := version.value
 
 ThisBuild / scmInfo := Some(
