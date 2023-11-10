@@ -34,6 +34,7 @@ class DataTypeSpec extends AnyWordSpec {
     "checkValue should not return any errors if the date is valid" in {
       DateTime.checkValue("1990-12-10T00:00:00", criteria) should be(None)
       DateTime.checkValue("2000-2-29T00:00:00", criteria) should be(None)
+      DateTime.checkValue("1990-01-01 00:00:00.0", criteria) should be(None)
     }
 
     "checkValue should not return any errors if the value is empty but it is not mandatory" in {
@@ -43,6 +44,7 @@ class DataTypeSpec extends AnyWordSpec {
     "checkValue should not return any errors if future date is allowed" in {
       DateTime.checkValue("1990-12-10T00:00:00", criteria.copy(isFutureDateAllowed = true)) should be(None)
       DateTime.checkValue("2090-12-10T00:00:00", criteria.copy(isFutureDateAllowed = true)) should be(None)
+      DateTime.checkValue("2090-12-10 00:00:00", criteria.copy(isFutureDateAllowed = true)) should be(None)
     }
 
     "checkValue should return an error if the date format is invalid" in {
@@ -59,6 +61,7 @@ class DataTypeSpec extends AnyWordSpec {
       DateTime.checkValue("1990-10-T00:00:00", criteria) should be(Some(EMPTY_VALUE_ERROR_FOR_DAY))
       DateTime.checkValue("1990--10T00:00:00", criteria) should be(Some(EMPTY_VALUE_ERROR_FOR_MONTH))
       DateTime.checkValue("-10-10T00:00:00", criteria) should be(Some(EMPTY_VALUE_ERROR_FOR_YEAR))
+      DateTime.checkValue("-10-10 00:00:00", criteria) should be(Some(EMPTY_VALUE_ERROR_FOR_YEAR))
     }
 
     "checkValue should return an error if the day or month or year is not valid" in {
@@ -66,6 +69,7 @@ class DataTypeSpec extends AnyWordSpec {
       DateTime.checkValue("1990-28-10T00:00:00", criteria) should be(Some(INVALID_NUMBER_ERROR_FOR_MONTH))
       DateTime.checkValue("19999-10-10T00:00:00", criteria) should be(Some(INVALID_NUMBER_ERROR_FOR_YEAR))
       DateTime.checkValue("199-10-10T00:00:00", criteria) should be(Some(INVALID_NUMBER_ERROR_FOR_YEAR))
+      DateTime.checkValue("199-10-10 00:00:00", criteria) should be(Some(INVALID_NUMBER_ERROR_FOR_YEAR))
     }
 
     "checkValue should return an error if the day is not valid for given month" in {
@@ -74,6 +78,7 @@ class DataTypeSpec extends AnyWordSpec {
       DateTime.checkValue("1990-6-31T00:00:00", criteria) should be(Some(INVALID_DAY_FOR_MONTH_ERROR))
       DateTime.checkValue("1990-9-31T00:00:00", criteria) should be(Some(INVALID_DAY_FOR_MONTH_ERROR))
       DateTime.checkValue("1990-11-31T00:00:00", criteria) should be(Some(INVALID_DAY_FOR_MONTH_ERROR))
+      DateTime.checkValue("1990-11-31 00:00:00", criteria) should be(Some(INVALID_DAY_FOR_MONTH_ERROR))
     }
 
     "checkValue should return an error if future date is not allowed" in {
