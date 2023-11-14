@@ -24,7 +24,7 @@ case object DateTime extends DataType with Product with Serializable {
       case "" if criteria.required  => Some(EMPTY_VALUE_ERROR)
       case "" if !criteria.required => None
       case v =>
-        val date = v.replace("T", "-").split("[-:]")
+        val date = v.replaceAll("[T ]", ":").split("[/:]")
         if (date.length < 6) {
           Some(INVALID_DATE_FORMAT_ERROR)
         } else {

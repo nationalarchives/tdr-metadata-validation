@@ -20,7 +20,7 @@ class MetadataValidationSpec extends AnyFlatSpec {
       Metadata("ClosureType", "Closed"),
       Metadata("Property1", "yes"),
       Metadata("Property2", "hello"),
-      Metadata("Property3", "1990-10-10T00:00:00"),
+      Metadata("Property3", "1990/10/10T00:00:00"),
       Metadata("Property4", "90")
     )
     val metadataValidation = new MetadataValidation(closureMetadataCriteria, Nil)
@@ -104,7 +104,7 @@ class MetadataValidationSpec extends AnyFlatSpec {
       Metadata("ClosureType", "Closed"),
       Metadata("Property1", ""),
       Metadata("Property2", ""),
-      Metadata("Property3", "1990-55-10T00:00:00"),
+      Metadata("Property3", "1990/55/10T00:00:00"),
       Metadata("Property4", "tt")
     )
     val metadataValidation = new MetadataValidation(closureMetadataCriteria, Nil)
