@@ -22,6 +22,10 @@ class DataTypeSpec extends AnyWordSpec {
       Integer.checkValue("-1", criteria) should be(Some(NEGATIVE_NUMBER_ERROR))
     }
 
+    "checkValue should return an error if the value is '0'" in {
+      Integer.checkValue("0", criteria) should be(Some(ZERO_NUMBER_ERROR))
+    }
+
     "checkValue should not return any errors if the value is a valid number" in {
       Integer.checkValue("1", criteria) should be(None)
     }

@@ -13,6 +13,7 @@ case object Integer extends DataType with Product with Serializable {
       case "" if criteria.required            => Some(EMPTY_VALUE_ERROR)
       case t if allCatch.opt(t.toInt).isEmpty => Some(NUMBER_ONLY_ERROR)
       case t if t.toInt < 0                   => Some(NEGATIVE_NUMBER_ERROR)
+      case t if t.toInt == 0                  => Some(ZERO_NUMBER_ERROR)
       case _                                  => None
     }
   }
