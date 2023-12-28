@@ -2,6 +2,7 @@ package uk.gov.nationalarchives.tdr.validation
 
 import uk.gov.nationalarchives.tdr.validation.ErrorCode._
 
+import java.sql.Timestamp
 import java.time.{LocalDateTime, Year}
 import scala.util.control.Exception.allCatch
 
@@ -25,11 +26,16 @@ case object DateTime extends DataType with Product with Serializable {
       case "" if criteria.required  => Some(EMPTY_VALUE_ERROR)
       case "" if !criteria.required => None
       case v =>
-        val date = v.replaceAll("[T ]", ":").split("[/:]")
-        if (date.length < 6) {
-          Some(INVALID_DATE_FORMAT_ERROR)
+        val dateTime = allCatch.opt(Timestamp.valueOf(v).toLocalDateTime)
+        if (dateTime.isEmpty) {
+          val date = v.replaceAll("[T ]", ":").split("[/:]")
+          if (date.length < 6) {
+            Some(INVALID_DATE_FORMAT_ERROR)
+          } else {
+            validate(date(2), date(1), date(0), criteria)
+          }
         } else {
-          validate(date(2), date(1), date(0), criteria)
+          dateTime.flatMap(date => validate(date.getDayOfMonth.toString, date.getMonthValue.toString, date.getYear.toString, criteria))
         }
     }
   }

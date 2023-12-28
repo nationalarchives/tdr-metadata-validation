@@ -40,6 +40,7 @@ class DataTypeSpec extends AnyWordSpec {
       DateTime.checkValue("2000/2/29T00:00:00", criteria) should be(None)
       DateTime.checkValue("1990/01/01 00:00:00.0", criteria) should be(None)
       DateTime.checkValue("1990:01:01T00:00:00.0", criteria) should be(None)
+      DateTime.checkValue("1990-01-01 00:00:00.0", criteria) should be(None)
     }
 
     "checkValue should not return any errors if the value is empty but it is not mandatory" in {
