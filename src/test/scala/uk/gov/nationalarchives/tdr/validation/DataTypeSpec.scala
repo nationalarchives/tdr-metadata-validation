@@ -96,6 +96,12 @@ class DataTypeSpec extends AnyWordSpec {
     "checkValue should return an error if future date is not allowed" in {
       DateTime.checkValue("2050/2/1T00:00:00", criteria) should be(Some(FUTURE_DATE_ERROR))
     }
+
+    "checkValue should return errors in year, month, day precedence" in {
+      DateTime.checkValue("19900/35/35T00:00:00", criteria) should be(Some(INVALID_NUMBER_ERROR_FOR_YEAR))
+      DateTime.checkValue("1990/35/35T00:00:00", criteria) should be(Some(INVALID_NUMBER_ERROR_FOR_MONTH))
+      DateTime.checkValue("1990/12/35T00:00:00", criteria) should be(Some(INVALID_NUMBER_ERROR_FOR_DAY))
+    }
   }
 
   "Text" should {

@@ -3,7 +3,7 @@ package uk.gov.nationalarchives.tdr.validation
 import uk.gov.nationalarchives.tdr.validation.ErrorCode._
 
 import java.sql.Timestamp
-import java.time.{LocalDateTime, Year}
+import java.time.{LocalDateTime, Year, YearMonth}
 import scala.util.control.Exception.allCatch
 
 sealed trait DataType
@@ -43,15 +43,6 @@ case object DateTime extends DataType with Product with Serializable {
   val isInvalidDay: Int => Boolean = (day: Int) => day < 1 || day > 31
   val isInvalidMonth: Int => Boolean = (month: Int) => month < 1 || month > 12
   val isInvalidYear: Int => Boolean = (year: Int) => year.toString.length != 4
-  val isALeapYear: Int => Boolean = (year: Int) => Year.of(year).isLeap
-
-  lazy val monthsWithLessThan31Days: Map[Int, String] = Map(
-    2 -> "February",
-    4 -> "April",
-    6 -> "June",
-    9 -> "September",
-    11 -> "November"
-  )
 
   private def validate(day: String, month: String, year: String, criteria: MetadataCriteria): Option[String] = {
     val emptyDate: Boolean = day.isEmpty && month.isEmpty && year.isEmpty
@@ -64,11 +55,11 @@ case object DateTime extends DataType with Product with Serializable {
   }
 
   private def validateDateValues(day: String, month: String, year: String, criteria: MetadataCriteria): Option[String] = {
-    val dayError = validateDay(day)
-    val monthError = if (dayError.isEmpty) validateMonth(month) else dayError
-    val yearError = if (monthError.isEmpty) validateYear(year) else monthError
-    val dayForMonthError = if (yearError.isEmpty) checkDayForTheMonthAndYear(day.toInt, month.toInt, year.toInt) else yearError
-    if (dayForMonthError.isEmpty) checkIfFutureDateIsAllowed(day.toInt, month.toInt, year.toInt, criteria) else dayForMonthError
+    validateYear(year) orElse
+      validateMonth(month) orElse
+      validateDay(day) orElse
+      checkDayForTheMonthAndYear(day.toInt, month.toInt, year.toInt) orElse
+      checkIfFutureDateIsAllowed(day.toInt, month.toInt, year.toInt, criteria)
   }
 
   private def validateDay(day: String): Option[String] = {
@@ -102,15 +93,8 @@ case object DateTime extends DataType with Product with Serializable {
   }
 
   private def checkDayForTheMonthAndYear(dayNumber: Int, monthNumber: Int, yearNumber: Int): Option[String] = {
-    val monthHasLessThan31Days = monthsWithLessThan31Days.contains(monthNumber)
-
-    if (dayNumber > 30 && monthHasLessThan31Days || dayNumber == 30 && monthNumber == 2) {
-      Some(INVALID_DAY_FOR_MONTH_ERROR)
-    } else if (dayNumber == 29 && monthNumber == 2 && !isALeapYear(yearNumber)) {
-      Some(INVALID_DAY_FOR_MONTH_ERROR)
-    } else {
-      None
-    }
+    val daysInMonth = YearMonth.of(yearNumber, monthNumber).lengthOfMonth()
+    if (dayNumber < 1 || (dayNumber > daysInMonth)) Some(INVALID_DAY_FOR_MONTH_ERROR) else None
   }
 
   private def checkIfFutureDateIsAllowed(day: Int, month: Int, year: Int, criteria: MetadataCriteria): Option[String] =
