@@ -3,7 +3,7 @@ package uk.gov.nationalarchives.tdr.validation
 import uk.gov.nationalarchives.tdr.validation.ErrorCode._
 
 import java.sql.Timestamp
-import java.time.{LocalDateTime, Year, YearMonth}
+import java.time.{LocalDateTime, YearMonth}
 import scala.util.control.Exception.allCatch
 
 sealed trait DataType
