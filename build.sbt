@@ -55,6 +55,7 @@ lazy val root = (project in file("."))
     name := "tdr-metadata-validation",
     libraryDependencies ++= Seq(
       commonsLang3,
-      scalaTest % Test
+      scalaTest % Test,
+      jsonSchemaValidator
     )
   )

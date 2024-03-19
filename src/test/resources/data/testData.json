@@ -1,0 +1,13 @@
+{
+  "name": "John Doe",
+  "credit_card": 5555555555555555,
+  "billing_address": "555 Debtor's Lane",
+  "street_address": "24 Sussex Drive",
+  "country": "Canada",
+  "postal_code": "10000",
+  "uuid": "dd",
+  "closure_type": "open_on_transfer",
+  "closure_period": 4,
+  "retention_type": null
+
+}
