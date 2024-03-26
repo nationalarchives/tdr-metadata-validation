@@ -1,21 +1,19 @@
 package uk.gov.nationalarchives.tdr.validation
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
-import com.networknt.schema.{Format, Formats, JsonMetaSchema, JsonSchema, JsonSchemaFactory, NonValidationKeyword, SchemaId, SchemaValidatorsConfig, SpecVersion}
-import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
-
-import java.io.InputStream
+import com.networknt.schema._
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.nationalarchives.tdr.validation.schema.GreatValidator
+import uk.gov.nationalarchives.tdr.validation.schema.{FileExistsValidator, InThePastValidator}
 
-import java.util
+import java.io.InputStream
+
 
 class SchemaDataTypeSpec extends AnyWordSpec {
 
   "JSON schema validation" should {
 
-    val schemaPath = "/schema/closureSchema.json"
+    val schemaPath = "/schema/closureSchema.schema.json"
     val dataPath = "/data/testData.json"
     val schemaInputStream = getClass.getResourceAsStream(schemaPath)
     val schema = getJsonSchemaFromStreamContentV7(schemaInputStream)
@@ -25,7 +23,7 @@ class SchemaDataTypeSpec extends AnyWordSpec {
     "validate uuid in correct format" in {
       val errors = schema.validate(node)
       println(errors)
-      assert(errors.size() === 2)
+      assert(errors.size() === 3)
 
     }
 
@@ -33,39 +31,15 @@ class SchemaDataTypeSpec extends AnyWordSpec {
 
   def getJsonSchemaFromStreamContentV7(schemaContent: InputStream): JsonSchema = {
     val IRI = SchemaId.V7
-    val ID = "$id"
 
-
-    val myJsonMetaSchema: JsonMetaSchema = JsonMetaSchema
-      .builder(IRI)
-      .specification(SpecVersion.VersionFlag.V7)
-      .idKeyword(ID)
-      .formats(Formats.DEFAULT)
-      .keywords(
-        util.Arrays.asList(
-//          new NonValidationKeyword("$schema"),
-          new NonValidationKeyword("title"),
-          new NonValidationKeyword("description"),
-          new NonValidationKeyword("default"),
-          new NonValidationKeyword("definitions"),
-          new NonValidationKeyword("$comment"),
-          new NonValidationKeyword("examples"),
-          new NonValidationKeyword("then"),
-          new NonValidationKeyword("else"),
-          new NonValidationKeyword("additionalItems")
-        )
-      )
-      //.keyword(new GreatValidator)
-      .build()
 
     val sch = JsonMetaSchema.getV7
-    sch.getKeywords.put("great",new GreatValidator)
-
-    val factory1 = new JsonSchemaFactory.Builder().defaultMetaSchemaIri(IRI)
+    sch.getKeywords.put("inThePast", new InThePastValidator)
+    sch.getKeywords.put("fileExists", new FileExistsValidator)
+    val factory1 = new JsonSchemaFactory.Builder()
+      .defaultMetaSchemaIri(IRI)
       .metaSchema(sch)
-      .build();
-
-    val factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7)
+      .build()
 
     val config = new SchemaValidatorsConfig()
     config.setFormatAssertionsEnabled(true)

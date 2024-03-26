@@ -1,13 +1,11 @@
 {
-  "name": "John Doe",
-  "credit_card": 5555555555555555,
-  "billing_address": "555 Debtor's Lane",
-  "street_address": "24 Sussex Drive",
-  "country": "Canada",
-  "postal_code": "10000",
   "uuid": "dd",
-  "closure_type": "open_on_transfer",
-  "closure_period": 4,
-  "retention_type": null
-
+  "closure_type": "closed_for",
+  "closure_period": 0,
+  "retention_type": null,
+  "closure_start_date": "2002-09-24",
+  "identifier":"file:///E:/DADRI_001/content/windsor.pdf",
+  "foi_exemption_code":"23",
+  "description_public":"false",
+  "description_alternate": "my alternate"
 }
