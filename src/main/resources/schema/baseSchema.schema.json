@@ -8,11 +8,8 @@
       "message": {
         "format": "uuid must be a valid UUID"
       },
-     "fileExists": "using to ensure file has been trsnsferred"
+     "fileExists": "using to ensure file has been transferred"
     }
-  },
-  "required": [
-    "uuid"
-  ]
+  }
 }
 

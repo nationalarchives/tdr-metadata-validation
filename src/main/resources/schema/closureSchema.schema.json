@@ -3,15 +3,14 @@
   "type": "object",
   "properties": {
     "identifier": {
-      "type": "string",
-      "format": "uri"
+      "type": "string"
+
     },
     "foi_exemption_asserted": {
       "type": [
         "string",
         "null"
       ],
-      "format": "date",
       "csvSchema": "if($closure_type/is(\"open_on_transfer\"),empty, xDateTime) if($closure_type/is(\"closed_for\"),not($closure_start_date))"
     },
     "foi_exemption_code": {
@@ -26,6 +25,7 @@
         "30(1)",
         "30(2)",
         "31",
+        31,
         "32",
         "33",
         "34",
@@ -48,6 +48,7 @@
         "43(1)",
         "43(2)",
         "44",
+        "null",
         null
       ],
       "csvSchema": "if($closure_type/is(\"open_on_transfer\"),is(\"open\"),regex(\"(?:2[34689]|27\\([12]\\)|30\\([12]\\)|3[1-4689]|35\\(1\\)\\([abcd]\\)|37\\(1\\)\\((?:(?:a|ac|ad|b)\\)|a\\) old)|40\\(2\\)|43\\(2\\)|4[1-4])(?:,\\s?(?:2[34689]|27\\([12]\\)|30\\([12]\\)|3[1-4689]|35\\(1\\)\\([abcd]\\)|37\\(1\\)\\((?:(?:a|ac|ad|b)\\)|a\\) old)|40\\(2\\)|4[1-4]))*\"))"
@@ -77,7 +78,6 @@
         "string",
         "null"
       ],
-      "format": "date",
       "csvSchema": "if($closure_type/is(\"open_on_transfer\"),empty,xDateTime)"
     },
     "description_public": {
@@ -113,20 +113,14 @@
       "then": {
         "properties": {
           "closure_period": {
-            "const": 0
+            "type": ["number","null"]
           },
           "closure_start_date": {
-            "type": [
-              "string",
-              null
-            ],
+            "type": [ "string", "null"],
             "maxLength": 0
           },
           "foi_exemption_asserted": {
-            "type": [
-              "string",
-              null
-            ],
+            "type": ["string", "null"],
             "maxLength": 0
           }
         }
@@ -158,7 +152,7 @@
       "if" : {
         "properties": {
           "description_public": {
-             "pattern": "FALSE|false"
+             "pattern": "TRUE|true"
           }
         }
       },
@@ -173,7 +167,7 @@
       "else": {
         "properties": {
           "description_alternate": {
-            "type": ["string",null],
+            "type": ["string","null"],
             "maxLength": 0
           }
         }
