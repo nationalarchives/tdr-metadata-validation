@@ -1,8 +1,5 @@
 name: Deploy if not a version bump PR
 on:
-  pull_request:
-    types:
-      - closed
   push:
     branches:
       - fix-validation-issue
