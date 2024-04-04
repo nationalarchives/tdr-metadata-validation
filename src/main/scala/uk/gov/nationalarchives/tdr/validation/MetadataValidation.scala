@@ -41,9 +41,9 @@ class MetadataValidation(closureMetadataCriteria: MetadataCriteria, descriptiveM
   implicit class BooleanValue(value: String) {
     def toYesOrNo: String = {
       value match {
-        case "true" => "Yes"
+        case "true"  => "Yes"
         case "false" => "No"
-        case _ => value
+        case _       => value
       }
     }
   }
