@@ -32,20 +32,10 @@ class MetadataValidation(closureMetadataCriteria: MetadataCriteria, descriptiveM
   def hasClosureMetadata(input: List[Metadata], metadataCriteria: Option[List[MetadataCriteria]]): Boolean = {
     metadataCriteria.exists(
       _.exists(criteria =>
-        input.find(_.name == criteria.name).exists(_.value != criteria.defaultValue.map(_.toYesOrNo).getOrElse(""))
+        input.find(_.name == criteria.name).exists(_.value != criteria.defaultValue.getOrElse(""))
           || hasClosureMetadata(input, criteria.dependencies.flatMap(_.get(criteria.defaultValue.getOrElse(""))))
       )
     )
-  }
-
-  implicit class BooleanValue(value: String) {
-    def toYesOrNo: String = {
-      value match {
-        case "true"  => "Yes"
-        case "false" => "No"
-        case _       => value
-      }
-    }
   }
 
   def validateDescriptiveMetadata(input: List[Metadata]): List[Error] = validateMetadata(input, descriptiveMetadataCriteria)
