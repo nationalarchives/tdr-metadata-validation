@@ -45,7 +45,7 @@ class SchemaDataTypeSpec extends AnyWordSpec {
           case Success(y) => map + (y -> x._1)
           case _          => map
         }
-        val tdrDescription = Try({ x._2("tdrDescription").str })
+        val tdrDescription = Try({ x._2("tdrFileHeader").str })
         tdrDescription match {
           case Success(y) => acc + (y -> x._1)
           case _          => acc
