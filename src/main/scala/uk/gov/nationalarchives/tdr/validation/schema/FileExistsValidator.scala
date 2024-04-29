@@ -17,7 +17,10 @@ class FileExistsValidator extends AbstractKeyword("fileExists") {
 
       override def validate(executionContext: ExecutionContext, node: JsonNode, rootNode: JsonNode, instanceLocation: JsonNodePath): util.Set[ValidationMessage] = {
         println("checking file exists")
-        Collections.emptySet
+        val set:util.HashSet[ValidationMessage] = new util.HashSet[ValidationMessage]
+        val v = new ValidationMessage("checking file exists")
+        set.add(v)
+        set
       }
     }
 

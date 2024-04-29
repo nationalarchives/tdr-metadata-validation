@@ -15,7 +15,10 @@ class InThePastValidator extends AbstractKeyword("inThePast") {
     new AbstractJsonValidator(schemaLocation, evaluationPath, this,schemaNode) {
       override def validate(executionContext: ExecutionContext, node: JsonNode, rootNode: JsonNode, instanceLocation: JsonNodePath): util.Set[ValidationMessage] = {
         println("checking " + node + "is in the past")
-        Collections.emptySet
+        val set:util.HashSet[ValidationMessage] = new util.HashSet[ValidationMessage]
+        val v = new ValidationMessage("checking " + node + "is in the past")
+        set.add(v)
+        set
       }
     }
 

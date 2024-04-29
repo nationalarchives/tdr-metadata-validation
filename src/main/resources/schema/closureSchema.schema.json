@@ -181,7 +181,6 @@
     ]
   },
   "required": [
-    "identifier",
     "foi_exemption_asserted",
     "closure_period",
     "closure_start_date",

@@ -10,6 +10,7 @@ import org.apache.pekko.stream.connectors.csv.scaladsl.{CsvParsing, CsvToMap}
 import org.apache.pekko.stream.scaladsl.{FileIO, Sink}
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
+import ujson.Value
 import uk.gov.nationalarchives.tdr.validation.schema.{FileExistsValidator, InThePastValidator}
 
 import java.io.InputStream
@@ -18,10 +19,9 @@ import java.util
 import scala.collection.IterableOnce.iterableOnceExtensionMethods
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-
+import scala.util.{Success, Try}
 
 class SchemaDataTypeSpec extends AnyWordSpec {
-
 
   "JSON schema validation" should {
 
@@ -32,6 +32,29 @@ class SchemaDataTypeSpec extends AnyWordSpec {
     val dataInputStream = getClass.getResourceAsStream(dataPath)
     val node = getJsonNodeFromStreamContent(dataInputStream)
 
+    /*
+     * Data driven map
+     */
+    val headerMapper: Map[String, String] = {
+      val nodeSchema = getJsonNodeFromStreamContent(getClass.getResourceAsStream("/schema/baseSchema.schema.json"))
+      val r = ujson.read(nodeSchema.toPrettyString)
+      val properties: Value = r("properties")
+      properties.obj.foldLeft(Map.empty[String, String])((map, x) => {
+        val tdrName = Try({ x._2("tdrName").str })
+        val acc = tdrName match {
+          case Success(y) => map + (y -> x._1)
+          case _          => map
+        }
+        val tdrDescription = Try({ x._2("tdrDescription").str })
+        tdrDescription match {
+          case Success(y) => acc + (y -> x._1)
+          case _          => acc
+        }
+      })
+    }
+
+    println(headerMapper)
+
     import scala.jdk.CollectionConverters._
     import play.api.libs.json._
 
@@ -39,12 +62,11 @@ class SchemaDataTypeSpec extends AnyWordSpec {
 
     val mapper = new ObjectMapper()
     mapper.registerModule(DefaultScalaModule)
-    def mapToLineRow (input: Map[String, String])= {
-     val a: Map[String, Any] =  input.map( {case (key, value) => (transformKey(key), transformValue(value))})
-    // println(a)
+    def mapToLineRow(input: Map[String, String]) = {
+      val a: Map[String, Any] = input.map({ case (key, value) => (headerMapper.getOrElse(key, key), transformValue(value)) })
       val p = mapper.writeValueAsString(a)
       println(p)
-      val r = schema.validate(p,InputFormat.JSON)
+      val r = schema.validate(p, InputFormat.JSON)
       r
 
     }
@@ -52,15 +74,16 @@ class SchemaDataTypeSpec extends AnyWordSpec {
     "validate uuid in correct format" in {
       val file = Paths.get("/home/ian/Downloads/Metadata_Basic.csv")
       val future =
-        FileIO.fromPath(file)
+        FileIO
+          .fromPath(file)
           .via(CsvParsing.lineScanner())
           .via(CsvToMap.toMapAsStrings())
-          .async.map(mapToLineRow)
+          .async
+          .map(mapToLineRow)
           .runWith(Sink.foreach(println))
 
-
-   Await.result(future,Duration("20 seconds"))
-     // val errors = schema.validate(node)
+      Await.result(future, Duration("20 seconds"))
+      // val errors = schema.validate(node)
       assert(3 === 3)
 
     }
@@ -69,7 +92,6 @@ class SchemaDataTypeSpec extends AnyWordSpec {
 
   def getJsonSchemaFromStreamContentV7(schemaContent: InputStream): JsonSchema = {
     val IRI = SchemaId.V7
-
 
     val sch = JsonMetaSchema.getV7
     sch.getKeywords.put("inThePast", new InThePastValidator)
@@ -85,50 +107,18 @@ class SchemaDataTypeSpec extends AnyWordSpec {
     factory1.getSchema(schemaContent, config)
   }
 
-  def transformKey(key:String): String = {
-    val keyMap = Map("FOI decision asserted"->"foi_exemption_asserted",
-       "Alternative description" -> "description_alternate",
-       "FOI exemption code" -> "foi_exemption_code",
-       "Closure Period" -> "closure_period",
-       "Closure status" -> "closure_type",
-       "Translated title of record" -> "translated_title_of_record",
-       "Add alternative title without the file extension" -> "title_alternate",
-      "Alternative description" -> "description_alternate",
-      "Description" -> "description",
-      "Language" -> "language",
-      "Filename" -> "filename",
-      "Date of the record" -> "date_of_the_record",
-      "Is the description sensitive for the public?" -> "description_public",
-      "Closure Start Date" -> "closure_start_date",
-      "Is the title sensitive for the public?" -> "title_public",
-      "Former reference" -> "former_reference",
-      "Date last modified" -> "date_last_modified",
-      "Closure Start Date" -> "closure_start_date",
-      "Filepath" -> "identifier"
+  def transformValue(value: String): Any = {
 
-    )
-
-
-    keyMap.getOrElse(key,key)
-
-
-  }
-
-  def transformValue(value:String): Any = {
-
-    val valueMap = Map("Closed"->"closed_for",
-      "Open" -> "open_on_transfer",
-      "No" -> "FALSE",
-      "Yes" -> "true"
-    )
-    def convertToNull(value:String) ={
+    val valueMap = Map("Closed" -> "closed_for", "Open" -> "open_on_transfer", "No" -> "FALSE", "Yes" -> "true")
+    def convertToNull(value: String) = {
       value match {
         case "" => null
-        case _ => if(value.forall(Character.isDigit))  value.toInt
-        else value
+        case _ =>
+          if (value.forall(Character.isDigit)) value.toInt
+          else value
       }
     }
-    valueMap.getOrElse(value,convertToNull(value))
+    valueMap.getOrElse(value, convertToNull(value))
   }
 
   protected def getJsonNodeFromStreamContent(content: InputStream): JsonNode = {
