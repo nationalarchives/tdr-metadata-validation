@@ -8,12 +8,12 @@
         "null"
       ],
       "tdrName": "FileReference",
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "UUID": {
       "type": "string",
       "format": "uuid",
-      "tdrDescription": "FiledID value for the record",
+      "tdrFileHeader": "FiledID value for the record",
       "message": {
         "format": "uuid must be a valid UUID"
       },
@@ -26,7 +26,7 @@
       ],
       "pattern": "^$|^(0?[1-9]|[12][0-9]|3[01])[\\/\\-](0?[1-9]|1[012])[\\/\\-]\\d{4}$|\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d(?:\\.\\d+)?Z?",
       "tdrName": "ClientSideFileLastModifiedDate",
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "file_size": {
       "type": [
@@ -34,7 +34,7 @@
         "null"
       ],
       "tdrName": "ClientSideFileSize",
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "date_created": {
       "type": [
@@ -42,18 +42,18 @@
         "null"
       ],
       "pattern": "^$|^(0?[1-9]|[12][0-9]|3[01])[\\/\\-](0?[1-9]|1[012])[\\/\\-]\\d{4}$|\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d(?:\\.\\d+)?Z?",
-      "tdrDescription": null,
+      "tdrFileHeader": null,
       "tdrName": "date_created"
     },
     "date_range": {
       "type": "string",
       "tdrName": "date_range",
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "description": {
       "type": "string",
       "tdrName": "description",
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "end_date": {
       "type": [
@@ -69,17 +69,17 @@
         "null"
       ],
       "tdrName": "file_name_language",
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "file_name_translation": {
       "type": "string",
       "tdrName": "file_name_translation",
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "file_name_translation_language": {
       "type": "string",
       "tdrName": "file_name_translation_language",
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "file_name": {
       "type": [
@@ -87,27 +87,27 @@
         "null"
       ],
       "tdrName": "Filename",
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "held_by": {
       "type": "string",
       "tdrName": "HeldBy",
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "language": {
       "type": "string",
       "tdrName": "Language",
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "legal_status": {
       "type": "string",
       "tdrName": "LegalStatus",
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "rights_copyright": {
       "type": "string",
       "tdrName": "RightsCopyright",
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "start_date": {
       "type": [
@@ -116,12 +116,12 @@
       ],
       "pattern": "^$|^(0?[1-9]|[12][0-9]|3[01])[\\/\\-](0?[1-9]|1[012])[\\/\\-]\\d{4}$|\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d(?:\\.\\d+)?Z?",
       "tdrName": "start_date",
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "parent_reference": {
       "type": "string",
       "tdrName": "ParentReference",
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "description_public": {
       "enum": [
@@ -132,7 +132,7 @@
         null
       ],
       "tdrName": "description_public",
-      "tdrDescription": null,
+      "tdrFileHeader": null,
       "csvSchema": "if($description_alternate/notEmpty,is(\"FALSE\") or is(\"false\"),is(\"true\") or is(\"TRUE\")) or empty"
     },
     "description_alternate": {
@@ -141,7 +141,7 @@
         "null"
       ],
       "tdrName": "DescriptionAlternate",
-      "tdrDescription": null,
+      "tdrFileHeader": null,
       "csvSchema": "if($description_public/any(\"FALSE\",\"false\"),notEmpty,empty)"
     },
     "description_closed": {
@@ -153,7 +153,7 @@
         null
       ],
       "tdrName": "DescriptionClosed",
-      "tdrDescription": null,
+      "tdrFileHeader": null,
       "csvSchema": "if($description_public/any(\"FALSE\",\"false\"),notEmpty,empty)"
     },
     "foi_exemption_asserted": {
@@ -163,7 +163,7 @@
       ],
       "pattern": "^$|^(0?[1-9]|[12][0-9]|3[01])[\\/\\-](0?[1-9]|1[012])[\\/\\-]\\d{4}$|\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d(?:\\.\\d+)?Z?",
       "tdrName": "FoiExemptionAsserted",
-      "tdrDescription": "Date of the Advisory Council approval (or SIRO approval if appropriate)",
+      "tdrFileHeader": "Date of the Advisory Council approval (or SIRO approval if appropriate)",
       "csvSchema": "if($closure_type/is(\"open_on_transfer\"),empty, xDateTime) if($closure_type/is(\"closed_for\"),not($closure_start_date))"
     },
     "foi_exemption_code": {
@@ -207,7 +207,7 @@
         ]
       },
       "tdrName": "FoiExemptionCode",
-      "tdrDescription": "Select the exemption code that applies",
+      "tdrFileHeader": "Select the exemption code that applies",
       "csvSchema": "if($closure_type/is(\"open_on_transfer\"),is(\"open\"),regex(\"(?:2[34689]|27\\([12]\\)|30\\([12]\\)|3[1-4689]|35\\(1\\)\\([abcd]\\)|37\\(1\\)\\((?:(?:a|ac|ad|b)\\)|a\\) old)|40\\(2\\)|43\\(2\\)|4[1-4])(?:,\\s?(?:2[34689]|27\\([12]\\)|30\\([12]\\)|3[1-4689]|35\\(1\\)\\([abcd]\\)|37\\(1\\)\\((?:(?:a|ac|ad|b)\\)|a\\) old)|40\\(2\\)|4[1-4]))*\"))"
     },
     "closure_type": {
@@ -233,7 +233,7 @@
       ],
       "tdrName": "ClosurePeriod",
       "tdrAlt" : "Closure Period",
-      "tdrDescription": "Number of years the record is closed from the closure start date"
+      "tdrFileHeader": "Number of years the record is closed from the closure start date"
     },
     "closure_start_date": {
       "type": [
@@ -242,7 +242,7 @@
       ],
       "pattern": "^$|^(0?[1-9]|[12][0-9]|3[01])[\\/\\-](0?[1-9]|1[012])[\\/\\-]\\d{4}$|\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d(?:\\.\\d+)?Z?",
       "tdrName": "ClosureStartDate",
-      "tdrDescription": "This has been defaulted to the last date modified. If this is not correct, amend the field below.",
+      "tdrFileHeader": "This has been defaulted to the last date modified. If this is not correct, amend the field below.",
       "csvSchema": "if($closure_type/is(\"open_on_transfer\"),empty,xDateTime)"
     },
     "title_closed": {
@@ -261,14 +261,14 @@
         "string",
         "null"
       ],
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "creating_body": {
       "type": [
         "string",
         "null"
       ],
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "original_filepath": {
       "type": [
@@ -276,14 +276,14 @@
         "null"
       ],
       "tdrName": "OriginalFilepath",
-      "tdrDescription": "The original filepath of a redacted file"
+      "tdrFileHeader": "The original filepath of a redacted file"
     },
     "file_type": {
       "type": [
         "string",
         "null"
       ],
-      "tdrDescription": "States if the type is a file or folder",
+      "tdrFileHeader": "States if the type is a file or folder",
       "tdrName": "FileType"
     },
     "Server Checksum": {
@@ -292,7 +292,7 @@
         "null"
       ],
       "tdrName": "SHA256ServerSideChecksum",
-      "tdrDescription": null
+      "tdrFileHeader": null
     },
     "Checksum": {
       "type": [
@@ -300,7 +300,7 @@
         "null"
       ],
       "tdrName": "SHA256ClientSideChecksum",
-      "tdrDescription": null
+      "tdrFileHeader": null
     }
   }
 }
