@@ -15,6 +15,8 @@ import uk.gov.nationalarchives.tdr.validation.schema.{FileExistsValidator, InThe
 
 import java.io.InputStream
 import java.nio.file.Paths
+import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util
 import scala.collection.IterableOnce.iterableOnceExtensionMethods
 import scala.concurrent.duration.Duration
@@ -25,7 +27,7 @@ class SchemaDataTypeSpec extends AnyWordSpec {
 
   "JSON schema validation" should {
 
-    val schemaPath = "/schema/closureSchema.schema.json"
+    val schemaPath = "/schema/baseSchema.schema.json"
     val dataPath = "/data/testData.json"
     val schemaInputStream = getClass.getResourceAsStream(schemaPath)
     val schema = getJsonSchemaFromStreamContentV7(schemaInputStream)
@@ -40,9 +42,11 @@ class SchemaDataTypeSpec extends AnyWordSpec {
       val r = ujson.read(nodeSchema.toPrettyString)
       val properties: Value = r("properties")
       properties.obj.foldLeft(Map.empty[String, String])((map, x) => {
-        val tdrName = Try({ x._2("tdrName").str })
+        println(Try({x._2("type")}))
+        val tdrName = Try({ x._2("alternateKeys") })
+        tdrName
         val acc = tdrName match {
-          case Success(y) => map + (y -> x._1)
+          case Success(y) => map + (y(0)("tdrFileHeader").str -> x._1)
           case _          => map
         }
         val tdrDescription = Try({ x._2("tdrDescription").str })
@@ -63,7 +67,7 @@ class SchemaDataTypeSpec extends AnyWordSpec {
     val mapper = new ObjectMapper()
     mapper.registerModule(DefaultScalaModule)
     def mapToLineRow(input: Map[String, String]) = {
-      val a: Map[String, Any] = input.map({ case (key, value) => (headerMapper.getOrElse(key, key), transformValue(value)) })
+      val a: Map[String, Any] = input.map({ case (key, value) => (headerMapper.getOrElse(key, key), transformValue(headerMapper.getOrElse(key, key) ,value)) })
       val p = mapper.writeValueAsString(a)
       println(p)
       val r = schema.validate(p, InputFormat.JSON)
@@ -107,18 +111,32 @@ class SchemaDataTypeSpec extends AnyWordSpec {
     factory1.getSchema(schemaContent, config)
   }
 
-  def transformValue(value: String): Any = {
+  def transformValue(key:String, value: String): Any = {
 
-    val valueMap = Map("Closed" -> "closed_for", "Open" -> "open_on_transfer", "No" -> "FALSE", "Yes" -> "true")
-    def convertToNull(value: String) = {
-      value match {
-        case "" => null
-        case _ =>
-          if (value.forall(Character.isDigit)) value.toInt
-          else value
+
+    key match {
+        case "foi_exemption_code" => value.split(":")
+        case "closure_period" => value.length match {
+          case 0 => 0
+          case _ => value.toInt
+        }
+        case "date_last_modified" => value.length match {
+          case 0 => 0
+          case _ => {
+            val sourceFormat = new SimpleDateFormat("dd/MM/yyyy")
+            Try{sourceFormat.parse(value)} match {
+              case Success(a) => a
+              case _ => value
+            }
+          }
+        }
+        case "file_size" => value.length match {
+          case 0 => 0
+          case _ => value.toInt
+        }
+        case _ => value
       }
-    }
-    valueMap.getOrElse(value, convertToNull(value))
+
   }
 
   protected def getJsonNodeFromStreamContent(content: InputStream): JsonNode = {
