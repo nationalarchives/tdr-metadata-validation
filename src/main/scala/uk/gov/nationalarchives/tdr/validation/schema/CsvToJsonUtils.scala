@@ -19,7 +19,7 @@ import scala.util.{Success, Try}
 class CsvToJsonUtils {
 
   implicit val actorSystem: ActorSystem[Nothing] = ActorSystem[Nothing](Behaviors.empty, "pekko-connectors-samples")
-  //This will be grabbed from S3
+  // This will be grabbed from S3
   val schemaPath: String = "/schema/baseSchema.schema.json"
   val schemaInputStream: InputStream = getClass.getResourceAsStream(schemaPath)
   val schema: JsonSchema = getJsonSchemaFromStreamContentV7(schemaInputStream)
@@ -67,7 +67,7 @@ class CsvToJsonUtils {
 
   private def transformValue(key: String, value: String): Any = {
     key match {
-      case "FOI exemption code" => value.split("\\|")
+      case "FOI exemption code" | "language" => value.split("\\|")
       case "closure_period" =>
         value.length match {
           case 0 => 0
@@ -88,11 +88,12 @@ class CsvToJsonUtils {
           case 0 => 0
           case _ => value.toInt
         }
-      case "title_closed" => value match {
-        case "Yes" => true
-        case "No" => false
-        case _ => value
-      }
+      case "title_closed" | "description_closed" =>
+        value match {
+          case "Yes" => true
+          case "No"  => false
+          case _     => value
+        }
       case _ => value
     }
   }
