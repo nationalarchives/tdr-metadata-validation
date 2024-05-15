@@ -67,7 +67,7 @@ class SchemaDataTypeSpec extends AnyWordSpec {
     val mapper = new ObjectMapper()
     mapper.registerModule(DefaultScalaModule)
     def mapToLineRow(input: Map[String, String]) = {
-      val a: Map[String, Any] = input.map({ case (key, value) => (headerMapper.getOrElse(key, key), transformValue(headerMapper.getOrElse(key, key) ,value)) })
+      val a: Map[String, Any] = input.map({ case (key, value) => (headerMapper.getOrElse(key, key), myfunct(headerMapper.getOrElse(key, key))(value)) })
       val p = mapper.writeValueAsString(a)
       println(p)
       val r = schema.validate(p, InputFormat.JSON)
@@ -94,6 +94,22 @@ class SchemaDataTypeSpec extends AnyWordSpec {
 
   }
 
+  val generatedMap: Map[String, String => Any] = {
+    var m: Map[String, String => Any] = Map[String, String => Any]()
+    val arrayType  =  (str: String) => str.split("\\|")
+    val numberType = (str: String) => Try(str.toInt).getOrElse("")
+    m+= ("foi_exemption_code" -> arrayType)
+    m+= ("closure_period" -> numberType)
+    m+= ("default" -> ((str: String) => str))
+    m
+  }
+
+  val myfunct: String => String => Any = (key:String)  => {
+    if(generatedMap.contains(key)) generatedMap(key)
+    else generatedMap("default")
+  }
+
+
   def getJsonSchemaFromStreamContentV7(schemaContent: InputStream): JsonSchema = {
     val IRI = SchemaId.V7
 
@@ -109,34 +125,6 @@ class SchemaDataTypeSpec extends AnyWordSpec {
     config.setFormatAssertionsEnabled(true)
 
     factory1.getSchema(schemaContent, config)
-  }
-
-  def transformValue(key:String, value: String): Any = {
-
-
-    key match {
-        case "foi_exemption_code" => value.split(":")
-        case "closure_period" => value.length match {
-          case 0 => 0
-          case _ => value.toInt
-        }
-        case "date_last_modified" => value.length match {
-          case 0 => 0
-          case _ => {
-            val sourceFormat = new SimpleDateFormat("dd/MM/yyyy")
-            Try{sourceFormat.parse(value)} match {
-              case Success(a) => a
-              case _ => value
-            }
-          }
-        }
-        case "file_size" => value.length match {
-          case 0 => 0
-          case _ => value.toInt
-        }
-        case _ => value
-      }
-
   }
 
   protected def getJsonNodeFromStreamContent(content: InputStream): JsonNode = {
