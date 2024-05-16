@@ -101,8 +101,6 @@ class CsvToJsonUtils {
   private def getJsonSchemaFromStreamContentV7(schemaContent: InputStream): JsonSchema = {
     val IRI = SchemaId.V7
     val sch = JsonMetaSchema.getV7
-    sch.getKeywords.put("inThePast", new InThePastValidator)
-    sch.getKeywords.put("fileExists", new FileExistsValidator)
     val factory1 = new JsonSchemaFactory.Builder()
       .defaultMetaSchemaIri(IRI)
       .metaSchema(sch)

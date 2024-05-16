@@ -29,12 +29,15 @@
     "date_last_modified": {
       "type": "string",
       "format": "date",
+      "message": {
+        "format": "ERROR_DATE_LAST_MODIFIED_1"
+      },
       "alternateKeys": [
         {
           "tdrFileHeader": "Date Last Modified"
         }
       ],
-      "daBeforeToday": "DA last modified specifics"
+      "daDateLastModified": "DA last modified specifics"
     },
     "description": {
       "type": "string",
