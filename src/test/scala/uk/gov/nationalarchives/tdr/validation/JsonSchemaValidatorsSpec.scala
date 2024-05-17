@@ -2,7 +2,7 @@ package uk.gov.nationalarchives.tdr.validation
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinitions.BASE_SCHEMA
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaValidators
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaValidators.ValidationError
 
@@ -26,7 +26,24 @@ class JsonSchemaValidatorsSpec extends AnyWordSpec with Matchers {
           "date_last_modified":"2030-12-23"
         }"""
         val errors = JsonSchemaValidators.validateJson(BASE_SCHEMA, json)
-        errors.iterator().next().property shouldBe "date_last_modified"
+        errors.contains(ValidationError("date_last_modified","daDateBefore")) shouldBe true
+      }
+      "produce no error for date_last_modified if before today" in {
+        val json =
+          """{
+          "date_last_modified":"2023-12-23"
+        }"""
+        val errors = JsonSchemaValidators.validateJson(BASE_SCHEMA, json)
+        errors.size shouldBe 0
+      }
+      "produce only one error for date_last_modified if invalid format" in {
+        val json =
+          """{
+          "date_last_modified":"Wrong"
+        }"""
+        val errors = JsonSchemaValidators.validateJson(BASE_SCHEMA, json)
+        errors.size shouldBe 1
+        errors.contains(ValidationError("date_last_modified","format.date")) shouldBe true
       }
     }
   }
