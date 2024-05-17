@@ -58,7 +58,8 @@ lazy val root = (project in file("."))
       commonsLang3,
       scalaTest % Test,
       jsonSchemaValidator,
-      catsEffect
+      catsEffect,
+      nscalaTime
     )
   )
 

@@ -2,9 +2,10 @@ package uk.gov.nationalarchives.tdr.validation.schema.extensions
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.networknt.schema._
+import org.joda.time.DateTime
 
 import java.util
-import java.util.Collections
+import scala.util.{Failure, Success, Try}
 
 class DaBeforeToday extends AbstractKeyword("daBeforeToday") {
 
@@ -21,7 +22,11 @@ class DaBeforeToday extends AbstractKeyword("daBeforeToday") {
         val validationMessageBuilder = ValidationMessage.builder().instanceLocation(instanceLocation)
         validationMessageBuilder.message("daDateBefore")
         val errors = new util.HashSet[ValidationMessage]()
-        errors.add(validationMessageBuilder.build())
+        val date = Try( DateTime.parse(node.textValue))
+        date match {
+          case Failure(_) =>
+          case Success(value) => if (DateTime.now() isBefore value) errors.add(validationMessageBuilder.build())
+        }
         errors
       }
     }
