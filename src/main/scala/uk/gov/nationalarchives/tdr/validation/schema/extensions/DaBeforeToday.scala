@@ -20,7 +20,8 @@ class DaBeforeToday extends AbstractKeyword("daBeforeToday") {
     new AbstractJsonValidator(schemaLocation, evaluationPath, this, schemaNode) {
       override def validate(executionContext: ExecutionContext, node: JsonNode, rootNode: JsonNode, instanceLocation: JsonNodePath): util.Set[ValidationMessage] = {
         val validationMessageBuilder = ValidationMessage.builder().instanceLocation(instanceLocation)
-        validationMessageBuilder.message("daDateBefore")
+           .message("daDateBefore")
+           .messageKey("daDateBefore")
         val errors = new util.HashSet[ValidationMessage]()
         val date = Try( DateTime.parse(node.textValue))
         date match {
