@@ -25,12 +25,21 @@ class CSVtoJsonUtilsSpec extends AnyWordSpec {
           .via(CsvParsing.lineScanner())
           .via(CsvToMap.toMapAsStrings())
           .async
-          .map(utils.mapToLineRow)
+          .map(utils.convertToJSONString)
           .runWith(Sink.foreach(println))
 
       Await.result(future, Duration("20 seconds"))
       assert(Set.empty.size === 0)
     }
+
+    "Return the correct JSON for a `number` type" in {
+      val utils = new CSVtoJsonUtils()
+      //The test will need to read a baseSchema (should it read real one or a dummy?)
+      val testData = Map("Closure Period" -> "5", "Example2" -> "what")
+      val result = utils.convertToJSONString(testData)
+      assert(result == "")
+    }
+
   }
 
 }
