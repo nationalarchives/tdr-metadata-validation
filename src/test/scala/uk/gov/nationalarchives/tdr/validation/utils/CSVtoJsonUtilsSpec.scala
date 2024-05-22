@@ -34,12 +34,30 @@ class CSVtoJsonUtilsSpec extends AnyWordSpec {
 
     "Return the correct JSON for a `number` type" in {
       val utils = new CSVtoJsonUtils()
-      //The test will need to read a baseSchema (should it read real one or a dummy?)
-      val testData = Map("Closure Period" -> "5", "Example2" -> "what")
+      val testData = Map("Closure Period" -> "5")
       val result = utils.convertToJSONString(testData)
-      assert(result == "")
+      assert(result == """{"closure_period":5}""")
     }
 
-  }
+    "Return the correct JSON for a `array` type" in {
+      val utils = new CSVtoJsonUtils()
+      val testData = Map("FOI exemption code" -> "37(1)(ab)|44")
+      val result = utils.convertToJSONString(testData)
+      assert(result == """{"foi_exemption_code":["37(1)(ab)","44"]}""")
+    }
 
+    "Return the correct JSON for a `boolean` type" in {
+      val utils = new CSVtoJsonUtils()
+      val testData = Map("Is the title sensitive for the public?" -> "Yes", "Is the description sensitive for the public?" -> "No")
+      val result = utils.convertToJSONString(testData)
+      assert(result == """{"title_closed":true,"description_closed":false}""")
+    }
+
+    "Preserve key-value pairs when key is not in schema" in {
+      val utils = new CSVtoJsonUtils()
+      val testData = Map("unknown" -> "some value")
+      val result = utils.convertToJSONString(testData)
+      assert(result == """{"unknown":"some value"}""")
+    }
+  }
 }

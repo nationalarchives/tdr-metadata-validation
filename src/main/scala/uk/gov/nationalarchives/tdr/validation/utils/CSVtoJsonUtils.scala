@@ -2,17 +2,14 @@ package uk.gov.nationalarchives.tdr.validation.utils
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
 
 import java.io.InputStream
 
 class CSVtoJsonUtils {
 
   private case class ConvertedProperty(propertyName: String, convertValueFunc: String => Any)
-  private val schemaPath = "/schema/baseSchema.schema.json"
-//  val dataPath = "/data/testData.json"
-//  val dataInputStream = getClass.getResourceAsStream(dataPath)
-//  val node = getJsonNodeFromStreamContent(dataInputStream)
-  private val nodeSchema = getJsonNodeFromStreamContent(getClass.getResourceAsStream(schemaPath))
+  private val nodeSchema = getJsonNodeFromStreamContent(getClass.getResourceAsStream(BASE_SCHEMA.location))
   private val json = ujson.read(nodeSchema.toPrettyString)
 
   private def getJsonNodeFromStreamContent(content: InputStream): JsonNode = {
@@ -33,11 +30,13 @@ class CSVtoJsonUtils {
     propertyType match {
       case "number" => (str: String) => str.toInt
       case "array"  => (str: String) => str.split("\\|")
-      case "boolean" => {
-        case "Yes" => true
-        case "No"  => false
-        case str   => str
-      }
+      case "boolean" =>
+        (str: String) =>
+          str.toUpperCase match {
+            case "YES" => true
+            case "NO"  => false
+            case _     => str
+          }
       case _ => (str: String) => str
     }
   }
