@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
 
 import java.io.InputStream
+import scala.util.Try
 
 class CSVtoJsonUtils {
 
@@ -28,8 +29,8 @@ class CSVtoJsonUtils {
 
   private def convertValueFunction(propertyType: String): String => Any = {
     propertyType match {
-      case "number" => (str: String) => str.toInt
-      case "array"  => (str: String) => str.split("\\|")
+      case "number" => (str: String) => Try(str.toInt).getOrElse(str)
+      case "array"  => (str: String) => Try(str.split("\\|")).getOrElse(str)
       case "boolean" =>
         (str: String) =>
           str.toUpperCase match {
