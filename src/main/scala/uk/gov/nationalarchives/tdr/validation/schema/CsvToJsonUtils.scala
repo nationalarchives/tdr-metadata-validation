@@ -58,11 +58,16 @@ class CsvToJsonUtils {
   }
 
   private def mapToLineRow(input: Map[String, String]) = {
-    val mapper = new ObjectMapper()
+    val generatedJsonAsString = mapRowToJson(input)
+    schema.validate(generatedJsonAsString, InputFormat.JSON)
+  }
+
+  private def mapRowToJson(input: Map[String, String]) = {
+    val mapper: ObjectMapper = new ObjectMapper()
     mapper.registerModule(DefaultScalaModule)
     val generatedJson: Map[String, Any] = input.map({ case (key, value) => (headerMapper.getOrElse(key, key), transformValue(headerMapper.getOrElse(key, key), value)) })
-    val generatedJsonAsString = mapper.writeValueAsString(generatedJson)
-    schema.validate(generatedJsonAsString, InputFormat.JSON)
+    mapper.writeValueAsString(generatedJson)
+
   }
 
   private def transformValue(key: String, value: String): Any = {

@@ -5,10 +5,11 @@ import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinitions.BASE_
 import uk.gov.nationalarchives.tdr.validation.schema.extensions.DaBeforeToday
 
 import java.util
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 object JsonSchemaValidators {
 
-  private val validators: Map[JsonSchemaDefinitions, JsonSchema] = Map(BASE_SCHEMA -> baseJsonSchemaValidator)
+  private val validators: Map[JsonSchemaDefinition, JsonSchema] = Map(BASE_SCHEMA -> baseJsonSchemaValidator)
 
   private lazy val baseJsonSchemaValidator: JsonSchema = {
 
@@ -27,7 +28,8 @@ object JsonSchemaValidators {
     factory1.getSchema(schemaInputStream, config)
   }
 
-  def validateJson(jsonSchemaDefinitions: JsonSchemaDefinitions, json: String): util.Set[ValidationMessage] = {
-    validators(jsonSchemaDefinitions).validate(json, InputFormat.JSON)
+  def validateJson(jsonSchemaDefinition: JsonSchemaDefinition, json: String): Set[ValidationMessage] = {
+
+    validators(jsonSchemaDefinition).validate(json, InputFormat.JSON).asScala.toSet
   }
 }
