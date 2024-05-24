@@ -4,7 +4,7 @@ import com.networknt.schema.ValidationMessage
 import org.apache.pekko.NotUsed
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.scaladsl.{Flow, Sink, Source}
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinitions.BASE_SCHEMA
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
 import uk.gov.nationalarchives.tdr.validation.schema.MetadataValidationJsonSchema.JsonValidationErrorReasons.BASE_SCHEMA_VALIDATION
 import uk.gov.nationalarchives.tdr.validation.{Error, Metadata}
 
@@ -25,7 +25,7 @@ object MetadataValidationJsonSchema {
     implicit val ec: ExecutionContextExecutor = system.dispatcher
 
     val streamData = metadata.map(metadata => ValidationStreamData(schemaDefinition, metadata))
-    val execution: Future[Seq[(String, Set[Error])]] = Source(streamData).via(validationFlow).runWith(Sink.f.seq[(String, Set[Error])])
+    val execution: Future[Seq[(String, Set[Error])]] = Source(streamData).via(validationFlow).runWith(Sink.seq[(String, Set[Error])])
 
     val result: Try[Seq[(String, Set[Error])]] = Await.ready(execution, Duration.Inf).value.get
 
@@ -58,7 +58,7 @@ object MetadataValidationJsonSchema {
     val json = """
     {
         "description" : "hello",
-        "date_last_modified" : "12/10/2013"
+        "date_last_modified" : "2044-06-30T01:20+02:00"
     }""".stripMargin
     JsonData(data.schemaDefinition, data.metadata.identifier, json)
   }

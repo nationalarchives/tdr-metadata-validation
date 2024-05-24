@@ -162,7 +162,7 @@
       ],
       "items": {
         "type": "string",
-        "$ref": "file:/home/ian/nationalarchivesgithub/tdr-metadata-validation/src/main/resources/schema/definitionsSchema.schema.json#/definitions/foi_codes"
+        "$ref": "classpath:/draft-07/schema#/definitions/simpleTypes"
       },
       "message": {
         "format": "ERROR_FOI_EXEMPTION_CODE_1"

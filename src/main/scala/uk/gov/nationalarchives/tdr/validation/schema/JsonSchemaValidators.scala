@@ -1,35 +1,35 @@
 package uk.gov.nationalarchives.tdr.validation.schema
 
-import com.networknt.schema.{InputFormat, JsonMetaSchema, JsonSchema, JsonSchemaFactory, SchemaId, SchemaValidatorsConfig, ValidationMessage}
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinitions.BASE_SCHEMA
+import com.networknt.schema._
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
 import uk.gov.nationalarchives.tdr.validation.schema.extensions.DaBeforeToday
 
-import java.util
-import scala.jdk.CollectionConverters.CollectionHasAsScala
+import scala.jdk.CollectionConverters._
 
 object JsonSchemaValidators {
 
   private val validators: Map[JsonSchemaDefinition, JsonSchema] = Map(BASE_SCHEMA -> baseJsonSchemaValidator)
 
+  case class ValidationError(property: String, code: String)
+
   private lazy val baseJsonSchemaValidator: JsonSchema = {
 
-    println("building validator")
     val schemaInputStream = getClass.getResourceAsStream(BASE_SCHEMA.location)
-    val sch = JsonMetaSchema.getV7
-    sch.getKeywords.put("daBeforeToday", new DaBeforeToday)
-    val factory1 = new JsonSchemaFactory.Builder()
+
+    val schema = JsonMetaSchema.getV7
+    schema.getKeywords.put("daBeforeToday", new DaBeforeToday)
+    val jsonSchemaFactory = new JsonSchemaFactory.Builder()
       .defaultMetaSchemaIri(SchemaId.V7)
-      .metaSchema(sch)
+      .metaSchema(schema)
       .build()
 
-    val config = new SchemaValidatorsConfig()
-    config.setFormatAssertionsEnabled(true)
+    val schemaValidatorsConfig = new SchemaValidatorsConfig()
+    schemaValidatorsConfig.setFormatAssertionsEnabled(true)
 
-    factory1.getSchema(schemaInputStream, config)
+    jsonSchemaFactory.getSchema(schemaInputStream, schemaValidatorsConfig)
   }
 
-  def validateJson(jsonSchemaDefinition: JsonSchemaDefinition, json: String): Set[ValidationMessage] = {
-
-    validators(jsonSchemaDefinition).validate(json, InputFormat.JSON).asScala.toSet
+   def validateJson(jsonSchemaDefinitions: JsonSchemaDefinition,json:String): Set[ValidationMessage] = {
+      validators(jsonSchemaDefinitions).validate(json,InputFormat.JSON).asScala.toSet
   }
 }
