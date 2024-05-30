@@ -15,10 +15,8 @@ object JsonSchemaValidators {
   private lazy val baseJsonSchemaValidator: JsonSchema = {
 
     val schemaInputStream = getClass.getResourceAsStream(BASE_SCHEMA.location)
-    println("JKGJGJKJJJNJNOJJM")
-    println(schemaInputStream)
-
     val schema = JsonMetaSchema.getV7
+
     schema.getKeywords.put("daBeforeToday", new DaBeforeToday)
     val jsonSchemaFactory = new JsonSchemaFactory.Builder()
       .defaultMetaSchemaIri(SchemaId.V7)
