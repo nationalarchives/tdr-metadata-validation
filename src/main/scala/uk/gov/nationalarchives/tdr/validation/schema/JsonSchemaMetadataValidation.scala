@@ -9,11 +9,11 @@ object JsonSchemaMetadataValidation {
   def validateMetadata(jsonSchemaDefinition: JsonSchemaDefinition,fileRows: List[FileRow]): Map[String, List[ValidationMessage]] = {
     jsonSchemaDefinition match {
       case BASE_SCHEMA => fileRows.map(fileRow=> fileRow.fileName ->
-        JsonSchemaValidators.validateJson(jsonSchemaDefinition,convertToJon(fileRow)).toList).toMap
+        JsonSchemaValidators.validateJson(jsonSchemaDefinition,convertToJson(fileRow)).toList).toMap
     }
    }
 
-   private def convertToJon(fileRow: FileRow) = {
+   private def convertToJson(fileRow: FileRow) = {
     fileRow.metadata.map(data => (data.name ->data.value))
      val json =
        """{
@@ -24,5 +24,4 @@ object JsonSchemaMetadataValidation {
         }"""
      json
   }
-
 }

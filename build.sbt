@@ -5,7 +5,7 @@ import sbtrelease.ReleaseStateTransformations._
 ThisBuild / organization := "uk.gov.nationalarchives"
 ThisBuild / organizationName := "National Archives"
 
-scalaVersion := "2.13.12"
+scalaVersion := "2.13.14"
 version := version.value
 
 ThisBuild / scmInfo := Some(
@@ -57,17 +57,15 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       commonsLang3,
       scalaTest % Test,
+      ujson,
       jsonSchemaValidator,
+      jacksonModule,
+      pekkoActor,
+      pekkoConnectors,
+      pekkoStream,
+      pekkoTestKit % Test,
       catsEffect,
-      nscalaTime
+      nscalaTime,
+      playJson
     )
   )
-
-libraryDependencies += "org.apache.pekko" %% "pekko-actor-typed" % "1.0.2"
-libraryDependencies += "org.apache.pekko" %% "pekko-connectors-csv" % "1.0.2"
-libraryDependencies += "org.apache.pekko" %% "pekko-stream" % "1.0.2"
-libraryDependencies += "com.typesafe.play" %% "play-json" % "2.10.4"
-libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.17.0"
-libraryDependencies += "com.lihaoyi" % "ujson_native0.5_2.13" % "3.3.0"
-val PekkoVersion = "1.0.2"
-libraryDependencies += "org.apache.pekko" %% "pekko-testkit" % PekkoVersion % Test

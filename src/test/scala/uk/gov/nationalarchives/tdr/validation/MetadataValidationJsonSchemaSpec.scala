@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.{AnyWordSpec, AnyWordSpecLike}
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
 import uk.gov.nationalarchives.tdr.validation.schema.MetadataValidationJsonSchema.{ObjectMetadata, ValidationStreamData, validationFlow}
-import uk.gov.nationalarchives.tdr.validation.schema.{CsvToJsonUtils, MetadataValidationJsonSchema}
+import uk.gov.nationalarchives.tdr.validation.schema.MetadataValidationJsonSchema
 
 import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.concurrent.duration.DurationInt
@@ -24,11 +24,9 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MySpec")) wi
         ObjectMetadata("file2", Set(dlm, description))
       )
 
-      println(MetadataValidationJsonSchema.validate(BASE_SCHEMA, data))
-      val streamData = data.map(metadata => ValidationStreamData(BASE_SCHEMA, metadata))
-      val execution = Source(streamData).via(validationFlow).runWith(Sink.foreach(println))
-      val result = Await.result(execution, 10.seconds)
-      println(result)
+      val validationErrors = MetadataValidationJsonSchema.validate(BASE_SCHEMA, data)
+
+
     }
   }
 }

@@ -4,7 +4,6 @@ import org.apache.pekko.actor.typed.ActorSystem
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.nationalarchives.tdr.validation.schema.CsvToJsonUtils
 
 class SchemaDataTypeSpec extends AnyWordSpec {
 

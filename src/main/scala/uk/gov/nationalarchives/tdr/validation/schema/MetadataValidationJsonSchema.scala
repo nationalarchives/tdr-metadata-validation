@@ -1,57 +1,68 @@
 package uk.gov.nationalarchives.tdr.validation.schema
 
+import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import com.networknt.schema.ValidationMessage
 import org.apache.pekko.NotUsed
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.scaladsl.{Flow, Sink, Source}
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
-import uk.gov.nationalarchives.tdr.validation.schema.MetadataValidationJsonSchema.JsonValidationErrorReasons.BASE_SCHEMA_VALIDATION
+import uk.gov.nationalarchives.tdr.validation.schema.JsonValidationErrorReason.BASE_SCHEMA_VALIDATION
 import uk.gov.nationalarchives.tdr.validation.{Error, Metadata}
 
-import scala.concurrent.duration.{Duration, DurationInt}
-import scala.concurrent.{Await, ExecutionContextExecutor, Future}
-import scala.jdk.CollectionConverters.CollectionHasAsScala
-import scala.util.{Failure, Success, Try}
+import scala.concurrent.ExecutionContextExecutor
 
 object MetadataValidationJsonSchema {
+  implicit val system: ActorSystem = ActorSystem("QuickStart")
+  implicit val ec: ExecutionContextExecutor = system.dispatcher
 
   case class ObjectMetadata(identifier: String, metadata: Set[Metadata])
   case class ValidationStreamData(schemaDefinition: JsonSchemaDefinition, metadata: ObjectMetadata)
+  case class ValidationErrors(jsonValidationErrorReason: JsonValidationErrorReason, identifier: String, errors: Set[ValidationMessage])
+
   private case class JsonData(schemaDefinition: JsonSchemaDefinition, identifier: String, jsonData: String)
-  private case class ValidationErrors(jsonValidationErrorReason: JsonValidationErrorReason, identifier: String, errors: Set[ValidationMessage])
 
   def validate(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): Map[String, List[Error]] = {
-    implicit val system: ActorSystem = ActorSystem("QuickStart")
-    implicit val ec: ExecutionContextExecutor = system.dispatcher
 
-    val streamData = metadata.map(metadata => ValidationStreamData(schemaDefinition, metadata))
-    val execution: Future[Seq[(String, Set[Error])]] = Source(streamData).via(validationFlow).runWith(Sink.seq[(String, Set[Error])])
+    val validationProgram =  for {
+      validationErrors <- streamValidation(schemaDefinition, metadata)
+      userPrettyErrors <- processErrors(validationErrors)
+    } yield { userPrettyErrors.toMap }
 
-    val result: Try[Seq[(String, Set[Error])]] = Await.ready(execution, Duration.Inf).value.get
-
-    val resultEither = result match {
-      case Success(t) => t
-      case Failure(_) => Set[(String, Set[Error])]()
-    }
-    val accumulatorMap = scala.collection.mutable.Map.empty[String, List[Error]]
-    resultEither.foldLeft(accumulatorMap)((acc, x) => acc += x._1 -> x._2.toList).toMap
+    validationProgram.unsafeRunSync()
 
   }
 
-  def validationFlow: Flow[ValidationStreamData, (String, Set[Error]), NotUsed] = {
+  private def streamValidation(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): IO[Seq[ValidationErrors]] = {
+    IO.fromFuture(
+      IO(
+        Source(metadata.map(metadata => ValidationStreamData(schemaDefinition, metadata)))
+          .via(validationFlow)
+          .runWith(Sink.seq[ValidationErrors])
+      )
+    )
+  }
+
+  def validationFlow: Flow[ValidationStreamData, ValidationErrors, NotUsed] = {
     Flow[ValidationStreamData]
       .map(mapToJson)
       .map(validateWithSchema)
-      .map(convertErrors)
+
   }
 
   private def validateWithSchema: JsonData => ValidationErrors = (data: JsonData) => {
-    val errors = JsonSchemaValidators.validateJson(BASE_SCHEMA, data.jsonData)
-    ValidationErrors(BASE_SCHEMA_VALIDATION, data.identifier, errors)
+    data.schemaDefinition match {
+      case BASE_SCHEMA =>
+        val errors = JsonSchemaValidators.validateJson(data.schemaDefinition, data.jsonData)
+        ValidationErrors(BASE_SCHEMA_VALIDATION, data.identifier, errors)
+    }
   }
 
-  private def convertErrors: ValidationErrors => (String, Set[Error]) = (jsonErrors: ValidationErrors) => {
-    jsonErrors.identifier -> jsonErrors.errors.map(error => Error(error.getInstanceLocation.getName(0), error.getMessage))
+  /*
+   What we want to use for the errors has yet to be defined
+   */
+  private def processErrors(errors: Seq[MetadataValidationJsonSchema.ValidationErrors]): IO[Seq[(String, List[Error])]] = {
+    IO(errors.map(error => error.identifier -> error.errors.map(error => Error(error.getInstanceLocation.getName(0), error.getMessage)).toList))
   }
 
   private def mapToJson = (data: ValidationStreamData) => {
@@ -63,9 +74,4 @@ object MetadataValidationJsonSchema {
     JsonData(data.schemaDefinition, data.metadata.identifier, json)
   }
 
-  sealed abstract class JsonValidationErrorReason(val reason: String)
-
-  object JsonValidationErrorReasons {
-    final case object BASE_SCHEMA_VALIDATION extends JsonValidationErrorReason("/schema/baseSchema.schema.json")
-  }
 }
