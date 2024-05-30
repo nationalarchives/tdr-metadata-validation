@@ -60,12 +60,12 @@ lazy val root = (project in file("."))
       ujson,
       jsonSchemaValidator,
       jacksonModule,
+      metadataSchema,
       pekkoActor,
       pekkoConnectors,
       pekkoStream,
       pekkoTestKit % Test,
       catsEffect,
-      nscalaTime,
-      playJson
+      nscalaTime
     )
   )

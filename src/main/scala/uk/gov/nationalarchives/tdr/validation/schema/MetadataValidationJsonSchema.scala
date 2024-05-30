@@ -8,6 +8,7 @@ import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.scaladsl.{Flow, Sink, Source}
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
 import uk.gov.nationalarchives.tdr.validation.schema.JsonValidationErrorReason.BASE_SCHEMA_VALIDATION
+import uk.gov.nationalarchives.tdr.validation.utils.CSVtoJsonUtils
 import uk.gov.nationalarchives.tdr.validation.{Error, Metadata}
 
 import scala.concurrent.ExecutionContextExecutor
@@ -24,7 +25,7 @@ object MetadataValidationJsonSchema {
 
   def validate(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): Map[String, List[Error]] = {
 
-    val validationProgram =  for {
+    val validationProgram = for {
       validationErrors <- streamValidation(schemaDefinition, metadata)
       userPrettyErrors <- processErrors(validationErrors)
     } yield { userPrettyErrors.toMap }
@@ -66,12 +67,9 @@ object MetadataValidationJsonSchema {
   }
 
   private def mapToJson = (data: ValidationStreamData) => {
-    val json = """
-    {
-        "description" : "hello",
-        "date_last_modified" : "2044-06-30T01:20+02:00"
-    }""".stripMargin
-    JsonData(data.schemaDefinition, data.metadata.identifier, json)
+    val mapData = data.metadata.metadata.foldLeft(Map.empty[String, String])((acc, z) => acc + (z.name -> z.value))
+    println(new CSVtoJsonUtils().convertToJSONString(mapData))
+    JsonData(data.schemaDefinition, data.metadata.identifier, new CSVtoJsonUtils().convertToJSONString(mapData))
   }
 
 }

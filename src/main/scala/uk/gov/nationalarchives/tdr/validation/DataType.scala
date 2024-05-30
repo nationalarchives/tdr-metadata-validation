@@ -3,7 +3,8 @@ package uk.gov.nationalarchives.tdr.validation
 import uk.gov.nationalarchives.tdr.validation.ErrorCode._
 
 import java.sql.Timestamp
-import java.time.{LocalDateTime, YearMonth}
+import java.time.format.DateTimeFormatter
+import java.time.{LocalDate, LocalDateTime, YearMonth}
 import scala.util.control.Exception.allCatch
 
 sealed trait DataType
@@ -22,11 +23,12 @@ case object Integer extends DataType with Product with Serializable {
 
 case object DateTime extends DataType with Product with Serializable {
   def checkValue(value: String, criteria: MetadataCriteria): Option[String] = {
+    val format = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     value match {
       case "" if criteria.required  => Some(EMPTY_VALUE_ERROR)
       case "" if !criteria.required => None
       case v =>
-        val dateTime = allCatch.opt(Timestamp.valueOf(v).toLocalDateTime)
+        val dateTime = allCatch.opt(Timestamp.valueOf(v).toLocalDateTime).orElse(allCatch.opt(LocalDate.parse(v, format).atStartOfDay()))
         if (dateTime.isEmpty) {
           val date = v.replaceAll("[T ]", ":").split("[/:]")
           if (date.length < 6) {
@@ -110,11 +112,11 @@ case object Text extends DataType with Product with Serializable {
   def checkValue(value: String, criteria: MetadataCriteria): Option[String] = {
     val definedValues = criteria.definedValues
     value match {
-      case "" if criteria.required                                                                 => Some(EMPTY_VALUE_ERROR)
-      case v if criteria.characterLimit.exists(v.length > _)                                       => Some(MAX_CHARACTER_LIMIT_INPUT_ERROR)
-      case v if definedValues.nonEmpty && !criteria.isMultiValueAllowed && v.split(",").length > 1 => Some(MULTI_VALUE_ERROR)
-      case v if definedValues.nonEmpty && !v.split(",").toList.forall(definedValues.contains)      => Some(UNDEFINED_VALUE_ERROR)
-      case _                                                                                       => None
+      case "" if criteria.required                                                                    => Some(EMPTY_VALUE_ERROR)
+      case v if criteria.characterLimit.exists(v.length > _)                                          => Some(MAX_CHARACTER_LIMIT_INPUT_ERROR)
+      case v if definedValues.nonEmpty && !criteria.isMultiValueAllowed && v.split("[,|]").length > 1 => Some(MULTI_VALUE_ERROR)
+      case v if definedValues.nonEmpty && !v.split("[,|]").toList.forall(definedValues.contains)      => Some(UNDEFINED_VALUE_ERROR)
+      case _                                                                                          => None
     }
   }
 }

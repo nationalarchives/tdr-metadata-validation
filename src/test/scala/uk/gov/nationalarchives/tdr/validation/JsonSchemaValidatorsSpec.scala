@@ -17,26 +17,26 @@ class JsonSchemaValidatorsSpec extends AnyWordSpec with Matchers {
         val errors = JsonSchemaValidators.validateJson(BASE_SCHEMA, json)
         errors.iterator.next().getInstanceLocation.getName(0) shouldBe "foi_exemption_code"
       }
-      "produce an error for date_last_modified if after today" in {
+      "produce an error for end_date if after today" in {
         val json =
           """{
-          "date_last_modified":"2030-12-23"
+          "end_date":"2030-12-23"
         }"""
         val errors = JsonSchemaValidators.validateJson(BASE_SCHEMA, json)
         errors.size shouldBe 1
       }
-      "produce no error for date_last_modified if before today" in {
+      "produce no error for end_date if before today" in {
         val json =
           """{
-          "date_last_modified":"2023-12-23"
+          "end_date":"2023-12-23"
         }"""
         val errors = JsonSchemaValidators.validateJson(BASE_SCHEMA, json)
         errors.size shouldBe 0
       }
-      "produce only one error for date_last_modified if invalid format" in {
+      "produce only one error for end_date if invalid format" in {
         val json =
           """{
-          "date_last_modified":"Wrong"
+          "end_date":"Wrong"
         }"""
         val errors = JsonSchemaValidators.validateJson(BASE_SCHEMA, json)
         errors.size shouldBe 1

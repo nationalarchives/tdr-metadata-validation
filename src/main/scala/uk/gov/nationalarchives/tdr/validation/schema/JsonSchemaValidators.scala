@@ -15,6 +15,8 @@ object JsonSchemaValidators {
   private lazy val baseJsonSchemaValidator: JsonSchema = {
 
     val schemaInputStream = getClass.getResourceAsStream(BASE_SCHEMA.location)
+    println("JKGJGJKJJJNJNOJJM")
+    println(schemaInputStream)
 
     val schema = JsonMetaSchema.getV7
     schema.getKeywords.put("daBeforeToday", new DaBeforeToday)
@@ -29,7 +31,7 @@ object JsonSchemaValidators {
     jsonSchemaFactory.getSchema(schemaInputStream, schemaValidatorsConfig)
   }
 
-   def validateJson(jsonSchemaDefinitions: JsonSchemaDefinition,json:String): Set[ValidationMessage] = {
-      validators(jsonSchemaDefinitions).validate(json,InputFormat.JSON).asScala.toSet
+  def validateJson(jsonSchemaDefinitions: JsonSchemaDefinition, json: String): Set[ValidationMessage] = {
+    validators(jsonSchemaDefinitions).validate(json, InputFormat.JSON).asScala.toSet
   }
 }

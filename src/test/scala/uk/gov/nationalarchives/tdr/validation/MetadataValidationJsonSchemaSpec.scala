@@ -17,16 +17,24 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MySpec")) wi
   "CsvToJsonUtils" should {
 
     "validate uuid in correct format" in {
-      val dlm = Metadata("DateLastModified", "23/12/2023")
+      val dlm = Metadata("Date last modified", "23/12/2023")
       val description = Metadata("Description", "Hello")
+      val language = Metadata("Language", "Banana")
       val data: Set[ObjectMetadata] = Set(
-        ObjectMetadata("file1", Set(dlm, description)),
+        ObjectMetadata("file1", Set(dlm, description, language)),
         ObjectMetadata("file2", Set(dlm, description))
       )
-
+      println("Hello")
       val validationErrors = MetadataValidationJsonSchema.validate(BASE_SCHEMA, data)
-
+      println(validationErrors)
 
     }
   }
+
+  val json = """
+    {
+        "description" : "hello",
+        "end_date" : "2044-06-30T01:20+02:00",
+        "language" : ["dd"]
+    }""".stripMargin
 }
