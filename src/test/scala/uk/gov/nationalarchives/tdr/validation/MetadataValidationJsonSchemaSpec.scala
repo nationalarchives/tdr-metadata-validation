@@ -106,6 +106,17 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MySpec")) wi
     }
   }
 
+  "MetadataValidationJsonSchema validate List[FileRow]" should {
+    "validate file rows" in {
+      val lastModified = Metadata("Date last modified", "12-12-2012")
+      val language = Metadata("Language", "Unknown")
+      val fileRow1 = FileRow("file_a", List(lastModified, language))
+      val fileRow2 = FileRow("file_b", List(lastModified, language))
+      val errors = MetadataValidationJsonSchema.validate(List(fileRow1, fileRow2))
+      errors.size shouldBe 2
+    }
+  }
+
   private def dataBuilder(key: String, value: String) = {
     val titleClosed = Metadata(key, value)
     Set(ObjectMetadata("file1", Set(titleClosed)))

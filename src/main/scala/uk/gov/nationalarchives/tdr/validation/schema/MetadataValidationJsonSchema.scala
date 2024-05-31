@@ -9,7 +9,7 @@ import org.apache.pekko.stream.scaladsl.{Flow, Sink, Source}
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
 import uk.gov.nationalarchives.tdr.validation.schema.JsonValidationErrorReason.BASE_SCHEMA_VALIDATION
 import uk.gov.nationalarchives.tdr.validation.utils.CSVtoJsonUtils
-import uk.gov.nationalarchives.tdr.validation.{Error, Metadata}
+import uk.gov.nationalarchives.tdr.validation.{Error, FileRow, Metadata}
 
 import scala.concurrent.ExecutionContextExecutor
 
@@ -44,6 +44,11 @@ object MetadataValidationJsonSchema {
    */
   def validate(metadata: Set[ObjectMetadata]): Map[String, List[Error]] = {
     validate(BASE_SCHEMA, metadata)
+  }
+
+  def validate(metadata: List[FileRow]): Map[String, List[Error]] = {
+    val convertedFileRows: Seq[ObjectMetadata] = metadata.map(fileRow => ObjectMetadata(fileRow.fileName, fileRow.metadata.toSet))
+    validate(BASE_SCHEMA, convertedFileRows.toSet)
   }
 
   private def streamValidation(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): IO[Seq[ValidationErrors]] = {
