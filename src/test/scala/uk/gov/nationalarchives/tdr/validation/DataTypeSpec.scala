@@ -41,6 +41,7 @@ class DataTypeSpec extends AnyWordSpec {
       DateTime.checkValue("1990/01/01 00:00:00.0", criteria) should be(None)
       DateTime.checkValue("1990:01:01T00:00:00.0", criteria) should be(None)
       DateTime.checkValue("1990-01-01 00:00:00.0", criteria) should be(None)
+      DateTime.checkValue("2020-05-29", criteria) should be(None)
     }
 
     "checkValue should not return any errors if the value is empty but it is not mandatory" in {
@@ -122,14 +123,17 @@ class DataTypeSpec extends AnyWordSpec {
 
     "checkValue should not return any errors if the value has multiple values but multiple values are allowed" in {
       Text.checkValue("22,44", criteria.copy(definedValues = List("22", "44"), isMultiValueAllowed = true)) should be(None)
+      Text.checkValue("22|44", criteria.copy(definedValues = List("22", "44"), isMultiValueAllowed = true)) should be(None)
     }
 
     "checkValue should return an error if the value has multiple values but multiple values are not allowed" in {
       Text.checkValue("22,44", criteria.copy(definedValues = List("22", "44"))) should be(Some(MULTI_VALUE_ERROR))
+      Text.checkValue("22|44", criteria.copy(definedValues = List("22", "44"))) should be(Some(MULTI_VALUE_ERROR))
     }
 
     "checkValue should return an error if the value is not matching its defined values" in {
       Text.checkValue("22,44", criteria.copy(definedValues = List("22", "33"), isMultiValueAllowed = true)) should be(Some(UNDEFINED_VALUE_ERROR))
+      Text.checkValue("22|44", criteria.copy(definedValues = List("22", "33"), isMultiValueAllowed = true)) should be(Some(UNDEFINED_VALUE_ERROR))
     }
 
     "checkValue should return an error if the length of the value is greater than the defined character limit" in {
