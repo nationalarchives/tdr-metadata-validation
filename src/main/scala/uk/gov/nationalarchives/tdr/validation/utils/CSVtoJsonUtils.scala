@@ -30,7 +30,7 @@ class CSVtoJsonUtils {
   private def convertValueFunction(propertyType: String): String => Any = {
     propertyType match {
       case "number" => (str: String) => Try(str.toInt).getOrElse(str)
-      case "array"  => (str: String) => Try(str.split("\\|")).getOrElse(str)
+      case "array"  => (str: String) => if (str.isEmpty) "" else str.split("\\|")
       case "boolean" =>
         (str: String) =>
           str.toUpperCase match {
