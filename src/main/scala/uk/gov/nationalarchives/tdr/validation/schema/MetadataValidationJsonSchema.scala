@@ -39,13 +39,6 @@ object MetadataValidationJsonSchema {
     validationProgram.unsafeRunSync()
   }
 
-  /*
-   Validate data. Validation rules defined in this class
-   */
-  def validate(metadata: Set[ObjectMetadata]): Map[String, List[Error]] = {
-    validate(BASE_SCHEMA, metadata)
-  }
-
   def validate(metadata: List[FileRow]): Map[String, List[Error]] = {
     val convertedFileRows: Seq[ObjectMetadata] = metadata.map(fileRow => ObjectMetadata(fileRow.fileName, fileRow.metadata.toSet))
     validate(BASE_SCHEMA, convertedFileRows.toSet)
