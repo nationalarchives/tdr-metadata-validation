@@ -91,10 +91,11 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MySpec")) wi
   }
 
   private def singleErrorCheck(validationErrors: Map[String, List[Error]], propertyName: String, value: Any): Unit = {
-    validationErrors.foreach(x => x._2.foreach(error => {
-      error.propertyName shouldBe propertyName
-      error.errorCode shouldBe value
-    }
-    ))
+    validationErrors.foreach(x =>
+      x._2.foreach(error => {
+        error.propertyName shouldBe propertyName
+        error.errorCode shouldBe value
+      })
+    )
   }
 }
