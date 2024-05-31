@@ -27,7 +27,7 @@ class DaBeforeToday extends AbstractKeyword("daBeforeToday") {
         val errors = new util.HashSet[ValidationMessage]()
         val date = Try(DateTime.parse(node.textValue))
         date match {
-          case Failure(_)     => println("OHHHHHHHHHHHHHHHHHHHHHHHHH")
+          case Failure(_)     => () // invalid date format caught with other checks
           case Success(value) => if (DateTime.now() isBefore value) errors.add(validationMessageBuilder.build())
         }
         errors

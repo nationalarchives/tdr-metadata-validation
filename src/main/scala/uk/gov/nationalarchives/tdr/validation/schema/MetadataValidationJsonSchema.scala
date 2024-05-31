@@ -14,24 +14,36 @@ import uk.gov.nationalarchives.tdr.validation.{Error, Metadata}
 import scala.concurrent.ExecutionContextExecutor
 
 object MetadataValidationJsonSchema {
-  implicit val system: ActorSystem = ActorSystem("QuickStart")
+  implicit val system: ActorSystem = ActorSystem("MetadataValidation")
   implicit val ec: ExecutionContextExecutor = system.dispatcher
 
   case class ObjectMetadata(identifier: String, metadata: Set[Metadata])
-  case class ValidationStreamData(schemaDefinition: JsonSchemaDefinition, metadata: ObjectMetadata)
-  case class ValidationErrors(jsonValidationErrorReason: JsonValidationErrorReason, identifier: String, errors: Set[ValidationMessage])
+
+  private case class ValidationStreamData(schemaDefinition: JsonSchemaDefinition, metadata: ObjectMetadata)
+
+  private case class ValidationErrors(jsonValidationErrorReason: JsonValidationErrorReason, identifier: String, errors: Set[ValidationMessage])
 
   private case class JsonData(schemaDefinition: JsonSchemaDefinition, identifier: String, jsonData: String)
 
+  /*
+   Validate against specified schema
+   */
   def validate(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): Map[String, List[Error]] = {
-
     val validationProgram = for {
       validationErrors <- streamValidation(schemaDefinition, metadata)
-      userPrettyErrors <- processErrors(validationErrors)
-    } yield { userPrettyErrors.toMap }
+      errors <- convertSchemaValidatorError(validationErrors)
+    } yield {
+      errors.toMap
+    }
 
     validationProgram.unsafeRunSync()
+  }
 
+  /*
+   Validate data. Validation rules defined in this class
+   */
+  def validate(metadata: Set[ObjectMetadata]): Map[String, List[Error]] = {
+    validate(BASE_SCHEMA, metadata)
   }
 
   private def streamValidation(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): IO[Seq[ValidationErrors]] = {
@@ -44,11 +56,10 @@ object MetadataValidationJsonSchema {
     )
   }
 
-  def validationFlow: Flow[ValidationStreamData, ValidationErrors, NotUsed] = {
+  private def validationFlow: Flow[ValidationStreamData, ValidationErrors, NotUsed] = {
     Flow[ValidationStreamData]
       .map(mapToJson)
       .map(validateWithSchema)
-
   }
 
   private def validateWithSchema: JsonData => ValidationErrors = (data: JsonData) => {
@@ -62,14 +73,13 @@ object MetadataValidationJsonSchema {
   /*
    What we want to use for the errors has yet to be defined
    */
-  private def processErrors(errors: Seq[MetadataValidationJsonSchema.ValidationErrors]): IO[Seq[(String, List[Error])]] = {
-    IO(errors.map(error => error.identifier -> error.errors.map(error => Error(error.getInstanceLocation.getName(0), error.getMessage)).toList))
+  private def convertSchemaValidatorError(errors: Seq[MetadataValidationJsonSchema.ValidationErrors]): IO[Seq[(String, List[Error])]] = {
+    IO(errors.map(error => error.identifier -> error.errors.map(error => Error(error.getInstanceLocation.getName(0), error.getMessageKey)).toList))
   }
 
   private def mapToJson = (data: ValidationStreamData) => {
     val mapData = data.metadata.metadata.foldLeft(Map.empty[String, String])((acc, z) => acc + (z.name -> z.value))
-    println(new CSVtoJsonUtils().convertToJSONString(mapData))
-    JsonData(data.schemaDefinition, data.metadata.identifier, new CSVtoJsonUtils().convertToJSONString(mapData))
+    JsonData(data.schemaDefinition, data.metadata.identifier, new CSVtoJsonUtils().convertToJSONString(mapData).replaceAll("\"\"", "null"))
   }
 
 }
