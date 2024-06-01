@@ -53,12 +53,12 @@ object MetadataValidationJsonSchema {
     )
   }
 
-  private def validateWithSchema(schemaDefinition: JsonSchemaDefinition) = {
-    (jsonData: JsonData) =>
-      schemaDefinition match {
-        case BASE_SCHEMA => val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
-          ValidationErrors(BASE_SCHEMA_VALIDATION, jsonData.identifier, errors)
-      }
+  private def validateWithSchema(schemaDefinition: JsonSchemaDefinition) = { (jsonData: JsonData) =>
+    schemaDefinition match {
+      case BASE_SCHEMA =>
+        val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
+        ValidationErrors(BASE_SCHEMA_VALIDATION, jsonData.identifier, errors)
+    }
   }
 
   /*
