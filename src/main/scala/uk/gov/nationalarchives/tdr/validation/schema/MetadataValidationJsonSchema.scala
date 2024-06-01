@@ -35,14 +35,14 @@ object MetadataValidationJsonSchema {
    */
   def validate(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): Map[String, List[Error]] = {
     val validationProgram = for {
-      validationErrors <- streamValidation(schemaDefinition, metadata)
+      validationErrors <- schemaValidation(schemaDefinition, metadata)
       errors <- convertSchemaValidatorError(validationErrors)
     } yield errors.toMap
 
     validationProgram.unsafeRunSync()
   }
 
-  private def streamValidation(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): IO[Seq[ValidationErrors]] = {
+  private def schemaValidation(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): IO[Seq[ValidationErrors]] = {
     IO.fromFuture(
       IO(
         Source(metadata)
