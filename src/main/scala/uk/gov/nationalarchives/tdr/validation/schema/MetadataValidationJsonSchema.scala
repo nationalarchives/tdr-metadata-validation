@@ -37,9 +37,7 @@ object MetadataValidationJsonSchema {
     val validationProgram = for {
       validationErrors <- streamValidation(schemaDefinition, metadata)
       errors <- convertSchemaValidatorError(validationErrors)
-    } yield {
-      errors.toMap
-    }
+    } yield errors.toMap
 
     validationProgram.unsafeRunSync()
   }
@@ -71,7 +69,7 @@ object MetadataValidationJsonSchema {
   }
 
   private def mapToJson: ObjectMetadata => JsonData = (data: ObjectMetadata) => {
-    val mapData = data.metadata.foldLeft(Map.empty[String, String])((acc, z) => acc + (z.name -> z.value))
+    val mapData = data.metadata.foldLeft(Map.empty[String, String])((acc, metadata) => acc + (metadata.name -> metadata.value))
     JsonData(data.identifier, csvToJsonUtils.convertToJSONString(mapData).replaceAll("\"\"", "null"))
   }
 }
