@@ -33,13 +33,13 @@ class JsonSchemaValidatorsSpec extends AnyWordSpec with Matchers {
         val errors = JsonSchemaValidators.validateJson(BASE_SCHEMA, json)
         errors.size shouldBe 0
       }
-      "produce only one error for end_date if invalid format" in {
+      "produce two errors for end_date if invalid format - one in standard schema check and one from daBeforeData" in {
         val json =
           """{
           "end_date":"Wrong"
         }"""
         val errors = JsonSchemaValidators.validateJson(BASE_SCHEMA, json)
-        errors.size shouldBe 1
+        errors.size shouldBe 2
 
       }
     }
