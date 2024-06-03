@@ -5,7 +5,7 @@ object Dependencies {
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.18"
   lazy val ujson = "com.lihaoyi" % "ujson_native0.5_2.13" % "3.3.1"
   lazy val jacksonModule = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.17.0"
-  lazy val metadataSchema = "uk.gov.nationalarchives" % "da-metadata-schema_3" % "0.0.22-SNAPSHOT"
+  lazy val metadataSchema = "uk.gov.nationalarchives" % "da-metadata-schema_3" % "0.0.22"
   lazy val jsonSchemaValidator = "com.networknt" % "json-schema-validator" % "1.4.0"
   lazy val pekkoActor = "org.apache.pekko" %% "pekko-actor-typed" % "1.0.2"
   lazy val pekkoConnectors = "org.apache.pekko" %% "pekko-connectors-csv" % "1.0.2"
