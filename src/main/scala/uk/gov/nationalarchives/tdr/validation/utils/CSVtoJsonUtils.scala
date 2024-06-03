@@ -61,7 +61,7 @@ class CSVtoJsonUtils {
   // Converts a CSV key-value pair to a JSON string with correct types
   def convertToJSONString(input: Map[String, String]): String = {
     val mapper = new ObjectMapper().registerModule(DefaultScalaModule)
-    val a: Map[String, Any] = input.map { case (key, value) =>
+    val dataConvertedToSchemaDefinitions: Map[String, Any] = input.map { case (key, value) =>
       propertyValueConverterMap.get(key) match {
         case Some(convertedProperty: ConvertedProperty) =>
           convertedProperty.propertyName -> convertedProperty.convertValueFunc(value)
@@ -69,7 +69,7 @@ class CSVtoJsonUtils {
           key -> value
       }
     }
-    val generatedJson = mapper.writeValueAsString(a)
+    val generatedJson = mapper.writeValueAsString(dataConvertedToSchemaDefinitions)
     generatedJson
   }
 }
