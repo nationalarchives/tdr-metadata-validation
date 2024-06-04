@@ -9,7 +9,7 @@ class JsonSchemaValidatorsSpec extends AnyWordSpec with Matchers {
 
   "JsonSchemaValidators" when {
     "validating using base schema" should {
-      "produce a unionType error for foi_exemption_code that is not in the definitions" in {
+      "produce a unionType error for foi_exemption_code that is not in the FOI code definitions" in {
         val json =
           """{
           "foi_exemption_code":"23"
