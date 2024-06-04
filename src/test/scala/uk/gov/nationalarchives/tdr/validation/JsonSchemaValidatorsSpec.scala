@@ -9,13 +9,15 @@ class JsonSchemaValidatorsSpec extends AnyWordSpec with Matchers {
 
   "JsonSchemaValidators" when {
     "validating using base schema" should {
-      "produce array error for foi_exemption_code" in {
+      "produce a unionType error for foi_exemption_code that is not in the definitions" in {
         val json =
           """{
           "foi_exemption_code":"23"
         }"""
         val errors = JsonSchemaValidators.validateJson(BASE_SCHEMA, json)
-        errors.iterator.next().getInstanceLocation.getName(0) shouldBe "foi_exemption_code"
+        val error = errors.iterator.next()
+        error.getInstanceLocation.getName(0) shouldBe "foi_exemption_code"
+        error.getMessageKey shouldBe "unionType"
       }
       "produce an error for end_date if after today" in {
         val json =
@@ -40,7 +42,6 @@ class JsonSchemaValidatorsSpec extends AnyWordSpec with Matchers {
         }"""
         val errors = JsonSchemaValidators.validateJson(BASE_SCHEMA, json)
         errors.size shouldBe 2
-
       }
     }
   }

@@ -8,7 +8,7 @@ import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_S
 import uk.gov.nationalarchives.tdr.validation.schema.MetadataValidationJsonSchema
 import uk.gov.nationalarchives.tdr.validation.schema.MetadataValidationJsonSchema.ObjectMetadata
 
-class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MySpec")) with ImplicitSender with AnyWordSpecLike {
+class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataValidationJsonSchemaSpec")) with ImplicitSender with AnyWordSpecLike {
 
   "MetadataValidationJsonSchema" should {
     "validate incorrect value in enumerated array" in {
@@ -27,16 +27,16 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MySpec")) wi
       val validationErrors = MetadataValidationJsonSchema.validate(BASE_SCHEMA, data)
       validationErrors("file1").size shouldBe 0
     }
-    "validate incorrect date" in {
+    "validate incorrect date format" in {
       val data: Set[ObjectMetadata] = dataBuilder("Date last modified", "12-12-2012")
       val validationErrors: Map[String, List[Error]] = MetadataValidationJsonSchema.validate(BASE_SCHEMA, data)
       validationErrors("file1").size shouldBe 1
+      singleErrorCheck(validationErrors, "date_last_modified", "format.date")
     }
-    "validate correct date" in {
+    "validate correct date format" in {
       val data: Set[ObjectMetadata] = dataBuilder("Date last modified", "2023-12-05")
       val validationErrors = MetadataValidationJsonSchema.validate(BASE_SCHEMA, data)
       validationErrors("file1").size shouldBe 0
-      singleErrorCheck(validationErrors, "date_last_modified", "format.date")
     }
     "validate date last modified must have a value" in {
       val data: Set[ObjectMetadata] = dataBuilder("Date last modified", "")
@@ -50,7 +50,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MySpec")) wi
       validationErrors("file1").size shouldBe 0
     }
     "validate end date must be before today" in {
-      val data: Set[ObjectMetadata] = dataBuilder("Date of the record", "2044-12-12")
+      val data: Set[ObjectMetadata] = dataBuilder("Date of the record", "3000-12-12")
       val validationErrors = MetadataValidationJsonSchema.validate(BASE_SCHEMA, data)
       validationErrors("file1").size shouldBe 1
       singleErrorCheck(validationErrors, "end_date", "daBeforeToday")
@@ -123,8 +123,8 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MySpec")) wi
   }
 
   private def singleErrorCheck(validationErrors: Map[String, List[Error]], propertyName: String, value: Any): Unit = {
-    validationErrors.foreach(x =>
-      x._2.foreach(error => {
+    validationErrors.foreach(objectIdentifierWithErrors =>
+      objectIdentifierWithErrors._2.foreach(error => {
         error.propertyName shouldBe propertyName
         error.errorCode shouldBe value
       })

@@ -10,8 +10,6 @@ object JsonSchemaValidators {
 
   private val validators: Map[JsonSchemaDefinition, JsonSchema] = Map(BASE_SCHEMA -> baseJsonSchemaValidator)
 
-  case class ValidationError(property: String, code: String)
-
   private lazy val baseJsonSchemaValidator: JsonSchema = {
 
     val schemaInputStream = getClass.getResourceAsStream(BASE_SCHEMA.location)
