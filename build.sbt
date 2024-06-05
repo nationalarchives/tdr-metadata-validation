@@ -57,7 +57,14 @@ lazy val root = (project in file("."))
       commonsLang3,
       scalaTest % Test,
       ujson,
+      jsonSchemaValidator,
       jacksonModule,
-      metadataSchema
+      metadataSchema,
+      pekkoActor,
+      pekkoConnectors,
+      pekkoStream,
+      pekkoTestKit % Test,
+      catsEffect,
+      nscalaTime
     )
   )
