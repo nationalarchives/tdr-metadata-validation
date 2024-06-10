@@ -5,8 +5,8 @@ import cats.effect.unsafe.implicits.global
 import com.networknt.schema.ValidationMessage
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.scaladsl.{Sink, Source}
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
-import uk.gov.nationalarchives.tdr.validation.schema.JsonValidationErrorReason.BASE_SCHEMA_VALIDATION
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA}
+import uk.gov.nationalarchives.tdr.validation.schema.JsonValidationErrorReason.{BASE_SCHEMA_VALIDATION, CLOSURE_SCHEMA_VALIDATION}
 import uk.gov.nationalarchives.tdr.validation.utils.CSVtoJsonUtils
 import uk.gov.nationalarchives.tdr.validation.{Error, FileRow, Metadata}
 
@@ -27,7 +27,14 @@ object MetadataValidationJsonSchema {
   // Interface for draft metadata validator
   def validate(metadata: List[FileRow]): Map[String, List[Error]] = {
     val convertedFileRows: Seq[ObjectMetadata] = metadata.map(fileRow => ObjectMetadata(fileRow.fileName, fileRow.metadata.toSet))
-    validate(BASE_SCHEMA, convertedFileRows.toSet)
+    val validationProgram = for {
+      validationErrors <- schemaValidation(BASE_SCHEMA, convertedFileRows.toSet)
+      closureValidationErrors <- schemaValidation(CLOSURE_SCHEMA, convertedFileRows.toSet)
+      errors <- convertSchemaValidatorError(validationErrors ++ closureValidationErrors)
+    } yield errors.toMap
+
+    validationProgram.unsafeRunSync()
+
   }
 
   /*
@@ -36,7 +43,7 @@ object MetadataValidationJsonSchema {
   def validate(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): Map[String, List[Error]] = {
     val validationProgram = for {
       validationErrors <- schemaValidation(schemaDefinition, metadata)
-      errors <- convertSchemaValidatorError(validationErrors)
+      errors <- convertSchemaValidatorError(validationErrors ++ closureValidationErrors)
     } yield errors.toMap
 
     validationProgram.unsafeRunSync()
@@ -58,6 +65,9 @@ object MetadataValidationJsonSchema {
       case BASE_SCHEMA =>
         val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
         ValidationErrors(BASE_SCHEMA_VALIDATION, jsonData.identifier, errors)
+      case CLOSURE_SCHEMA =>
+        val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
+        ValidationErrors(CLOSURE_SCHEMA_VALIDATION, jsonData.identifier, errors)
     }
   }
 
