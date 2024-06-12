@@ -180,7 +180,14 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
     Set(ObjectMetadata("file1", Set(metadata)))
   }
 
-  private def closureDataBuilder(closureStartDate: String, foiCodes: String, closurePeriod: String, foiDecisionAsserted: String, descriptionClosed: String, titleClosed: String): Set[ObjectMetadata] = {
+  private def closureDataBuilder(
+      closureStartDate: String,
+      foiCodes: String,
+      closurePeriod: String,
+      foiDecisionAsserted: String,
+      descriptionClosed: String,
+      titleClosed: String
+  ): Set[ObjectMetadata] = {
     Set(
       ObjectMetadata(
         "file1",
