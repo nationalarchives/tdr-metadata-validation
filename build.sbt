@@ -60,9 +60,6 @@ lazy val root = (project in file("."))
       jsonSchemaValidator,
       jacksonModule,
       metadataSchema,
-      pekkoActor,
-      pekkoConnectors,
-      pekkoStream,
       pekkoTestKit % Test,
       catsEffect,
       nscalaTime
