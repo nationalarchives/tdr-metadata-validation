@@ -4,6 +4,7 @@ import com.networknt.schema._
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA}
 import uk.gov.nationalarchives.tdr.validation.schema.extensions.DaBeforeToday
 
+import java.io.InputStream
 import scala.jdk.CollectionConverters._
 
 object JsonSchemaValidators {
@@ -14,17 +15,9 @@ object JsonSchemaValidators {
 
     val schemaInputStream = getClass.getResourceAsStream(BASE_SCHEMA.location)
     val schema = JsonMetaSchema.getV7
-
     schema.getKeywords.put("daBeforeToday", new DaBeforeToday)
-    val jsonSchemaFactory = new JsonSchemaFactory.Builder()
-      .defaultMetaSchemaIri(SchemaId.V7)
-      .metaSchema(schema)
-      .build()
 
-    val schemaValidatorsConfig = new SchemaValidatorsConfig()
-    schemaValidatorsConfig.setFormatAssertionsEnabled(true)
-
-    jsonSchemaFactory.getSchema(schemaInputStream, schemaValidatorsConfig)
+    createSchemaValidator(schema, schemaInputStream)
   }
 
   private lazy val closureJsonSchemaValidator: JsonSchema = {
@@ -32,11 +25,14 @@ object JsonSchemaValidators {
     val schemaInputStream = getClass.getResourceAsStream(CLOSURE_SCHEMA.location)
     val schema = JsonMetaSchema.getV7
 
+    createSchemaValidator(schema, schemaInputStream)
+  }
+
+  private def createSchemaValidator(schema: JsonMetaSchema, schemaInputStream: InputStream) = {
     val jsonSchemaFactory = new JsonSchemaFactory.Builder()
       .defaultMetaSchemaIri(SchemaId.V7)
       .metaSchema(schema)
       .build()
-
     val schemaValidatorsConfig = new SchemaValidatorsConfig()
     schemaValidatorsConfig.setFormatAssertionsEnabled(true)
 
