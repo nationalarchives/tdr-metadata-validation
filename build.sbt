@@ -1,6 +1,8 @@
 import Dependencies.*
 import sbt.url
+import sbtrelease.*
 import sbtrelease.ReleaseStateTransformations.*
+
 
 ThisBuild / organization := "uk.gov.nationalarchives"
 ThisBuild / organizationName := "National Archives"
@@ -48,6 +50,29 @@ releaseProcess := Seq[ReleaseStep](
 )
 
 enablePlugins(JavaAppPackaging)
+
+
+
+topLevelDirectory := Some("java")
+
+
+// removes all jar mappings in universal and appends the fat jar
+//mappings in Universal := {
+//  // universalMappings: Seq[(File,String)]
+//  val universalMappings = (mappings in Universal).value
+//  val fatJar = (assembly in Compile).value
+//  // removing means filtering
+//  val filtered = universalMappings filter {
+//    case (file, name) =>  ! name.endsWith(".jar")
+//  }
+//  // add the fat jar
+//  filtered :+ (fatJar -> ("lib/" + fatJar.getName))
+//}
+
+
+// the bash scripts classpath only needs the fat jar
+//scriptClasspath := Seq( (jarName in assembly).value )
+
 resolvers +=
   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
