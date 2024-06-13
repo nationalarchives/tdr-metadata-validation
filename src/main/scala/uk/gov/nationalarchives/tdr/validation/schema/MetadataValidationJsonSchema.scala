@@ -59,7 +59,11 @@ object MetadataValidationJsonSchema {
    What we want to use for the errors has yet to be defined
    */
   private def convertSchemaValidatorError(errors: Seq[MetadataValidationJsonSchema.ValidationErrors]): IO[Seq[(String, List[Error])]] = {
-    IO(errors.map(error => error.identifier -> error.errors.map(e => Error(Option(e.getProperty).getOrElse(e.getInstanceLocation.getName(0)), e.getMessageKey)).toList))
+    IO(errors.map(error => error.identifier -> error.errors.map(convertValidationMessageToError).toList))
+  }
+
+  private def convertValidationMessageToError(message: ValidationMessage): Error = {
+    Error(Option(message.getProperty).getOrElse(message.getInstanceLocation.getName(0)), message.getMessageKey)
   }
 
   private def mapToJson: ObjectMetadata => JsonData = (data: ObjectMetadata) => {

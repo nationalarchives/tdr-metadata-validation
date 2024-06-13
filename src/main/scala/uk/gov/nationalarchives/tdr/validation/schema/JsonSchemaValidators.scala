@@ -10,40 +10,26 @@ object JsonSchemaValidators {
 
   private val validators: Map[JsonSchemaDefinition, JsonSchema] = Map(BASE_SCHEMA -> baseJsonSchemaValidator, CLOSURE_SCHEMA -> closureJsonSchemaValidator)
 
-  private lazy val baseJsonSchemaValidator: JsonSchema = {
-
-    val schemaInputStream = getClass.getResourceAsStream(BASE_SCHEMA.location)
-    val schema = JsonMetaSchema.getV7
-
-    schema.getKeywords.put("daBeforeToday", new DaBeforeToday)
-    val jsonSchemaFactory = new JsonSchemaFactory.Builder()
-      .defaultMetaSchemaIri(SchemaId.V7)
-      .metaSchema(schema)
-      .build()
-
-    val schemaValidatorsConfig = new SchemaValidatorsConfig()
-    schemaValidatorsConfig.setFormatAssertionsEnabled(true)
-
-    jsonSchemaFactory.getSchema(schemaInputStream, schemaValidatorsConfig)
-  }
-
-  private lazy val closureJsonSchemaValidator: JsonSchema = {
-
-    val schemaInputStream = getClass.getResourceAsStream(CLOSURE_SCHEMA.location)
-    val schema = JsonMetaSchema.getV7
-
-    val jsonSchemaFactory = new JsonSchemaFactory.Builder()
-      .defaultMetaSchemaIri(SchemaId.V7)
-      .metaSchema(schema)
-      .build()
-
-    val schemaValidatorsConfig = new SchemaValidatorsConfig()
-    schemaValidatorsConfig.setFormatAssertionsEnabled(true)
-
-    jsonSchemaFactory.getSchema(schemaInputStream, schemaValidatorsConfig)
-  }
+  private lazy val baseJsonSchemaValidator: JsonSchema = getJsonSchema(BASE_SCHEMA, Map("daBeforeToday" -> new DaBeforeToday))
+  private lazy val closureJsonSchemaValidator: JsonSchema = getJsonSchema(CLOSURE_SCHEMA)
 
   def validateJson(jsonSchemaDefinitions: JsonSchemaDefinition, json: String): Set[ValidationMessage] = {
     validators(jsonSchemaDefinitions).validate(json, InputFormat.JSON).asScala.toSet
+  }
+
+  private def getJsonSchema(jsonSchemaDefinition: JsonSchemaDefinition, customSchemaKeywords: Map[String, Keyword] = Map.empty): JsonSchema = {
+    val schemaInputStream = getClass.getResourceAsStream(jsonSchemaDefinition.location)
+    val schema = JsonMetaSchema.getV7
+
+    schema.getKeywords.putAll(customSchemaKeywords.asJava)
+    val jsonSchemaFactory = new JsonSchemaFactory.Builder()
+      .defaultMetaSchemaIri(SchemaId.V7)
+      .metaSchema(schema)
+      .build()
+
+    val schemaValidatorsConfig = new SchemaValidatorsConfig()
+    schemaValidatorsConfig.setFormatAssertionsEnabled(true)
+
+    jsonSchemaFactory.getSchema(schemaInputStream, schemaValidatorsConfig)
   }
 }
