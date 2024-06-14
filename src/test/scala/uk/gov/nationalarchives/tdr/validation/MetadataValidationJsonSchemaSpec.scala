@@ -115,7 +115,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
     }
 
     "not return any errors when closure_type is Closed" in {
-      val data: Set[ObjectMetadata] = closureDataBuilder("1990-01-12", "33", "12", "1990-11-12", "false", "false")
+      val data: Set[ObjectMetadata] = closureDataBuilder("1990-01-12", "33", "12", "1990-11-12", "No", "No")
       val validationErrors = MetadataValidationJsonSchema.validate(CLOSURE_SCHEMA, data)
       validationErrors("file1") shouldBe List.empty
     }
@@ -144,8 +144,8 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
         Error("foi_exemption_code", "enum"),
         Error("closure_period", "minimum"),
         Error("foi_exemption_asserted", "format.date"),
-        Error("description_closed", "enum"),
-        Error("title_closed", "enum")
+        Error("description_closed", "type"),
+        Error("title_closed", "type")
       )
     }
 
@@ -158,8 +158,8 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
         Error("foi_exemption_code", "type"),
         Error("closure_period", "type"),
         Error("foi_exemption_asserted", "type"),
-        Error("description_closed", "enum"),
-        Error("title_closed", "enum")
+        Error("description_closed", "type"),
+        Error("title_closed", "type")
       )
     }
   }
@@ -197,7 +197,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
           Metadata("FOI exemption code", foiCodes),
           Metadata("Closure Period", closurePeriod),
           Metadata("FOI decision asserted", foiDecisionAsserted),
-          Metadata("description_closed", descriptionClosed),
+          Metadata("Is the description sensitive for the public?", descriptionClosed),
           Metadata("Is the title sensitive for the public?", titleClosed)
         )
       )
