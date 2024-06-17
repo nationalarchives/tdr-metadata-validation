@@ -1,6 +1,6 @@
-import Dependencies._
+import Dependencies.*
 import sbt.url
-import sbtrelease.ReleaseStateTransformations._
+import sbtrelease.ReleaseStateTransformations.*
 
 ThisBuild / organization := "uk.gov.nationalarchives"
 ThisBuild / organizationName := "National Archives"
@@ -55,6 +55,16 @@ lazy val root = (project in file("."))
     name := "tdr-metadata-validation",
     libraryDependencies ++= Seq(
       commonsLang3,
-      scalaTest % Test
+      scalaTest % Test,
+      ujson,
+      jsonSchemaValidator,
+      jacksonModule,
+      metadataSchema,
+      pekkoActor,
+      pekkoConnectors,
+      pekkoStream,
+      pekkoTestKit % Test,
+      catsEffect,
+      nscalaTime
     )
   )
