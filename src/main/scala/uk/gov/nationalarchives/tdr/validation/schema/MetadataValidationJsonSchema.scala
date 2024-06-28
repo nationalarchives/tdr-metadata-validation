@@ -12,6 +12,8 @@ object MetadataValidationJsonSchema {
 
   case class ObjectMetadata(identifier: String, metadata: Set[Metadata])
 
+  case class SchemaValidationResults(schemaLocation: String, schemaErrors: Map[String, List[Error]])
+
   private case class ValidationErrors(jsonValidationErrorReason: JsonValidationErrorReason, identifier: String, errors: Set[ValidationMessage])
 
   private case class JsonData(identifier: String, json: String)
@@ -32,16 +34,18 @@ object MetadataValidationJsonSchema {
   }
 
   /*
-   Validate against specified schema
+   Validate against multiple schemas
    */
-  def validate(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): Map[String, List[Error]] = {
-    val validationProgram = for {
-      jsonData <- IO(metadata.map(objectMetadata => mapToJson(objectMetadata)))
-      validationErrors <- IO(jsonData.map(jsonData => validateWithSchema(schemaDefinition)(jsonData)))
-      errors <- convertSchemaValidatorError(validationErrors.toSeq)
-    } yield errors.toMap
+  def validate(schemaDefinitions: Set[JsonSchemaDefinition], metadata: Set[ObjectMetadata]): Set[SchemaValidationResults] = {
+    val validationPrograms = schemaDefinitions.map(schema =>
+      for {
+        jsonData <- IO(metadata.map(objectMetadata => mapToJson(objectMetadata)))
+        validationErrors <- IO(jsonData.map(jsonData => validateWithSchema(schema)(jsonData)))
+        errors <- convertSchemaValidatorError(validationErrors.toSeq)
+      } yield SchemaValidationResults(schema.location, errors.toMap)
+    )
 
-    validationProgram.unsafeRunSync()
+    validationPrograms.map(_.unsafeRunSync())
   }
 
   private def validateWithSchema(schemaDefinition: JsonSchemaDefinition): JsonData => ValidationErrors = { (jsonData: JsonData) =>
