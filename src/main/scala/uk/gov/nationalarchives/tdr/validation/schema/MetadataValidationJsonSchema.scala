@@ -3,14 +3,10 @@ package uk.gov.nationalarchives.tdr.validation.schema
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import com.networknt.schema.ValidationMessage
-import org.apache.pekko.actor.ActorSystem
-import org.apache.pekko.stream.scaladsl.{Sink, Source}
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
-import uk.gov.nationalarchives.tdr.validation.schema.JsonValidationErrorReason.BASE_SCHEMA_VALIDATION
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA}
+import uk.gov.nationalarchives.tdr.validation.schema.JsonValidationErrorReason.{BASE_SCHEMA_VALIDATION, CLOSURE_SCHEMA_VALIDATION}
 import uk.gov.nationalarchives.tdr.validation.utils.CSVtoJsonUtils
 import uk.gov.nationalarchives.tdr.validation.{Error, FileRow, Metadata}
-
-import scala.concurrent.ExecutionContextExecutor
 
 object MetadataValidationJsonSchema {
 
@@ -20,14 +16,19 @@ object MetadataValidationJsonSchema {
 
   private case class JsonData(identifier: String, json: String)
 
-  implicit val system: ActorSystem = ActorSystem("MetadataValidation")
-  implicit val ec: ExecutionContextExecutor = system.dispatcher
   private val csvToJsonUtils = new CSVtoJsonUtils
 
   // Interface for draft metadata validator
   def validate(metadata: List[FileRow]): Map[String, List[Error]] = {
     val convertedFileRows: Seq[ObjectMetadata] = metadata.map(fileRow => ObjectMetadata(fileRow.fileName, fileRow.metadata.toSet))
-    validate(BASE_SCHEMA, convertedFileRows.toSet)
+    val validationProgram = for {
+      jsonData <- IO(convertedFileRows.map(objectMetadata => mapToJson(objectMetadata)))
+      validationErrors <- IO(jsonData.map(jsonData => validateWithSchema(BASE_SCHEMA)(jsonData)))
+      closureValidationErrors <- IO(jsonData.map(jsonData => validateWithSchema(CLOSURE_SCHEMA)(jsonData)))
+      errors <- convertSchemaValidatorError(validationErrors ++ closureValidationErrors)
+    } yield errors.toMap
+
+    validationProgram.unsafeRunSync()
   }
 
   /*
@@ -35,29 +36,22 @@ object MetadataValidationJsonSchema {
    */
   def validate(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): Map[String, List[Error]] = {
     val validationProgram = for {
-      validationErrors <- schemaValidation(schemaDefinition, metadata)
-      errors <- convertSchemaValidatorError(validationErrors)
+      jsonData <- IO(metadata.map(objectMetadata => mapToJson(objectMetadata)))
+      validationErrors <- IO(jsonData.map(jsonData => validateWithSchema(schemaDefinition)(jsonData)))
+      errors <- convertSchemaValidatorError(validationErrors.toSeq)
     } yield errors.toMap
 
     validationProgram.unsafeRunSync()
   }
 
-  private def schemaValidation(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): IO[Seq[ValidationErrors]] = {
-    IO.fromFuture(
-      IO(
-        Source(metadata)
-          .map(mapToJson)
-          .map(validateWithSchema(schemaDefinition))
-          .runWith(Sink.seq[ValidationErrors])
-      )
-    )
-  }
-
-  private def validateWithSchema(schemaDefinition: JsonSchemaDefinition) = { (jsonData: JsonData) =>
+  private def validateWithSchema(schemaDefinition: JsonSchemaDefinition): JsonData => ValidationErrors = { (jsonData: JsonData) =>
     schemaDefinition match {
       case BASE_SCHEMA =>
         val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
         ValidationErrors(BASE_SCHEMA_VALIDATION, jsonData.identifier, errors)
+      case CLOSURE_SCHEMA =>
+        val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
+        ValidationErrors(CLOSURE_SCHEMA_VALIDATION, jsonData.identifier, errors)
     }
   }
 
@@ -65,7 +59,11 @@ object MetadataValidationJsonSchema {
    What we want to use for the errors has yet to be defined
    */
   private def convertSchemaValidatorError(errors: Seq[MetadataValidationJsonSchema.ValidationErrors]): IO[Seq[(String, List[Error])]] = {
-    IO(errors.map(error => error.identifier -> error.errors.map(error => Error(error.getInstanceLocation.getName(0), error.getMessageKey)).toList))
+    IO(errors.map(error => error.identifier -> error.errors.map(convertValidationMessageToError).toList))
+  }
+
+  private def convertValidationMessageToError(message: ValidationMessage): Error = {
+    Error(Option(message.getProperty).getOrElse(message.getInstanceLocation.getName(0)), message.getMessageKey)
   }
 
   private def mapToJson: ObjectMetadata => JsonData = (data: ObjectMetadata) => {
