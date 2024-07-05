@@ -42,7 +42,7 @@ class CSVtoJsonUtils {
     }
   }
 
-  private val propertyValueConverterMap: Map[String, ConvertedProperty] = (for {
+  private def propertyValueConverterMap(alternativeKey: String): Map[String, ConvertedProperty] = (for {
     (propertyName, propertyValue) <- json("properties").obj
     propertyTypes = getPropertyType(propertyValue.obj)
     // Use propertyName if alternateKeys is absent
@@ -50,7 +50,7 @@ class CSVtoJsonUtils {
       case Some(alternateKeys) =>
         for {
           alternateKey <- alternateKeys.arr
-          header <- alternateKey.obj.get("tdrFileHeader").toSeq
+          header <- alternateKey.obj.get(alternativeKey).toSeq
         } yield header.str -> ConvertedProperty(propertyName, convertValueFunction(propertyType = propertyTypes))
       case None =>
         Seq(propertyName -> ConvertedProperty(propertyName, convertValueFunction(propertyType = propertyTypes)))
@@ -59,10 +59,10 @@ class CSVtoJsonUtils {
   } yield headerMapping).toMap
 
   // Converts a CSV key-value pair to a JSON string with correct types
-  def convertToJSONString(input: Map[String, String]): String = {
+  def convertToJSONString(input: Map[String, String], alternativeKey: String): String = {
     val mapper = new ObjectMapper().registerModule(DefaultScalaModule)
     val dataConvertedToSchemaDefinitions: Map[String, Any] = input.map { case (key, value) =>
-      propertyValueConverterMap.get(key) match {
+      propertyValueConverterMap(alternativeKey).get(key) match {
         case Some(convertedProperty: ConvertedProperty) =>
           convertedProperty.propertyName -> convertedProperty.convertValueFunc(value)
         case None =>
