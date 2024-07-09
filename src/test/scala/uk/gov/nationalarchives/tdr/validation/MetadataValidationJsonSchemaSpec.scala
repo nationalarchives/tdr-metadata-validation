@@ -43,7 +43,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
     }
   }
 
-  "MetadataValidationJsonSchema BASIC_SCHEMA" should {
+  "MetadataValidationJsonSchema BASE_SCHEMA" should {
     "validate incorrect value in enumerated array" in {
       val data: Set[ObjectMetadata] = dataBuilder("Language", "Unknown")
       val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA), data)
