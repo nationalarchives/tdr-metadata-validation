@@ -3,8 +3,8 @@ package uk.gov.nationalarchives.tdr.validation.schema
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import com.networknt.schema.ValidationMessage
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA}
-import uk.gov.nationalarchives.tdr.validation.schema.JsonValidationErrorReason.{BASE_SCHEMA_VALIDATION, CLOSURE_SCHEMA_VALIDATION}
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA, DATA_LOAD_SHAREPOINT_SCHEMA}
+import uk.gov.nationalarchives.tdr.validation.schema.JsonValidationErrorReason.{BASE_SCHEMA_VALIDATION, CLOSURE_SCHEMA_VALIDATION, DATA_LOAD_SHAREPOINT_SCHEMA_VALIDATION}
 import uk.gov.nationalarchives.tdr.validation.utils.CSVtoJsonUtils
 import uk.gov.nationalarchives.tdr.validation.{Error, FileRow, Metadata}
 
@@ -52,6 +52,9 @@ object MetadataValidationJsonSchema {
       case CLOSURE_SCHEMA =>
         val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
         ValidationErrors(CLOSURE_SCHEMA_VALIDATION, jsonData.identifier, errors)
+      case DATA_LOAD_SHAREPOINT_SCHEMA =>
+        val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
+        ValidationErrors(DATA_LOAD_SHAREPOINT_SCHEMA_VALIDATION, jsonData.identifier, errors)
     }
   }
 

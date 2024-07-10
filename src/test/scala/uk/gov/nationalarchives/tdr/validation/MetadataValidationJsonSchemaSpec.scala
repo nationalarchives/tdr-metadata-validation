@@ -4,13 +4,13 @@ import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.testkit.{ImplicitSender, TestKit}
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpecLike
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA}
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA, DATA_LOAD_SHAREPOINT_SCHEMA}
 import uk.gov.nationalarchives.tdr.validation.schema.MetadataValidationJsonSchema
 import uk.gov.nationalarchives.tdr.validation.schema.MetadataValidationJsonSchema.ObjectMetadata
 
 class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataValidationJsonSchemaSpec")) with ImplicitSender with AnyWordSpecLike {
 
-  "MetadataValidationJsonSchema BASIC_SCHEMA" should {
+  "MetadataValidationJsonSchema BASE_SCHEMA" should {
     "validate incorrect value in enumerated array" in {
       val data: Set[ObjectMetadata] = dataBuilder("Language", "Unknown")
       val validationErrors = MetadataValidationJsonSchema.validate(BASE_SCHEMA, data)
@@ -160,6 +160,38 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
         Error("foi_exemption_asserted", "type"),
         Error("description_closed", "type"),
         Error("title_closed", "type")
+      )
+    }
+  }
+
+  "MetadataValidationJsonSchema DATA_LOAD_SHAREPOINT_SCHEMA" should {
+    "validate if all required properties are present" in {
+      val validMetadata = Set(
+        Metadata("date_last_modified", "2001-12-12"),
+        Metadata("UUID", "b8b624e4-ec68-4e08-b5db-dfdc9ec84fea"),
+        Metadata("file_path", "a/filepath/filename1.docx"),
+        Metadata("client_side_checksum", "8b9118183f01b3df0fc5073feb68f0ecd5a7f85a88ed63ac7d0d242dc2aba2ea"),
+        Metadata("file_size", "26")
+      )
+      val data: Set[ObjectMetadata] = Set(
+        ObjectMetadata("file1", validMetadata)
+      )
+      val validationErrors = MetadataValidationJsonSchema.validate(DATA_LOAD_SHAREPOINT_SCHEMA, data)
+      validationErrors("file1").size shouldBe 0
+    }
+
+    "return errors if required properties are not present" in {
+      val data: Set[ObjectMetadata] = Set(
+        ObjectMetadata("file1", Set())
+      )
+      val validationErrors = MetadataValidationJsonSchema.validate(DATA_LOAD_SHAREPOINT_SCHEMA, data)
+      validationErrors("file1").size shouldBe 5
+      validationErrors("file1") should contain theSameElementsAs List(
+        Error("UUID", "required"),
+        Error("file_path", "required"),
+        Error("client_side_checksum", "required"),
+        Error("date_last_modified", "required"),
+        Error("file_size", "required")
       )
     }
   }

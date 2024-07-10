@@ -1,17 +1,22 @@
 package uk.gov.nationalarchives.tdr.validation.schema
 
 import com.networknt.schema._
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA}
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA, DATA_LOAD_SHAREPOINT_SCHEMA}
 import uk.gov.nationalarchives.tdr.validation.schema.extensions.DaBeforeToday
 
 import scala.jdk.CollectionConverters._
 
 object JsonSchemaValidators {
 
-  private val validators: Map[JsonSchemaDefinition, JsonSchema] = Map(BASE_SCHEMA -> baseJsonSchemaValidator, CLOSURE_SCHEMA -> closureJsonSchemaValidator)
+  private val validators: Map[JsonSchemaDefinition, JsonSchema] = Map(
+    BASE_SCHEMA -> baseJsonSchemaValidator,
+    CLOSURE_SCHEMA -> closureJsonSchemaValidator,
+    DATA_LOAD_SHAREPOINT_SCHEMA -> dataLoadSharePointJsonSchemaValidator
+  )
 
   private lazy val baseJsonSchemaValidator: JsonSchema = getJsonSchema(BASE_SCHEMA, Map("daBeforeToday" -> new DaBeforeToday))
   private lazy val closureJsonSchemaValidator: JsonSchema = getJsonSchema(CLOSURE_SCHEMA)
+  private lazy val dataLoadSharePointJsonSchemaValidator: JsonSchema = getJsonSchema(DATA_LOAD_SHAREPOINT_SCHEMA)
 
   def validateJson(jsonSchemaDefinitions: JsonSchemaDefinition, json: String): Set[ValidationMessage] = {
     validators(jsonSchemaDefinitions).validate(json, InputFormat.JSON).asScala.toSet
@@ -27,8 +32,10 @@ object JsonSchemaValidators {
       .metaSchema(schema)
       .build()
 
-    val schemaValidatorsConfig = new SchemaValidatorsConfig()
-    schemaValidatorsConfig.setFormatAssertionsEnabled(true)
+    val schemaValidatorsConfig = SchemaValidatorsConfig
+      .builder()
+      .formatAssertionsEnabled(true)
+      .build()
 
     jsonSchemaFactory.getSchema(schemaInputStream, schemaValidatorsConfig)
   }
