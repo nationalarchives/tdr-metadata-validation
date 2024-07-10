@@ -180,7 +180,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       validationErrors("file1").size shouldBe 0
     }
 
-    "return errors if required properties are not present" in {
+    "return errors for all missing required properties" in {
       val data: Set[ObjectMetadata] = Set(
         ObjectMetadata("file1", Set())
       )
