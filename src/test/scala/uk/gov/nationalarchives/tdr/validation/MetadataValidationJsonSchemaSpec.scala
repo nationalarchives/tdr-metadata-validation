@@ -167,11 +167,11 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
   "MetadataValidationJsonSchema DATA_LOAD_SHAREPOINT_SCHEMA" should {
     "validate if all required properties are present" in {
       val validMetadata = Set(
-        Metadata("date_last_modified", "2001-12-12"),
+        Metadata("ClientSideFileLastModifiedDate", "2001-12-12"),
         Metadata("UUID", "b8b624e4-ec68-4e08-b5db-dfdc9ec84fea"),
-        Metadata("file_path", "a/filepath/filename1.docx"),
-        Metadata("client_side_checksum", "8b9118183f01b3df0fc5073feb68f0ecd5a7f85a88ed63ac7d0d242dc2aba2ea"),
-        Metadata("file_size", "26")
+        Metadata("ClientSideOriginalFilepath", "a/filepath/filename1.docx"),
+        Metadata("SHA256ClientSideChecksum", "8b9118183f01b3df0fc5073feb68f0ecd5a7f85a88ed63ac7d0d242dc2aba2ea"),
+        Metadata("ClientSideFileSize", "26")
       )
       val data: Set[ObjectMetadata] = Set(
         ObjectMetadata("file1", validMetadata)
