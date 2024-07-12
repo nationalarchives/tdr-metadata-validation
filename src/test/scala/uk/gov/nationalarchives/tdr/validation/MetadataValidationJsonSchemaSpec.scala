@@ -4,9 +4,10 @@ import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.testkit.{ImplicitSender, TestKit}
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpecLike
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA}
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA, DATA_LOAD_SHAREPOINT_SCHEMA}
 import uk.gov.nationalarchives.tdr.validation.schema.{JsonSchemaDefinition, MetadataValidationJsonSchema}
 import uk.gov.nationalarchives.tdr.validation.schema.MetadataValidationJsonSchema.ObjectMetadata
+import uk.gov.nationalarchives.tdr.validation.utils.CSVtoJsonUtils
 
 class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataValidationJsonSchemaSpec")) with ImplicitSender with AnyWordSpecLike {
 
@@ -15,7 +16,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
     "validate data against all schema and return no errors if data valid" in {
       val data: Set[ObjectMetadata] =
         Set(ObjectMetadata("file1", Set(Metadata("closure_type", "Open")))) ++ dataBuilder("Language", "Welsh")
-      val validationResults = MetadataValidationJsonSchema.validate(schemaDefinitions, data)
+      val validationResults = MetadataValidationJsonSchema.validate(schemaDefinitions, data, Some("tdrFileHeader"))
       validationResults.size shouldBe 2
       validationResults.head.schemaLocation shouldBe BASE_SCHEMA.location
       validationResults.head.schemaErrors.head._2.size shouldBe 0
@@ -34,7 +35,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
             )
           )
         )
-      val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA, CLOSURE_SCHEMA), data)
+      val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA, CLOSURE_SCHEMA), data, Some("tdrFileHeader"))
       validationResults.size shouldBe 2
       validationResults.head.schemaLocation shouldBe BASE_SCHEMA.location
       validationResults.head.schemaErrors.head._2.size shouldBe 1
@@ -67,7 +68,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
     }
     "validate incorrect date format" in {
       val data: Set[ObjectMetadata] = dataBuilder("Date last modified", "12-12-2012")
-      val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA), data)
+      val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA), data, Some("tdrFileHeader"))
       validationResults.size shouldBe 1
       validationResults.head.schemaLocation shouldBe BASE_SCHEMA.location
       validationResults.head.schemaErrors("file1").size shouldBe 1
@@ -82,7 +83,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
     }
     "validate date last modified must have a value" in {
       val data: Set[ObjectMetadata] = dataBuilder("Date last modified", "")
-      val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA), data)
+      val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA), data, Some("tdrFileHeader"))
       validationResults.size shouldBe 1
       validationResults.head.schemaLocation shouldBe BASE_SCHEMA.location
       validationResults.head.schemaErrors("file1").size shouldBe 1
@@ -97,7 +98,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
     }
     "validate end date must be before today" in {
       val data: Set[ObjectMetadata] = dataBuilder("Date of the record", "3000-12-12")
-      val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA), data)
+      val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA), data, Some("tdrFileHeader"))
       validationResults.size shouldBe 1
       validationResults.head.schemaLocation shouldBe BASE_SCHEMA.location
       validationResults.head.schemaErrors("file1").size shouldBe 1
@@ -112,7 +113,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
     }
     "validate closure period must be less than 150" in {
       val data: Set[ObjectMetadata] = dataBuilder("Closure Period", "151")
-      val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA), data)
+      val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA), data, Some("tdrFileHeader"))
       validationResults.size shouldBe 1
       validationResults.head.schemaLocation shouldBe BASE_SCHEMA.location
       validationResults.head.schemaErrors("file1").size shouldBe 1
@@ -120,7 +121,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
     }
     "validate closure period must be at least 1" in {
       val data: Set[ObjectMetadata] = dataBuilder("Closure Period", "0")
-      val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA), data)
+      val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA), data, Some("tdrFileHeader"))
       validationResults.size shouldBe 1
       validationResults.head.schemaLocation shouldBe BASE_SCHEMA.location
       validationResults.head.schemaErrors("file1").size shouldBe 1
@@ -149,7 +150,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
     }
     "validate title closed not yes/no" in {
       val data: Set[ObjectMetadata] = dataBuilder("Is the title sensitive for the public?", "blah")
-      val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA), data)
+      val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA), data, Some("tdrFileHeader"))
       validationResults.size shouldBe 1
       validationResults.head.schemaLocation shouldBe BASE_SCHEMA.location
       validationResults.head.schemaErrors("file1").size shouldBe 1
@@ -164,7 +165,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
     }
     "validate file path must have content" in {
       val data: Set[ObjectMetadata] = dataBuilder("Filepath", "")
-      val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA), data)
+      val validationResults = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA), data, Some("tdrFileHeader"))
       validationResults.size shouldBe 1
       validationResults.head.schemaLocation shouldBe BASE_SCHEMA.location
       validationResults.head.schemaErrors("file1").size shouldBe 1
@@ -209,7 +210,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
 
     "return errors if required fields has invalid values when closure_type is Closed" in {
       val data: Set[ObjectMetadata] = closureDataBuilder("1990--12", "55", "-12", "1990--12", "tttt", "tttt")
-      val validationResults = MetadataValidationJsonSchema.validate(Set(CLOSURE_SCHEMA), data)
+      val validationResults = MetadataValidationJsonSchema.validate(Set(CLOSURE_SCHEMA), data, Some("tdrFileHeader"))
       validationResults.size shouldBe 1
       validationResults.head.schemaLocation shouldBe CLOSURE_SCHEMA.location
       validationResults.head.schemaErrors("file1").size shouldBe 6
@@ -225,7 +226,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
 
     "return errors if required fields have empty values when closure_type is Closed" in {
       val data: Set[ObjectMetadata] = closureDataBuilder("", "", "", "", "", "")
-      val validationResults = MetadataValidationJsonSchema.validate(Set(CLOSURE_SCHEMA), data)
+      val validationResults = MetadataValidationJsonSchema.validate(Set(CLOSURE_SCHEMA), data, Some("tdrFileHeader"))
       validationResults.size shouldBe 1
       validationResults.head.schemaLocation shouldBe CLOSURE_SCHEMA.location
       validationResults.head.schemaErrors("file1").size shouldBe 6
@@ -252,22 +253,25 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       val data: Set[ObjectMetadata] = Set(
         ObjectMetadata("file1", validMetadata)
       )
-      val validationErrors = MetadataValidationJsonSchema.validate(DATA_LOAD_SHAREPOINT_SCHEMA, data)
-      validationErrors("file1").size shouldBe 0
+      val validationErrors = MetadataValidationJsonSchema.validate(Set(DATA_LOAD_SHAREPOINT_SCHEMA), data, Some("tdrDataLoadHeader"))
+      validationErrors.size shouldBe 1
+      validationErrors.head.schemaErrors.size shouldBe 1
+      validationErrors.head.schemaErrors.head._2.size shouldBe 0
     }
 
     "return errors for all missing required properties" in {
       val data: Set[ObjectMetadata] = Set(
         ObjectMetadata("file1", Set())
       )
-      val validationErrors = MetadataValidationJsonSchema.validate(DATA_LOAD_SHAREPOINT_SCHEMA, data)
-      validationErrors("file1").size shouldBe 5
-      validationErrors("file1") should contain theSameElementsAs List(
+      val validationErrors = MetadataValidationJsonSchema.validate(Set(DATA_LOAD_SHAREPOINT_SCHEMA), data, Some("tdrDataLoadHeader"))
+      validationErrors.size shouldBe 1
+      validationErrors.head.schemaErrors.size shouldBe 1
+      validationErrors.head.schemaErrors.head._2 should contain theSameElementsAs List(
         Error("UUID", "required"),
-        Error("file_path", "required"),
-        Error("client_side_checksum", "required"),
-        Error("date_last_modified", "required"),
-        Error("file_size", "required")
+        Error("ClientSideFileSize", "required"),
+        Error("SHA256ClientSideChecksum", "required"),
+        Error("ClientSideFileLastModifiedDate", "required"),
+        Error("ClientSideOriginalFilepath", "required")
       )
     }
   }

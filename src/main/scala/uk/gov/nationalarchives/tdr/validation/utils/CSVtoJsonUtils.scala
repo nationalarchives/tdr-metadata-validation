@@ -42,7 +42,7 @@ class CSVtoJsonUtils {
     }
   }
 
-  private def propertyValueConverterMap(alternativeKey: String): Map[String, ConvertedProperty] = (for {
+  private def propertyValueConverterMap(alternativeKey: Option[String]): Map[String, ConvertedProperty] = (for {
     (propertyName, propertyValue) <- json("properties").obj
     propertyTypes = getPropertyType(propertyValue.obj)
     // Use propertyName if alternateKeys is absent
@@ -50,7 +50,7 @@ class CSVtoJsonUtils {
       case Some(alternateKeys) =>
         for {
           alternateKey <- alternateKeys.arr
-          header <- alternateKey.obj.get(alternativeKey).toSeq
+          header <- if (alternativeKey.nonEmpty) alternateKey.obj.get(alternativeKey.get).toSeq else Seq()
         } yield header.str -> ConvertedProperty(propertyName, convertValueFunction(propertyType = propertyTypes))
       case None =>
         Seq(propertyName -> ConvertedProperty(propertyName, convertValueFunction(propertyType = propertyTypes)))
@@ -59,7 +59,7 @@ class CSVtoJsonUtils {
   } yield headerMapping).toMap
 
   // Converts a CSV key-value pair to a JSON string with correct types
-  def convertToJSONString(input: Map[String, String], alternativeKey: String): String = {
+  def convertToJSONString(input: Map[String, String], alternativeKey: Option[String]): String = {
     val mapper = new ObjectMapper().registerModule(DefaultScalaModule)
     val dataConvertedToSchemaDefinitions: Map[String, Any] = input.map { case (key, value) =>
       propertyValueConverterMap(alternativeKey).get(key) match {
@@ -72,4 +72,16 @@ class CSVtoJsonUtils {
     val generatedJson = mapper.writeValueAsString(dataConvertedToSchemaDefinitions)
     generatedJson
   }
+
+  def propertyNameToAlternativeKeyMapping(alternativeKey: String): Map[String, String] = (for {
+    (propertyName, propertyValue) <- json("properties").obj
+    mapping = propertyValue.obj.get("alternateKeys") match {
+      case Some(alternateKeys) =>
+        for {
+          alternateKey <- alternateKeys.arr
+          alternativeHeader <- alternateKey.obj.get(alternativeKey).toSeq
+        } yield propertyName -> alternativeHeader.str
+      case None => Map()
+    }
+  } yield mapping).flatten.toMap
 }
