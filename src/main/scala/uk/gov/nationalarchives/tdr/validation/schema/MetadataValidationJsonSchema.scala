@@ -20,7 +20,7 @@ object MetadataValidationJsonSchema {
 
   // Interface for draft metadata validator
   def validate(metadata: List[FileRow]): Map[String, List[Error]] = {
-    val convertedFileRows: Seq[ObjectMetadata] = metadata.map(fileRow => ObjectMetadata(fileRow.fileName, fileRow.metadata.toSet))
+    val convertedFileRows: Seq[ObjectMetadata] = metadata.map(fileRow => ObjectMetadata(fileRow.matchIdentifier, fileRow.metadata.toSet))
     val validationProgram = for {
       jsonData <- IO(convertedFileRows.map(objectMetadata => mapToJson(objectMetadata)))
       validationErrors <- IO(jsonData.map(jsonData => validateWithSchema(BASE_SCHEMA)(jsonData)))
