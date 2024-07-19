@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
   private val pekkoVersion = "1.0.3"
 
-  lazy val commonsLang3 = "org.apache.commons" % "commons-lang3" % "3.14.0"
+  lazy val commonsLang3 = "org.apache.commons" % "commons-lang3" % "3.15.0"
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.19"
   lazy val ujson = "com.lihaoyi" % "ujson_native0.5_2.13" % "3.3.1"
   lazy val jacksonModule = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.17.2"
