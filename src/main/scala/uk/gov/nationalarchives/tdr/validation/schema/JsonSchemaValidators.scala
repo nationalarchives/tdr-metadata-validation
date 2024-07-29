@@ -19,16 +19,16 @@ object JsonSchemaValidators {
 
   private def getJsonSchema(jsonSchemaDefinition: JsonSchemaDefinition, customSchemaKeywords: Map[String, Keyword] = Map.empty): JsonSchema = {
     val schemaInputStream = getClass.getResourceAsStream(jsonSchemaDefinition.location)
-    val schema = JsonMetaSchema.getV7
+    val schema = JsonMetaSchema.getV202012
 
     schema.getKeywords.putAll(customSchemaKeywords.asJava)
     val jsonSchemaFactory = new JsonSchemaFactory.Builder()
-      .defaultMetaSchemaIri(SchemaId.V7)
+      .defaultMetaSchemaIri(SchemaId.V202012)
       .metaSchema(schema)
       .build()
 
-    val schemaValidatorsConfig = new SchemaValidatorsConfig()
-    schemaValidatorsConfig.setFormatAssertionsEnabled(true)
+    val schemaValidatorsConfig = SchemaValidatorsConfig.builder().formatAssertionsEnabled(true).build()
+
 
     jsonSchemaFactory.getSchema(schemaInputStream, schemaValidatorsConfig)
   }

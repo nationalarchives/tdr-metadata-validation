@@ -2,68 +2,83 @@ package uk.gov.nationalarchives.tdr.validation.schema
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
+import cats.syntax.all._
 import com.networknt.schema.ValidationMessage
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA}
 import uk.gov.nationalarchives.tdr.validation.schema.JsonValidationErrorReason.{BASE_SCHEMA_VALIDATION, CLOSURE_SCHEMA_VALIDATION}
 import uk.gov.nationalarchives.tdr.validation.utils.CSVtoJsonUtils
-import uk.gov.nationalarchives.tdr.validation.{Error, FileRow, Metadata}
+import uk.gov.nationalarchives.tdr.validation.{FileRow, Metadata}
+
+case class ValidationError(validationProcess: JsonValidationErrorReason, property: String, errorKey: String)
 
 object MetadataValidationJsonSchema {
 
   case class ObjectMetadata(identifier: String, metadata: Set[Metadata])
 
-  private case class ValidationErrors(jsonValidationErrorReason: JsonValidationErrorReason, identifier: String, errors: Set[ValidationMessage])
+  private case class ValidationErrorWithValidationMessages(jsonValidationErrorReason: JsonValidationErrorReason, identifier: String, errors: Set[ValidationMessage])
 
   private case class JsonData(identifier: String, json: String)
 
   private val csvToJsonUtils = new CSVtoJsonUtils
 
-  // Interface for draft metadata validator
-  def validate(metadata: List[FileRow]): Map[String, List[Error]] = {
+  def validate(schema: Seq[JsonSchemaDefinition], metadata: Seq[FileRow]): Map[String, Seq[ValidationError]] = {
     val convertedFileRows: Seq[ObjectMetadata] = metadata.map(fileRow => ObjectMetadata(fileRow.matchIdentifier, fileRow.metadata.toSet))
+
     val validationProgram = for {
       jsonData <- IO(convertedFileRows.map(objectMetadata => mapToJson(objectMetadata)))
-      validationErrors <- IO(jsonData.map(jsonData => validateWithSchema(BASE_SCHEMA)(jsonData)))
-      closureValidationErrors <- IO(jsonData.map(jsonData => validateWithSchema(CLOSURE_SCHEMA)(jsonData)))
-      errors <- convertSchemaValidatorError(validationErrors ++ closureValidationErrors)
-    } yield errors.toMap
+      schemaValidationErrors <- parallelSchemaValidation(schema, jsonData)
+      errors <- convertSchemaValidatorError(schemaValidationErrors.flatten)
+      combinedErrors <- combineErrors(errors)
+    } yield combinedErrors
 
     validationProgram.unsafeRunSync()
+  }
+
+  private def parallelSchemaValidation(schema: Seq[JsonSchemaDefinition], jsonData: Seq[JsonData]): IO[Seq[Seq[ValidationErrorWithValidationMessages]]] = {
+    val validations: Seq[IO[Seq[ValidationErrorWithValidationMessages]]] = schema.map(schemaDefinition => IO(jsonData.map(json => validateWithSchema(schemaDefinition)(json))))
+    validations.parSequence
   }
 
   /*
    Validate against specified schema
    */
-  def validate(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): Map[String, List[Error]] = {
+  def validateWithSingleSchema(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): Map[String, List[ValidationError]] = {
     val validationProgram = for {
       jsonData <- IO(metadata.map(objectMetadata => mapToJson(objectMetadata)))
       validationErrors <- IO(jsonData.map(jsonData => validateWithSchema(schemaDefinition)(jsonData)))
-      errors <- convertSchemaValidatorError(validationErrors.toSeq)
-    } yield errors.toMap
+      errors <- convertSchemaValidatorError(validationErrors.toList)
+      combinedErrors <- combineErrors(errors)
+    } yield combinedErrors
 
     validationProgram.unsafeRunSync()
   }
 
-  private def validateWithSchema(schemaDefinition: JsonSchemaDefinition): JsonData => ValidationErrors = { (jsonData: JsonData) =>
+  private def validateWithSchema(schemaDefinition: JsonSchemaDefinition): JsonData => ValidationErrorWithValidationMessages = { (jsonData: JsonData) =>
     schemaDefinition match {
       case BASE_SCHEMA =>
         val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
-        ValidationErrors(BASE_SCHEMA_VALIDATION, jsonData.identifier, errors)
+        ValidationErrorWithValidationMessages(BASE_SCHEMA_VALIDATION, jsonData.identifier, errors)
       case CLOSURE_SCHEMA =>
         val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
-        ValidationErrors(CLOSURE_SCHEMA_VALIDATION, jsonData.identifier, errors)
+        ValidationErrorWithValidationMessages(CLOSURE_SCHEMA_VALIDATION, jsonData.identifier, errors)
     }
   }
 
   /*
    What we want to use for the errors has yet to be defined
    */
-  private def convertSchemaValidatorError(errors: Seq[MetadataValidationJsonSchema.ValidationErrors]): IO[Seq[(String, List[Error])]] = {
-    IO(errors.map(error => error.identifier -> error.errors.map(convertValidationMessageToError).toList))
+  private def convertSchemaValidatorError(errors: Seq[ValidationErrorWithValidationMessages]): IO[Seq[(String, List[ValidationError])]] = {
+    IO(errors.map(error => error.identifier -> error.errors.map(validationMessage => convertValidationMessageToError(validationMessage, error.jsonValidationErrorReason)).toList))
   }
 
-  private def convertValidationMessageToError(message: ValidationMessage): Error = {
-    Error(Option(message.getProperty).getOrElse(message.getInstanceLocation.getName(0)), message.getMessageKey)
+  private def combineErrors(errors: Seq[(String, List[ValidationError])]) = {
+    IO(errors.foldLeft(Map.empty[String, List[ValidationError]]) { case (acc, (k, v)) =>
+      acc.updated(k, acc.getOrElse(k, List.empty[ValidationError]) ++ v)
+    })
+  }
+
+  private def convertValidationMessageToError(message: ValidationMessage, jsonValidationErrorReason: JsonValidationErrorReason): ValidationError = {
+    ValidationError(jsonValidationErrorReason, Option(message.getProperty).getOrElse(message.getInstanceLocation.getName(0)), message.getMessageKey)
   }
 
   private def mapToJson: ObjectMetadata => JsonData = (data: ObjectMetadata) => {
