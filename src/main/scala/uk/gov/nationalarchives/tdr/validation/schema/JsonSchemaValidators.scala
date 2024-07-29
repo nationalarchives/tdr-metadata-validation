@@ -29,7 +29,6 @@ object JsonSchemaValidators {
 
     val schemaValidatorsConfig = SchemaValidatorsConfig.builder().formatAssertionsEnabled(true).build()
 
-
     jsonSchemaFactory.getSchema(schemaInputStream, schemaValidatorsConfig)
   }
 }

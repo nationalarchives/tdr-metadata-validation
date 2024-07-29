@@ -110,11 +110,15 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
   "MetadataValidationJsonSchema CLOSURE_SCHEMA" should {
 
     "not return any errors form Closure Schema when closure_type is Open and start date empty" in {
-      val data: Set[ObjectMetadata] = Set(ObjectMetadata("file1",
-        Set(
-          Metadata("closure_type", "Open"),
-          Metadata("closure_start_date", "")
-        )))
+      val data: Set[ObjectMetadata] = Set(
+        ObjectMetadata(
+          "file1",
+          Set(
+            Metadata("closure_type", "Open"),
+            Metadata("closure_start_date", "")
+          )
+        )
+      )
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA, data)
       validationErrors("file1") shouldBe List.empty
     }
@@ -137,12 +141,12 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA, data)
       validationErrors("file1").size shouldBe 6
       validationErrors("file1") should contain theSameElementsAs List(
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"closure_start_date", "required"),
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"foi_exemption_code", "required"),
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "closure_start_date", "required"),
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "foi_exemption_code", "required"),
         ValidationError(CLOSURE_SCHEMA_VALIDATION, "closure_period", "required"),
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"foi_exemption_asserted", "required"),
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"description_closed", "required"),
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"title_closed", "required")
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "foi_exemption_asserted", "required"),
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "description_closed", "required"),
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "title_closed", "required")
       )
     }
 
@@ -151,12 +155,12 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA, data)
       validationErrors("file1").size shouldBe 6
       validationErrors("file1") should contain theSameElementsAs List(
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"closure_start_date", "format.date"),
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"foi_exemption_code", "enum"),
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"closure_period", "minimum"),
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"foi_exemption_asserted", "format.date"),
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"description_closed", "type"),
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"title_closed", "type")
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "closure_start_date", "format.date"),
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "foi_exemption_code", "enum"),
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "closure_period", "minimum"),
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "foi_exemption_asserted", "format.date"),
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "description_closed", "type"),
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "title_closed", "type")
       )
     }
 
@@ -165,12 +169,12 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA, data)
       validationErrors("file1").size shouldBe 6
       validationErrors("file1") should contain theSameElementsAs List(
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"closure_start_date", "type"),
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"foi_exemption_code", "type"),
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"closure_period", "type"),
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"foi_exemption_asserted", "type"),
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"description_closed", "type"),
-        ValidationError(CLOSURE_SCHEMA_VALIDATION,"title_closed", "type")
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "closure_start_date", "type"),
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "foi_exemption_code", "type"),
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "closure_period", "type"),
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "foi_exemption_asserted", "type"),
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "description_closed", "type"),
+        ValidationError(CLOSURE_SCHEMA_VALIDATION, "title_closed", "type")
       )
     }
   }
@@ -181,7 +185,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       val language = Metadata("Language", "Unknown")
       val fileRow1 = FileRow("file_a", List(lastModified, language))
       val fileRow2 = FileRow("file_b", List(lastModified, language))
-      val errors: Map[String, Seq[ValidationError]] = MetadataValidationJsonSchema.validate(List(BASE_SCHEMA,CLOSURE_SCHEMA),List(fileRow1, fileRow2))
+      val errors: Map[String, Seq[ValidationError]] = MetadataValidationJsonSchema.validate(List(BASE_SCHEMA, CLOSURE_SCHEMA), List(fileRow1, fileRow2))
       errors.size shouldBe 2
       errors("file_a").size shouldBe 2
     }
@@ -189,13 +193,13 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
     "validate file rows that produce error from base schema and closure" in {
       val lastModified = Metadata("Date last modified", "12-12-2012")
       val closureStartDateError = Metadata("Closure Start Date", "12-12-2001")
-      val closureStatus = Metadata("Closure status","Open")
+      val closureStatus = Metadata("Closure status", "Open")
       val fileRow1 = FileRow("file_a", List(lastModified, closureStatus, closureStartDateError))
-      val errors: Map[String, Seq[ValidationError]] = MetadataValidationJsonSchema.validate(List(BASE_SCHEMA,CLOSURE_SCHEMA),List(fileRow1))
+      val errors: Map[String, Seq[ValidationError]] = MetadataValidationJsonSchema.validate(List(BASE_SCHEMA, CLOSURE_SCHEMA), List(fileRow1))
       errors.size shouldBe 1
-      errors("file_a") should contain (ValidationError(BASE_SCHEMA_VALIDATION, "date_last_modified", "format.date"))
-      errors("file_a") should contain (ValidationError(BASE_SCHEMA_VALIDATION, "closure_start_date", "format.date"))
-      errors("file_a") should contain (ValidationError(CLOSURE_SCHEMA_VALIDATION, "closure_start_date", "maxLength"))
+      errors("file_a") should contain(ValidationError(BASE_SCHEMA_VALIDATION, "date_last_modified", "format.date"))
+      errors("file_a") should contain(ValidationError(BASE_SCHEMA_VALIDATION, "closure_start_date", "format.date"))
+      errors("file_a") should contain(ValidationError(CLOSURE_SCHEMA_VALIDATION, "closure_start_date", "maxLength"))
     }
   }
 
