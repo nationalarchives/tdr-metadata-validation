@@ -65,8 +65,8 @@ object MetadataValidationJsonSchema {
   }
 
   private def combineErrors(errors: Seq[(String, List[ValidationError])]) = {
-    IO(errors.foldLeft(Map.empty[String, List[ValidationError]]) { case (acc, (k, v)) =>
-      acc.updated(k, acc.getOrElse(k, List.empty[ValidationError]) ++ v)
+    IO(errors.foldLeft(Map.empty[String, List[ValidationError]]) { case (idToErrorMap, (id, errors)) =>
+      idToErrorMap.updated(id, idToErrorMap.getOrElse(id, List.empty[ValidationError]) ++ errors)
     })
   }
 
