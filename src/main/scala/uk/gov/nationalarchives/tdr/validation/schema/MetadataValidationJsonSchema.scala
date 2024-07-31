@@ -5,17 +5,17 @@ import cats.effect.unsafe.implicits.global
 import cats.syntax.all._
 import com.networknt.schema.ValidationMessage
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA}
-import uk.gov.nationalarchives.tdr.validation.schema.JsonValidationErrorReason.{BASE_SCHEMA_VALIDATION, CLOSURE_SCHEMA_VALIDATION}
+import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess._
 import uk.gov.nationalarchives.tdr.validation.utils.CSVtoJsonUtils
 import uk.gov.nationalarchives.tdr.validation.{FileRow, Metadata}
 
-case class ValidationError(validationProcess: JsonValidationErrorReason, property: String, errorKey: String)
+case class ValidationError(validationProcess: ValidationProcess, property: String, errorKey: String)
 
 object MetadataValidationJsonSchema {
 
   case class ObjectMetadata(identifier: String, metadata: Set[Metadata])
 
-  private case class ValidationErrorWithValidationMessages(jsonValidationErrorReason: JsonValidationErrorReason, identifier: String, errors: Set[ValidationMessage])
+  private case class ValidationErrorWithValidationMessages(jsonValidationErrorReason: ValidationProcess, identifier: String, errors: Set[ValidationMessage])
 
   private case class JsonData(identifier: String, json: String)
 
@@ -57,10 +57,10 @@ object MetadataValidationJsonSchema {
     schemaDefinition match {
       case BASE_SCHEMA =>
         val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
-        ValidationErrorWithValidationMessages(BASE_SCHEMA_VALIDATION, jsonData.identifier, errors)
+        ValidationErrorWithValidationMessages(SCHEMA_BASE, jsonData.identifier, errors)
       case CLOSURE_SCHEMA =>
         val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
-        ValidationErrorWithValidationMessages(CLOSURE_SCHEMA_VALIDATION, jsonData.identifier, errors)
+        ValidationErrorWithValidationMessages(SCHEMA_CLOSURE, jsonData.identifier, errors)
     }
   }
 
@@ -77,7 +77,7 @@ object MetadataValidationJsonSchema {
     })
   }
 
-  private def convertValidationMessageToError(message: ValidationMessage, jsonValidationErrorReason: JsonValidationErrorReason): ValidationError = {
+  private def convertValidationMessageToError(message: ValidationMessage, jsonValidationErrorReason: ValidationProcess): ValidationError = {
     ValidationError(jsonValidationErrorReason, Option(message.getProperty).getOrElse(message.getInstanceLocation.getName(0)), message.getMessageKey)
   }
 
