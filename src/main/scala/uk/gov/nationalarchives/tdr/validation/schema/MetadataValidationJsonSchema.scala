@@ -4,7 +4,6 @@ import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import cats.syntax.all._
 import com.networknt.schema.ValidationMessage
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA}
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess._
 import uk.gov.nationalarchives.tdr.validation.utils.CSVtoJsonUtils
 import uk.gov.nationalarchives.tdr.validation.{FileRow, Metadata}
@@ -54,14 +53,8 @@ object MetadataValidationJsonSchema {
   }
 
   private def validateWithSchema(schemaDefinition: JsonSchemaDefinition): JsonData => ValidationErrorWithValidationMessages = { (jsonData: JsonData) =>
-    schemaDefinition match {
-      case BASE_SCHEMA =>
-        val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
-        ValidationErrorWithValidationMessages(SCHEMA_BASE, jsonData.identifier, errors)
-      case CLOSURE_SCHEMA =>
-        val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
-        ValidationErrorWithValidationMessages(SCHEMA_CLOSURE, jsonData.identifier, errors)
-    }
+    val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
+    ValidationErrorWithValidationMessages(schemaDefinition.validationProcess, jsonData.identifier, errors)
   }
 
   /*
