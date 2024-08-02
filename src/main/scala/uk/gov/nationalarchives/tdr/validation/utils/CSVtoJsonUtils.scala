@@ -42,8 +42,12 @@ class CSVtoJsonUtils {
     }
   }
 
-  def originalHeader(property: String) = {
-    propertyValueConverterMap.filter(mapEntry => mapEntry._2.propertyName.equals(property)).head._1
+  def tdrFileHeader(property: String) = {
+    propertyToTRDFileHeaderMap.getOrElse(property, property)
+  }
+
+  private lazy val propertyToTRDFileHeaderMap: Map[String, String] = {
+    propertyValueConverterMap.map(mapEntry => mapEntry._2.propertyName -> mapEntry._1)
   }
 
   private val propertyValueConverterMap: Map[String, ConvertedProperty] = (for {

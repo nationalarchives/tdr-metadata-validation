@@ -72,7 +72,7 @@ object MetadataValidationJsonSchema {
 
   private def convertValidationMessageToError(message: ValidationMessage, jsonValidationErrorReason: ValidationProcess): ValidationError = {
     val propertyName = Option(message.getProperty).getOrElse(message.getInstanceLocation.getName(0))
-    ValidationError(jsonValidationErrorReason, propertyName, message.getMessageKey, csvToJsonUtils.originalHeader(propertyName))
+    ValidationError(jsonValidationErrorReason, propertyName, message.getMessageKey, csvToJsonUtils.tdrFileHeader(propertyName))
   }
 
   private def mapToJson: ObjectMetadata => JsonData = (data: ObjectMetadata) => {
