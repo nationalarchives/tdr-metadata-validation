@@ -8,7 +8,7 @@ import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess._
 import uk.gov.nationalarchives.tdr.validation.utils.CSVtoJsonUtils
 import uk.gov.nationalarchives.tdr.validation.{FileRow, Metadata}
 
-case class ValidationError(validationProcess: ValidationProcess, property: String, errorKey: String)
+case class ValidationError(validationProcess: ValidationProcess, property: String, errorKey: String, suppliedProperty: String)
 
 object MetadataValidationJsonSchema {
 
@@ -71,7 +71,8 @@ object MetadataValidationJsonSchema {
   }
 
   private def convertValidationMessageToError(message: ValidationMessage, jsonValidationErrorReason: ValidationProcess): ValidationError = {
-    ValidationError(jsonValidationErrorReason, Option(message.getProperty).getOrElse(message.getInstanceLocation.getName(0)), message.getMessageKey)
+    val propertyName = Option(message.getProperty).getOrElse(message.getInstanceLocation.getName(0))
+    ValidationError(jsonValidationErrorReason, propertyName, message.getMessageKey, csvToJsonUtils.originalHeader(propertyName))
   }
 
   private def mapToJson: ObjectMetadata => JsonData = (data: ObjectMetadata) => {

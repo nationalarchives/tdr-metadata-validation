@@ -42,6 +42,10 @@ class CSVtoJsonUtils {
     }
   }
 
+  def originalHeader(property: String) = {
+    propertyValueConverterMap.filter(mapEntry => mapEntry._2.propertyName.equals(property)).head._1
+  }
+
   private val propertyValueConverterMap: Map[String, ConvertedProperty] = (for {
     (propertyName, propertyValue) <- json("properties").obj
     propertyTypes = getPropertyType(propertyValue.obj)
