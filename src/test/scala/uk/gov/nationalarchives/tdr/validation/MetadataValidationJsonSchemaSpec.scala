@@ -200,7 +200,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       val language = Metadata("Language", "Unknown")
       val fileRow1 = FileRow("file_a", List(lastModified, language))
       val fileRow2 = FileRow("file_b", List(lastModified, language))
-      val errors: Map[String, Seq[ValidationError]] = MetadataValidationJsonSchema.validate(List(BASE_SCHEMA, CLOSURE_SCHEMA), List(fileRow1, fileRow2))
+      val errors: Map[String, Seq[ValidationError]] = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA, CLOSURE_SCHEMA), List(fileRow1, fileRow2))
       errors.size shouldBe 2
       errors("file_a").size shouldBe 2
       errors("file_a") should contain(ValidationError(SCHEMA_BASE, "language", "enum"))
@@ -215,7 +215,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       val closureStartDateError = Metadata("Closure Start Date", "12-12-2001")
       val closureStatus = Metadata("Closure status", "Open")
       val fileRow1 = FileRow("file_a", List(lastModified, closureStatus, closureStartDateError))
-      val errors: Map[String, Seq[ValidationError]] = MetadataValidationJsonSchema.validate(List(BASE_SCHEMA, CLOSURE_SCHEMA), List(fileRow1))
+      val errors: Map[String, Seq[ValidationError]] = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA, CLOSURE_SCHEMA), List(fileRow1))
       errors.size shouldBe 1
       errors("file_a") should contain(ValidationError(SCHEMA_BASE, "date_last_modified", "format.date"))
       errors("file_a") should contain(ValidationError(SCHEMA_BASE, "closure_start_date", "format.date"))

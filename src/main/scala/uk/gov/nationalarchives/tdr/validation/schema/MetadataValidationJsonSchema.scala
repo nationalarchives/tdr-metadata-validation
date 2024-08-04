@@ -20,7 +20,7 @@ object MetadataValidationJsonSchema {
 
   private val csvToJsonUtils = new CSVtoJsonUtils
 
-  def validate(schema: Seq[JsonSchemaDefinition], metadata: Seq[FileRow]): Map[String, Seq[ValidationError]] = {
+  def validate(schema: Set[JsonSchemaDefinition], metadata: Seq[FileRow]): Map[String, Seq[ValidationError]] = {
     val convertedFileRows: Seq[ObjectMetadata] = metadata.map(fileRow => ObjectMetadata(fileRow.matchIdentifier, fileRow.metadata.toSet))
 
     val validationProgram = for {
@@ -33,8 +33,9 @@ object MetadataValidationJsonSchema {
     validationProgram.unsafeRunSync()
   }
 
-  private def parallelSchemaValidation(schema: Seq[JsonSchemaDefinition], jsonData: Seq[JsonData]): IO[Seq[Seq[ValidationErrorWithValidationMessages]]] = {
-    val validations: Seq[IO[Seq[ValidationErrorWithValidationMessages]]] = schema.map(schemaDefinition => IO(jsonData.map(json => validateWithSchema(schemaDefinition)(json))))
+  private def parallelSchemaValidation(schema: Set[JsonSchemaDefinition], jsonData: Seq[JsonData]): IO[Seq[Seq[ValidationErrorWithValidationMessages]]] = {
+    val validations: Seq[IO[Seq[ValidationErrorWithValidationMessages]]] =
+      schema.toSeq.map(schemaDefinition => IO(jsonData.map(json => validateWithSchema(schemaDefinition)(json))))
     validations.parSequence
   }
 
