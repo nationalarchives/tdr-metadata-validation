@@ -47,8 +47,7 @@ object MetadataValidationJsonSchema {
       jsonData <- IO(metadata.map(objectMetadata => mapToJson(objectMetadata)))
       validationErrors <- IO(jsonData.map(jsonData => validateWithSchema(schemaDefinition)(jsonData)))
       errors <- convertSchemaValidatorError(validationErrors.toList)
-      combinedErrors <- combineErrors(errors)
-    } yield combinedErrors
+    } yield errors.toMap
 
     validationProgram.unsafeRunSync()
   }
