@@ -10,7 +10,7 @@ import scala.util.Try
 class CSVtoJsonUtils {
 
   private case class ConvertedProperty(propertyName: String, convertValueFunc: String => Any)
-  private val nodeSchema = getJsonNodeFromStreamContent(getClass.getResourceAsStream(BASE_SCHEMA.location))
+  private val nodeSchema = getJsonNodeFromStreamContent(getClass.getResourceAsStream(BASE_SCHEMA.schemaLocation))
   private val json = ujson.read(nodeSchema.toPrettyString)
 
   private def getJsonNodeFromStreamContent(content: InputStream): JsonNode = {
