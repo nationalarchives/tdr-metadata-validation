@@ -55,6 +55,19 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       validationErrors("file1").size shouldBe 1
       singleErrorCheck(validationErrors, "end_date", "daBeforeToday")
     }
+
+    "validate description field with some value" in {
+      val data: Set[ObjectMetadata] = dataBuilder("description", "ggg")
+      val validationErrors = MetadataValidationJsonSchema.validate(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 0
+    }
+
+    "validate description field with empty value" in {
+      val data: Set[ObjectMetadata] = dataBuilder("description", "")
+      val validationErrors = MetadataValidationJsonSchema.validate(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 0
+    }
+
     "validate closure period must be a number" in {
       val data: Set[ObjectMetadata] = dataBuilder("Closure Period", "123")
       val validationErrors = MetadataValidationJsonSchema.validate(BASE_SCHEMA, data)
