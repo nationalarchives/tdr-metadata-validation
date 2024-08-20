@@ -2,68 +2,77 @@ package uk.gov.nationalarchives.tdr.validation.schema
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
+import cats.syntax.all._
 import com.networknt.schema.ValidationMessage
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA}
-import uk.gov.nationalarchives.tdr.validation.schema.JsonValidationErrorReason.{BASE_SCHEMA_VALIDATION, CLOSURE_SCHEMA_VALIDATION}
+import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess._
 import uk.gov.nationalarchives.tdr.validation.utils.CSVtoJsonUtils
-import uk.gov.nationalarchives.tdr.validation.{Error, FileRow, Metadata}
+import uk.gov.nationalarchives.tdr.validation.{FileRow, Metadata}
+
+case class ValidationError(validationProcess: ValidationProcess, property: String, errorKey: String)
 
 object MetadataValidationJsonSchema {
 
   case class ObjectMetadata(identifier: String, metadata: Set[Metadata])
 
-  private case class ValidationErrors(jsonValidationErrorReason: JsonValidationErrorReason, identifier: String, errors: Set[ValidationMessage])
+  private case class ValidationErrorWithValidationMessages(jsonValidationErrorReason: ValidationProcess, identifier: String, errors: Set[ValidationMessage])
 
   private case class JsonData(identifier: String, json: String)
 
   private val csvToJsonUtils = new CSVtoJsonUtils
 
-  // Interface for draft metadata validator
-  def validate(metadata: List[FileRow]): Map[String, List[Error]] = {
-    val convertedFileRows: Seq[ObjectMetadata] = metadata.map(fileRow => ObjectMetadata(fileRow.fileName, fileRow.metadata.toSet))
+  def validate(schema: Set[JsonSchemaDefinition], metadata: Seq[FileRow]): Map[String, Seq[ValidationError]] = {
+    val convertedFileRows: Seq[ObjectMetadata] = metadata.map(fileRow => ObjectMetadata(fileRow.matchIdentifier, fileRow.metadata.toSet))
+
     val validationProgram = for {
       jsonData <- IO(convertedFileRows.map(objectMetadata => mapToJson(objectMetadata)))
-      validationErrors <- IO(jsonData.map(jsonData => validateWithSchema(BASE_SCHEMA)(jsonData)))
-      closureValidationErrors <- IO(jsonData.map(jsonData => validateWithSchema(CLOSURE_SCHEMA)(jsonData)))
-      errors <- convertSchemaValidatorError(validationErrors ++ closureValidationErrors)
-    } yield errors.toMap
+      schemaValidationErrors <- parallelSchemaValidation(schema, jsonData)
+      errors <- convertSchemaValidatorError(schemaValidationErrors.flatten)
+      combinedErrors <- combineErrors(errors)
+    } yield combinedErrors
 
     validationProgram.unsafeRunSync()
+  }
+
+  private def parallelSchemaValidation(schema: Set[JsonSchemaDefinition], jsonData: Seq[JsonData]): IO[Seq[Seq[ValidationErrorWithValidationMessages]]] = {
+    val validations: Seq[IO[Seq[ValidationErrorWithValidationMessages]]] =
+      schema.toSeq.map(schemaDefinition => IO(jsonData.map(json => validateWithSchema(schemaDefinition)(json))))
+    validations.parSequence
   }
 
   /*
    Validate against specified schema
    */
-  def validate(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): Map[String, List[Error]] = {
+  def validateWithSingleSchema(schemaDefinition: JsonSchemaDefinition, metadata: Set[ObjectMetadata]): Map[String, List[ValidationError]] = {
     val validationProgram = for {
       jsonData <- IO(metadata.map(objectMetadata => mapToJson(objectMetadata)))
       validationErrors <- IO(jsonData.map(jsonData => validateWithSchema(schemaDefinition)(jsonData)))
-      errors <- convertSchemaValidatorError(validationErrors.toSeq)
+      errors <- convertSchemaValidatorError(validationErrors.toList)
     } yield errors.toMap
 
     validationProgram.unsafeRunSync()
   }
 
-  private def validateWithSchema(schemaDefinition: JsonSchemaDefinition): JsonData => ValidationErrors = { (jsonData: JsonData) =>
-    schemaDefinition match {
-      case BASE_SCHEMA =>
-        val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
-        ValidationErrors(BASE_SCHEMA_VALIDATION, jsonData.identifier, errors)
-      case CLOSURE_SCHEMA =>
-        val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
-        ValidationErrors(CLOSURE_SCHEMA_VALIDATION, jsonData.identifier, errors)
-    }
+  private def validateWithSchema(schemaDefinition: JsonSchemaDefinition): JsonData => ValidationErrorWithValidationMessages = { (jsonData: JsonData) =>
+    val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
+    ValidationErrorWithValidationMessages(schemaDefinition.validationProcess, jsonData.identifier, errors)
   }
 
   /*
    What we want to use for the errors has yet to be defined
    */
-  private def convertSchemaValidatorError(errors: Seq[MetadataValidationJsonSchema.ValidationErrors]): IO[Seq[(String, List[Error])]] = {
-    IO(errors.map(error => error.identifier -> error.errors.map(convertValidationMessageToError).toList))
+  private def convertSchemaValidatorError(errors: Seq[ValidationErrorWithValidationMessages]): IO[Seq[(String, List[ValidationError])]] = {
+    IO(errors.map(error => error.identifier -> error.errors.map(validationMessage => convertValidationMessageToError(validationMessage, error.jsonValidationErrorReason)).toList))
   }
 
-  private def convertValidationMessageToError(message: ValidationMessage): Error = {
-    Error(Option(message.getProperty).getOrElse(message.getInstanceLocation.getName(0)), message.getMessageKey)
+  private def combineErrors(errors: Seq[(String, List[ValidationError])]) = {
+    IO(errors.foldLeft(Map.empty[String, List[ValidationError]]) { case (idToErrorMap, (id, errors)) =>
+      idToErrorMap.updated(id, idToErrorMap.getOrElse(id, List.empty[ValidationError]) ++ errors)
+    })
+  }
+
+  private def convertValidationMessageToError(message: ValidationMessage, validationProcess: ValidationProcess): ValidationError = {
+    val propertyName = Option(message.getProperty).getOrElse(message.getInstanceLocation.getName(0))
+    ValidationError(validationProcess, propertyName, message.getMessageKey)
   }
 
   private def mapToJson: ObjectMetadata => JsonData = (data: ObjectMetadata) => {
