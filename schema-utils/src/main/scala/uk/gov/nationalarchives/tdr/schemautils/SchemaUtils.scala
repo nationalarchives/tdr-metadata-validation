@@ -12,12 +12,12 @@ object SchemaUtils {
     mapper.readTree(content)
   }
 
-  //Return schema as JsonNode for clients to manipulate as required
+  // Return schema as JsonNode for clients to manipulate as required
   def schema(schemaLocation: String): JsonNode = {
     getJsonNodeFromStreamContent(getClass.getResourceAsStream(schemaLocation))
   }
 
-  def convertToValidationKey(alternateKey:String, propertyKey:String): String = ???
+  def convertToValidationKey(alternateKey: String, propertyKey: String): String = ???
 
-  def convertToAlternateKey(alternateKey:String, propertyKey:String): String = ???
+  def convertToAlternateKey(alternateKey: String, propertyKey: String): String = ???
 }
