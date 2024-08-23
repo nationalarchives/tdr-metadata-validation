@@ -1,8 +1,8 @@
 name: Deploy if not a version bump PR
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    types:
+      - closed
 jobs:
   deploy:
     runs-on: ubuntu-latest
