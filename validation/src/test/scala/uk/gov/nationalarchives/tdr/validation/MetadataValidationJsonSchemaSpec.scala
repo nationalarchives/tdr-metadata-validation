@@ -290,34 +290,70 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       )
     }
 
-//  "MetadataValidationJsonSchema validate with both BASE_SCHEMA and CLOSURE_SCHEMA" should {
-//    "validate file rows that only have base schema errors" in {
-//      val lastModified = Metadata("Date last modified", "12-12-2012")
-//      val language = Metadata("Language", "Unknown")
-//      val fileRow1 = FileRow("file_a", List(lastModified, language))
-//      val fileRow2 = FileRow("file_b", List(lastModified, language))
-//      val errors: Map[String, Seq[ValidationError]] = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN), List(fileRow1, fileRow2))
-//      errors.size shouldBe 2
-//      errors("file_a").size shouldBe 2
-//      errors("file_a") should contain(ValidationError(SCHEMA_BASE, "language", "enum"))
-//      errors("file_a") should contain(ValidationError(SCHEMA_BASE, "date_last_modified", "format.date"))
-//      errors("file_b").size shouldBe 2
-//      errors("file_b") should contain(ValidationError(SCHEMA_BASE, "language", "enum"))
-//      errors("file_b") should contain(ValidationError(SCHEMA_BASE, "date_last_modified", "format.date"))
-//    }
-//  }
+    "MetadataValidationJsonSchema validate with both BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED and CLOSURE_SCHEMA_OPEN" should {
+      "validate file rows that only have base schema errors" in {
+        val data = closureDataBuilder(
+          closureType = Some("Closed"),
+          closurePeriod = Some("5"),
+          titleClosed = Some("no"),
+          foiCodes = Some("27(1)"),
+          foiExemptionAsserted = Some("2001-12-12"),
+          closureStartDate = Some("2001-12-12"),
+          descriptionClosed = Some("no")
+        ).flatMap(_.metadata).toList
+        val lastModified = Metadata("Date last modified", "12-12-2012")
+        val language = Metadata("Language", "Unknown")
+        val fileRow1 = FileRow("file_a", List(lastModified, language) ++ data)
+        val fileRow2 = FileRow("file_b", List(lastModified, language) ++ data)
+        val errors: Map[String, Seq[ValidationError]] =
+          MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN), List(fileRow1, fileRow2))
+        errors.size shouldBe 2
+        errors("file_a").size shouldBe 2
+        errors("file_a") should contain(ValidationError(SCHEMA_BASE, "language", "enum"))
+        errors("file_a") should contain(ValidationError(SCHEMA_BASE, "date_last_modified", "format.date"))
+        errors("file_b").size shouldBe 2
+        errors("file_b") should contain(ValidationError(SCHEMA_BASE, "language", "enum"))
+        errors("file_b") should contain(ValidationError(SCHEMA_BASE, "date_last_modified", "format.date"))
+      }
+    }
 
-//    "validate file rows that produce error from base schema and closure" in {
-//      val lastModified = Metadata("Date last modified", "12-12-2012")
-//      val closureStartDateError = Metadata("Closure Start Date", "12-12-2001")
-//      val closureStatus = Metadata("Closure status", "Open")
-//      val fileRow1 = FileRow("file_a", List(lastModified, closureStatus, closureStartDateError))
-//      val errors: Map[String, Seq[ValidationError]] = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA, CLOSURE_SCHEMA), List(fileRow1))
-//      errors.size shouldBe 1
-//      errors("file_a") should contain(ValidationError(SCHEMA_BASE, "date_last_modified", "format.date"))
-//      errors("file_a") should contain(ValidationError(SCHEMA_BASE, "closure_start_date", "format.date"))
-//      errors("file_a") should contain(ValidationError(SCHEMA_CLOSURE, "closure_start_date", "maxLength"))
-//    }
+    "validate file rows that produce error from base schema and closure_open schema" in {
+      val data = closureDataBuilder(
+        closureType = Some("Open"),
+        closureStartDate = Some("12-12-2001"),
+        closurePeriod = Some("5"),
+        titleClosed = Some("N")
+      ).flatMap(_.metadata).toList
+      val lastModified = Metadata("Date last modified", "12-12-2012")
+      val fileRow1 = FileRow("file_a", List(lastModified) ++ data)
+      val errors: Map[String, Seq[ValidationError]] = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN), List(fileRow1))
+      errors.size shouldBe 1
+      errors("file_a") should contain(ValidationError(SCHEMA_BASE, "date_last_modified", "format.date"))
+      errors("file_a") should contain(ValidationError(SCHEMA_BASE, "closure_start_date", "format.date"))
+      errors("file_a") should contain(ValidationError(SCHEMA_CLOSURE_OPEN, "closure_start_date", "type"))
+      errors("file_a") should contain(ValidationError(SCHEMA_CLOSURE_OPEN, "closure_period", "type"))
+      errors("file_a") should contain(ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "enum"))
+    }
+
+    "validate file rows that produce error from base schema and closure_closed schema" in {
+      val data = closureDataBuilder(
+        closureType = Some("Closed"),
+        closurePeriod = Some("-99"),
+        titleClosed = Some("no"),
+        foiCodes = Some("27(1)"),
+        foiExemptionAsserted = Some("2001-12-12"),
+        closureStartDate = Some("2001-12-12"),
+        descriptionClosed = Some("yes")
+      ).flatMap(_.metadata).toList
+      val lastModified = Metadata("Date last modified", "12-12-2012")
+      val fileRow1 = FileRow("file_a", List(lastModified) ++ data)
+      val errors: Map[String, Seq[ValidationError]] = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN), List(fileRow1))
+      errors.size shouldBe 1
+      errors("file_a") should contain(ValidationError(SCHEMA_BASE, "date_last_modified", "format.date"))
+      errors("file_a") should contain(ValidationError(SCHEMA_BASE, "closure_period", "minimum"))
+      errors("file_a") should contain(ValidationError(SCHEMA_CLOSURE_CLOSED, "closure_period", "minimum"))
+      errors("file_a") should contain(ValidationError(SCHEMA_CLOSURE_CLOSED, "description_alternate", "type"))
+    }
   }
 
   private def dataBuilder(key: String, value: String): Set[ObjectMetadata] = {
