@@ -1,7 +1,7 @@
 import sbt._
 
 object Dependencies {
-  private val pekkoVersion = "1.1.0"
+  private val pekkoVersion = "1.1.1"
 
   lazy val commonsLang3 = "org.apache.commons" % "commons-lang3" % "3.17.0"
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.19"
