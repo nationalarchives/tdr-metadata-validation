@@ -8,7 +8,8 @@ import scala.jdk.CollectionConverters._
 
 object JsonSchemaValidators {
 
-  private val validators: Map[JsonSchemaDefinition, JsonSchema] = Map(BASE_SCHEMA -> baseJsonSchemaValidator, CLOSURE_SCHEMA_CLOSED -> closureClosedJsonSchemaValidator, CLOSURE_SCHEMA_OPEN -> closureOpenJsonSchemaValidator)
+  private val validators: Map[JsonSchemaDefinition, JsonSchema] =
+    Map(BASE_SCHEMA -> baseJsonSchemaValidator, CLOSURE_SCHEMA_CLOSED -> closureClosedJsonSchemaValidator, CLOSURE_SCHEMA_OPEN -> closureOpenJsonSchemaValidator)
 
   private lazy val baseJsonSchemaValidator: JsonSchema = getJsonSchema(BASE_SCHEMA, Map("daBeforeToday" -> new DaBeforeToday))
   private lazy val closureClosedJsonSchemaValidator: JsonSchema = getJsonSchema(CLOSURE_SCHEMA_CLOSED)
