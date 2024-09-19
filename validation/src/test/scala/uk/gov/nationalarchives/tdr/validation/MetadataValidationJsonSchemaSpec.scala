@@ -317,7 +317,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
         closureType = Some("Closed"),
         closurePeriod = Some("-99"),
         titleClosed = Some("no"),
-        foiCodes = Some("27(1)"),
+        foiCodes = Some("78|27(1)|27(2)"),
         foiExemptionAsserted = Some("2001-12-12"),
         closureStartDate = Some("2001-12-12"),
         descriptionClosed = Some("yes")
@@ -326,8 +326,10 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       val fileRow1 = FileRow("file_a", List(lastModified) ++ data)
       val errors: Map[String, Seq[ValidationError]] = MetadataValidationJsonSchema.validate(Set(BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN), List(fileRow1))
       errors.size shouldBe 1
+      errors("file_a").size shouldBe 4
       errors("file_a") should contain(ValidationError(SCHEMA_BASE, "date_last_modified", "format.date"))
       errors("file_a") should contain(ValidationError(SCHEMA_BASE, "closure_period", "minimum"))
+      errors("file_a") should contain(ValidationError(SCHEMA_BASE, "foi_exemption_code", "enum"))
       errors("file_a") should contain(ValidationError(SCHEMA_CLOSURE_CLOSED, "description_alternate", "type"))
     }
   }
