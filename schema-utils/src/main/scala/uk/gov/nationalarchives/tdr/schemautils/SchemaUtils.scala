@@ -43,6 +43,16 @@ object SchemaUtils {
       .toMap
   }
 
+  def propertyTypeMapping(alternateKey: Option[String]): Map[String, String] = {
+    schemaProperties.map(p => {
+      val key = alternateKey match {
+        case Some(value) => convertToAlternateKey(value, p.getKey)
+        case _ => p.getKey
+      }
+      (if (key.isEmpty) p.getKey else key) -> p.getValue.at("/propertyType").asText()
+    }).toMap
+  }
+
   def convertToValidationKey(alternateKeyName: String, alternateKeyValue: String): String = {
     schemaProperties
       .find(property => property.getValue.at("/alternateKeys").asScala.exists(p => p.at(s"/$alternateKeyName").asText() == alternateKeyValue))

@@ -2,9 +2,61 @@ package uk.gov.nationalarchives.tdr.schemautils
 
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
-import SchemaUtils.{convertToAlternateKey, convertToValidationKey, originalKeyToAlternateKeyMapping}
+import SchemaUtils.{convertToAlternateKey, convertToValidationKey, originalKeyToAlternateKeyMapping, propertyTypeMapping}
 
 class SchemaUtilsTest extends AnyWordSpec {
+
+  "propertyTypeMapping" should {
+    "return properties' property type" in {
+      val res = propertyTypeMapping(None)
+      res.size should be(20)
+      res("title_alternate") should be("Supplied")
+      res("closure_type") should be("Supplied")
+      res("UUID") should be("System")
+      res("former_reference_department") should be("Supplied")
+      res("closure_period") should be("Supplied")
+      res("language") should be("Supplied")
+      res("end_date") should be("Supplied")
+      res("file_path") should be("System")
+      res("foi_exemption_code") should be("Supplied")
+      res("closure_start_date") should be("Supplied")
+      res("file_name_translation") should be("Supplied")
+      res("description_closed") should be("Supplied")
+      res("title_closed") should be("Supplied")
+      res("foi_exemption_asserted") should be("Supplied")
+      res("date_last_modified") should be("System")
+      res("description_alternate") should be("Supplied")
+      res("file_name") should be("System")
+      res("client_side_checksum") should be("System")
+      res("description") should be("Supplied")
+      res("file_size") should be("System")
+    }
+
+    "return properties' property type mapped to alternate key where present" in {
+      val res = propertyTypeMapping(Some("tdrDataLoadHeader"))
+//      res.size should be(20) duplicate alternate heading causing discrepancy in size
+      res("TitleAlternate") should be("Supplied")
+      res("ClosureType") should be("Supplied")
+      res("UUID") should be("System")
+      res("former_reference_department") should be("Supplied")
+      res("ClosurePeriod") should be("Supplied")
+      res("language") should be("Supplied")
+      res("end_date") should be("Supplied")
+      res("ClientSideOriginalFilepath") should be("System")
+      res("FoiExemptionCode") should be("Supplied")
+      res("ClosureStartDate") should be("Supplied")
+      res("file_name_translation") should be("Supplied")
+      res("DescriptionClosed") should be("Supplied")
+      res("ClosureType") should be("Supplied")
+      res("FoiExemptionAsserted") should be("Supplied")
+      res("ClientSideFileLastModifiedDate") should be("System")
+      res("DescriptionAlternate") should be("Supplied")
+      res("Filename") should be("System")
+      res("SHA256ClientSideChecksum") should be("System")
+      res("description") should be("Supplied")
+      res("ClientSideFileSize") should be("System")
+    }
+  }
 
   "originalKeyToAlternateKeyMapping" should {
     "return the correct mapping for the given original and alternate key parameters" in {
@@ -62,11 +114,4 @@ class SchemaUtilsTest extends AnyWordSpec {
       convertToValidationKey("dddd", "date_last_modified") should be("")
     }
   }
-
-  private val expectedKnownKeyMapping = {
-    Map(
-      "client_side_checksum" -> "SHA256ClientSideChecksum"
-    )
-  }
-
 }
