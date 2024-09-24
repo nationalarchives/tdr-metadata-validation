@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import scala.jdk.CollectionConverters.IterableHasAsScala
 
 object SchemaUtils {
-  val BASE_SCHEMA = "/metadata-schema/baseSchema.schema.json"
+  private val BASE_SCHEMA = "/metadata-schema/baseSchema.schema.json"
 
   private lazy val schemaNode: JsonNode = new ObjectMapper().readTree(getClass.getResourceAsStream(BASE_SCHEMA))
 
