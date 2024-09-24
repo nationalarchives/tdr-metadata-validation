@@ -120,7 +120,10 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
     }
 
     "validate former_reference_department can have max 255 characters" in {
-      val data: Set[ObjectMetadata] = dataBuilder("former_reference_department", "This is an example. This is an example. This is an example. This is an example. This is an example. This is an example. This is an example. This is an example. This is an example. This is an example. This is an example. This is an example. This is an example.")
+      val data: Set[ObjectMetadata] = dataBuilder(
+        "former_reference_department",
+        "This is an example. This is an example. This is an example. This is an example. This is an example. This is an example. This is an example. This is an example. This is an example. This is an example. This is an example. This is an example. This is an example."
+      )
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
       validationErrors("file1").size shouldBe 1
       singleErrorCheck(validationErrors, "former_reference_department", "maxLength", SCHEMA_BASE)
