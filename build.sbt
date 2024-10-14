@@ -20,9 +20,9 @@ lazy val commonSettings = Seq(
   ),
   developers := List(
     Developer(
-      id = "tna-digital-archiving-jenkins",
+      id = "tna-da-bot",
       name = "TNA Digital Archiving",
-      email = "digitalpreservation@nationalarchives.gov.uk",
+      email = "s-GitHubDABot@nationalarchives.gov.uk",
       url = url("https://github.com/nationalarchives/tdr-metadata-validation")
     )
   ),
