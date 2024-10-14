@@ -56,7 +56,12 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       validationErrors("file1").size shouldBe 1
       singleErrorCheck(validationErrors, "end_date", "daBeforeToday", SCHEMA_BASE)
     }
-
+    "validate incorrect value for a date field which has daBeforeToday condition" in {
+      val data: Set[ObjectMetadata] = dataBuilder("Date of the record", "eeee")
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 1
+      singleErrorCheck(validationErrors, "end_date", "format.date", SCHEMA_BASE)
+    }
     "validate description field with some value" in {
       val data: Set[ObjectMetadata] = dataBuilder("description", "ggg")
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
