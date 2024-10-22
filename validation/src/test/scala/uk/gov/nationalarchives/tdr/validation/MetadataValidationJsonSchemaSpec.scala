@@ -4,10 +4,10 @@ import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.testkit.{ImplicitSender, TestKit}
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpecLike
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN}
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN, REQUIRED_SCHEMA}
 import uk.gov.nationalarchives.tdr.validation.schema.MetadataValidationJsonSchema.ObjectMetadata
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.{SCHEMA_BASE, _}
-import uk.gov.nationalarchives.tdr.validation.schema.{MetadataValidationJsonSchema, ValidationError, ValidationProcess}
+import uk.gov.nationalarchives.tdr.validation.schema.{MetadataValidationJsonSchema, ValidationError}
 
 class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataValidationJsonSchemaSpec")) with ImplicitSender with AnyWordSpecLike {
 
@@ -349,6 +349,30 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       errors("file_a") should contain(ValidationError(SCHEMA_BASE, "closure_start_date", "daBeforeToday"))
     }
   }
+  "MetadataValidationJsonSchema validate with REQUIRED_SCHEMA" should {
+    "validate the absent required fields and return errors" in {
+      val data = closureDataBuilder(
+        closureType = Some("Closed"),
+        closurePeriod = Some("5"),
+        titleClosed = Some("no"),
+        foiCodes = Some("27(1)"),
+        foiExemptionAsserted = Some("2001-12-12"),
+        closureStartDate = Some("2001-12-12"),
+        descriptionClosed = Some("no"),
+        fileNameTranslation = Some("translated file name")
+      ).flatMap(_.metadata).toList
+      val lastModified = Metadata("Date last modified", "12-12-2012")
+      val language = Metadata("Language", "Unknown")
+      val fileRow1 = FileRow("file_a", List(lastModified, language) ++ data)
+      val errors: Map[String, Seq[ValidationError]] =
+        MetadataValidationJsonSchema.validate(Set(REQUIRED_SCHEMA), List(fileRow1))
+      errors.size shouldBe 1
+      errors("file_a").size shouldBe 3
+      errors("file_a") should contain(ValidationError(SCHEMA_REQUIRED, "file_path", "required"))
+      errors("file_a") should contain(ValidationError(SCHEMA_REQUIRED, "end_date", "required"))
+      errors("file_a") should contain(ValidationError(SCHEMA_REQUIRED, "description", "required"))
+    }
+  }
 
   private def dataBuilder(key: String, value: String): Set[ObjectMetadata] = {
     val metadata = Metadata(key, value)
@@ -364,7 +388,8 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       titleClosed: Option[String] = None,
       titleAlternative: Option[String] = None,
       descriptionClosed: Option[String] = None,
-      descriptionAlternative: Option[String] = None
+      descriptionAlternative: Option[String] = None,
+      fileNameTranslation: Option[String] = None
   ): Set[ObjectMetadata] = {
     Set(
       ObjectMetadata(
@@ -378,7 +403,8 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
           Metadata("Is the title sensitive for the public?", titleClosed.getOrElse("")), // title_closed
           Metadata("Add alternative title without the file extension", titleAlternative.getOrElse("")), // title_alternative
           Metadata("Is the description sensitive for the public?", descriptionClosed.getOrElse("")), // description_closed
-          Metadata("Alternative description", descriptionAlternative.getOrElse("")) // description_alternate
+          Metadata("Alternative description", descriptionAlternative.getOrElse("")), // description_alternate
+          Metadata("Translated title of record", fileNameTranslation.getOrElse("")) // description_alternate
         )
       )
     )
