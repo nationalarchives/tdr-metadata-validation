@@ -1,4 +1,4 @@
-import sbt._
+import sbt.*
 
 object Dependencies {
   private val pekkoVersion = "1.1.2"

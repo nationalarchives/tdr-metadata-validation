@@ -5,7 +5,9 @@ import com.networknt.schema._
 import org.joda.time.DateTime
 
 import java.util
-import scala.util.{Failure, Success, Try}
+import scala.collection.immutable.HashSet
+import scala.jdk.CollectionConverters.SetHasAsJava
+import scala.util.{Success, Try}
 
 class DaBeforeToday extends AbstractKeyword("daBeforeToday") {
 
@@ -24,15 +26,12 @@ class DaBeforeToday extends AbstractKeyword("daBeforeToday") {
           .instanceLocation(instanceLocation)
           .message("daBeforeToday")
           .messageKey("daBeforeToday")
-        val errors = new util.HashSet[ValidationMessage]()
-        if (!(node.textValue() == null || node.textValue().isEmpty)) {
-          val date = Try(DateTime.parse(node.textValue))
-          date match {
-            case Failure(_)     => errors.add(validationMessageBuilder.messageKey("format.date").build())
-            case Success(value) => if (DateTime.now() isBefore value) errors.add(validationMessageBuilder.build())
-          }
+
+        val validationMessages = Try(DateTime.parse(node.textValue())) match {
+          case Success(date) if DateTime.now() isBefore date => HashSet(validationMessageBuilder.build())
+          case _                                             => HashSet[ValidationMessage]()
         }
-        errors
+        validationMessages.asJava
       }
     }
   }
