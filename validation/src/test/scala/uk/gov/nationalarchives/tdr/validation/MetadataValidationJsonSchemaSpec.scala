@@ -404,7 +404,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
           Metadata("Add alternative title without the file extension", titleAlternative.getOrElse("")), // title_alternative
           Metadata("Is the description sensitive for the public?", descriptionClosed.getOrElse("")), // description_closed
           Metadata("Alternative description", descriptionAlternative.getOrElse("")), // description_alternate
-          Metadata("Translated title of record", fileNameTranslation.getOrElse("")) // description_alternate
+          Metadata("Translated title of record", fileNameTranslation.getOrElse("")) // file_name_translation
         )
       )
     )
