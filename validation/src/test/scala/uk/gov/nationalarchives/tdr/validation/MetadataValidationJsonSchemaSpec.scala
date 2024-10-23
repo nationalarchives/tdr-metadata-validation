@@ -24,7 +24,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       validationErrors("file1").size shouldBe 0
     }
     "validate array can be null" in {
-      val data: Set[ObjectMetadata] = dataBuilder("Language", "")
+      val data: Set[ObjectMetadata] = dataBuilder("Translated title of record", "")
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
       validationErrors("file1").size shouldBe 0
     }
