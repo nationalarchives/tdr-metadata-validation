@@ -13,7 +13,7 @@ object Dependencies {
   lazy val pekkoConnectors = "org.apache.pekko" %% "pekko-connectors-csv" % pekkoVersion
   lazy val pekkoStream = "org.apache.pekko" %% "pekko-stream" % pekkoVersion
   lazy val pekkoTestKit = "org.apache.pekko" %% "pekko-testkit" % pekkoVersion
-  lazy val catsEffect = "org.typelevel" %% "cats-effect" % "3.5.4"
+  lazy val catsEffect = "org.typelevel" %% "cats-effect" % "3.5.5"
   lazy val nscalaTime = "com.github.nscala-time" %% "nscala-time" % "2.34.0"
 
 }
