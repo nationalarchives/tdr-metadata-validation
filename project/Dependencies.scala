@@ -6,7 +6,7 @@ object Dependencies {
   lazy val commonsLang3 = "org.apache.commons" % "commons-lang3" % "3.17.0"
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.19"
   lazy val ujson = "com.lihaoyi" % "ujson_native0.5_2.13" % "4.0.2"
-  lazy val jacksonModule = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.0"
+  lazy val jacksonModule = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.1"
   lazy val metadataSchema = "uk.gov.nationalarchives" % "da-metadata-schema_3" % "0.0.37"
   lazy val jsonSchemaValidator = "com.networknt" % "json-schema-validator" % "1.5.2"
   lazy val pekkoActor = "org.apache.pekko" %% "pekko-actor-typed" % pekkoVersion
