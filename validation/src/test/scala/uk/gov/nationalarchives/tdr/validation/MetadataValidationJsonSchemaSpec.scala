@@ -110,7 +110,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       val data: Set[ObjectMetadata] = dataBuilder("Is the title sensitive for the public?", "blah")
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
       validationErrors("file1").size shouldBe 1
-      singleErrorCheck(validationErrors, "title_closed", "unionType", SCHEMA_BASE)
+      singleErrorCheck(validationErrors, "title_closed", "type", SCHEMA_BASE)
     }
     "validate file path ok with one character" in {
       val data: Set[ObjectMetadata] = dataBuilder("Filepath", "b")
@@ -155,20 +155,30 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
     "return no errors if all fields have valid values when closure_type is Open" in {
       val data: Set[ObjectMetadata] = closureDataBuilder(
         closureType = Some("Open"),
-        descriptionClosed = Some("No")
+        descriptionClosed = Some("No"),
+        titleClosed = Some("No")
       )
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_OPEN, data)
       validationErrors("file1").size shouldBe 0
     }
 
     "not return any errors from Closure Schema when closure_type is Open and start date empty" in {
-      val data: Set[ObjectMetadata] = closureDataBuilder(closureType = Some("Open"))
+      val data: Set[ObjectMetadata] = closureDataBuilder(
+        closureType = Some("Open"),
+        descriptionClosed = Some("No"),
+        titleClosed = Some("No")
+      )
 
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_OPEN, data)
       validationErrors("file1") shouldBe List.empty
     }
     "return any errors from Closure Schema when closure_type is Open and start date is not empty" in {
-      val data: Set[ObjectMetadata] = closureDataBuilder(closureType = Some("Open"), closureStartDate = Some("2012-12-12"))
+      val data: Set[ObjectMetadata] = closureDataBuilder(
+        closureType = Some("Open"),
+        descriptionClosed = Some("No"),
+        titleClosed = Some("No"),
+        closureStartDate = Some("2012-12-12")
+      )
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_OPEN, data)
       validationErrors("file1").size shouldBe 1
       singleErrorCheck(validationErrors, "closure_start_date", "type", SCHEMA_CLOSURE_OPEN)
@@ -220,7 +230,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
 
       validationErrors("file1").size shouldBe 5
       validationErrors("file1") should contain theSameElementsAs List(
-        ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "enum"),
+        ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "const"),
         ValidationError(SCHEMA_CLOSURE_OPEN, "foi_exemption_asserted", "type"),
         ValidationError(SCHEMA_CLOSURE_OPEN, "closure_start_date", "type"),
         ValidationError(SCHEMA_CLOSURE_OPEN, "closure_period", "type"),
@@ -248,24 +258,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       validationErrors("file1").size shouldBe 0
     }
 
-    "return errors if title_closed is true but alternative_title is not provided when closure_type is Closed" in {
-      val data: Set[ObjectMetadata] = closureDataBuilder(
-        closureType = Some("Closed"),
-        closureStartDate = Some("2001-12-12"),
-        closurePeriod = Some("5"),
-        foiExemptionAsserted = Some("2001-12-12"),
-        foiCodes = Some("27(1)"),
-        titleClosed = Some("Yes"),
-        descriptionClosed = Some("No")
-      )
-      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_CLOSED, data)
-      validationErrors("file1").size shouldBe 1
-      validationErrors("file1") should contain theSameElementsAs List(
-        ValidationError(SCHEMA_CLOSURE_CLOSED, "title_alternate", "type")
-      )
-    }
-
-    "return errors if descriptionClosed is true but alternative_description is not provided when closure_type is Closed" in {
+    "return no errors if title/description is false and an alternative title/description is not provided when closure_type is Closed" in {
       val data: Set[ObjectMetadata] = closureDataBuilder(
         closureType = Some("Closed"),
         closureStartDate = Some("2001-12-12"),
@@ -273,12 +266,128 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
         foiExemptionAsserted = Some("2001-12-12"),
         foiCodes = Some("27(1)"),
         titleClosed = Some("No"),
+        descriptionClosed = Some("No")
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_CLOSED, data)
+      validationErrors("file1").size shouldBe 0
+    }
+
+    "return no errors if title/description closed is true an alternative title/description is provided when closure_type is Closed" in {
+      val data: Set[ObjectMetadata] = closureDataBuilder(
+        closureType = Some("Closed"),
+        closureStartDate = Some("2001-12-12"),
+        closurePeriod = Some("5"),
+        foiExemptionAsserted = Some("2001-12-12"),
+        foiCodes = Some("27(1)"),
+        titleClosed = Some("Yes"),
+        titleAlternative = Some("alt title"),
+        descriptionClosed = Some("Yes"),
+        descriptionAlternative = Some("alt desc")
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_CLOSED, data)
+      validationErrors("file1").size shouldBe 0
+    }
+
+    "return errors if title/description closed is true but an alternative title/description is not provided when closure_type is Closed" in {
+      val data: Set[ObjectMetadata] = closureDataBuilder(
+        closureType = Some("Closed"),
+        closureStartDate = Some("2001-12-12"),
+        closurePeriod = Some("5"),
+        foiExemptionAsserted = Some("2001-12-12"),
+        foiCodes = Some("27(1)"),
+        titleClosed = Some("Yes"),
         descriptionClosed = Some("Yes")
       )
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_CLOSED, data)
-      validationErrors("file1").size shouldBe 1
+      validationErrors("file1").size shouldBe 2
       validationErrors("file1") should contain theSameElementsAs List(
+        ValidationError(SCHEMA_CLOSURE_CLOSED, "title_alternate", "type"),
         ValidationError(SCHEMA_CLOSURE_CLOSED, "description_alternate", "type")
+      )
+    }
+
+    "allow title/description to be null for closed" in {
+      val data: Set[ObjectMetadata] = closureDataBuilder(
+        closureType = Some("Closed"),
+        closureStartDate = Some("2001-12-12"),
+        closurePeriod = Some("5"),
+        foiExemptionAsserted = Some("2001-12-12"),
+        foiCodes = Some("27(1)"),
+        titleClosed = None,
+        descriptionClosed = Some(""),
+        titleAlternative = Some(""),
+        descriptionAlternative = None
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_CLOSED, data)
+      validationErrors("file1").size shouldBe 2
+      validationErrors("file1") should contain theSameElementsAs List(
+        ValidationError(SCHEMA_CLOSURE_CLOSED, "title_closed", "type"),
+        ValidationError(SCHEMA_CLOSURE_CLOSED, "description_closed", "type")
+      )
+    }
+
+    "don't allow title/description closed to be null for open" in {
+      val data: Set[ObjectMetadata] = closureDataBuilder(
+        closureType = Some("Open"),
+        titleClosed = None,
+        descriptionClosed = Some(""),
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_OPEN, data)
+      validationErrors("file1").size shouldBe 2
+      println( validationErrors("file1"))
+      validationErrors("file1") should contain theSameElementsAs List(
+        ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "const"),
+        ValidationError(SCHEMA_CLOSURE_OPEN, "description_closed", "const")
+      )
+    }
+
+    "don't allow title/description closed to be true for open" in {
+      val data: Set[ObjectMetadata] = closureDataBuilder(
+        closureType = Some("Open"),
+        titleClosed = Some("Yes"),
+        descriptionClosed = Some("Yes"),
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_OPEN, data)
+      validationErrors("file1").size shouldBe 2
+      println( validationErrors("file1"))
+      validationErrors("file1") should contain theSameElementsAs List(
+        ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "const"),
+        ValidationError(SCHEMA_CLOSURE_OPEN, "description_closed", "const")
+      )
+    }
+
+
+    "don't allow title/description closed to be null for base" in {
+      val data: Set[ObjectMetadata] = closureDataBuilder(
+        closureType = Some("Open"),
+        titleClosed = None,
+        descriptionClosed = Some(""),
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 2
+      validationErrors("file1") should contain theSameElementsAs List(
+        ValidationError(SCHEMA_BASE, "title_closed", "type"),
+        ValidationError(SCHEMA_BASE, "description_closed", "type")
+      )
+    }
+
+    "return errors if title/description closed is false but an alternative title/description is provided when closure_type is Closed" in {
+      val data: Set[ObjectMetadata] = closureDataBuilder(
+        closureType = Some("Closed"),
+        closureStartDate = Some("2001-12-12"),
+        closurePeriod = Some("5"),
+        foiExemptionAsserted = Some("2001-12-12"),
+        foiCodes = Some("27(1)"),
+        titleClosed = Some("No"),
+        titleAlternative = Some("alt title"),
+        descriptionClosed = Some("No"),
+        descriptionAlternative = Some("alt desc"),
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_CLOSED, data)
+      validationErrors("file1").size shouldBe 2
+      validationErrors("file1") should contain theSameElementsAs List(
+        ValidationError(SCHEMA_CLOSURE_CLOSED, "title_closed", "const"),
+        ValidationError(SCHEMA_CLOSURE_CLOSED, "description_closed", "const")
       )
     }
 
@@ -324,7 +433,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       errors("file_a") should contain(ValidationError(SCHEMA_BASE, "closure_start_date", "format.date"))
       errors("file_a") should contain(ValidationError(SCHEMA_CLOSURE_OPEN, "closure_start_date", "type"))
       errors("file_a") should contain(ValidationError(SCHEMA_CLOSURE_OPEN, "closure_period", "type"))
-      errors("file_a") should contain(ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "enum"))
+      errors("file_a") should contain(ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "const"))
     }
 
     "validate file rows that produce error from base schema and closure_closed schema" in {
