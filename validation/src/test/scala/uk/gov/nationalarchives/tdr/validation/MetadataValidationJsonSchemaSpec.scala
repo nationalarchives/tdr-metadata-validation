@@ -162,7 +162,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       validationErrors("file1").size shouldBe 0
     }
 
-    "not return any errors from Closure Schema when closure_type is Open and start date empty" in {
+    "not return any errors from Closure Schema when closure_type is Open and title/desc are open and start date empty" in {
       val data: Set[ObjectMetadata] = closureDataBuilder(
         closureType = Some("Open"),
         descriptionClosed = Some("No"),
@@ -172,7 +172,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_OPEN, data)
       validationErrors("file1") shouldBe List.empty
     }
-    "return any errors from Closure Schema when closure_type is Open and start date is not empty" in {
+    "return any errors from Closure Schema when closure_type is Open and title/desc are open and start date is not empty" in {
       val data: Set[ObjectMetadata] = closureDataBuilder(
         closureType = Some("Open"),
         descriptionClosed = Some("No"),
@@ -258,7 +258,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       validationErrors("file1").size shouldBe 0
     }
 
-    "return no errors if title/description is false and an alternative title/description is not provided when closure_type is Closed" in {
+    "return no errors if title/description closed is false and an alternative title/description is not provided when closure_type is Closed" in {
       val data: Set[ObjectMetadata] = closureDataBuilder(
         closureType = Some("Closed"),
         closureStartDate = Some("2001-12-12"),
@@ -306,7 +306,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       )
     }
 
-    "allow title/description to be null for closed" in {
+    "don't allow title/description closed to be null for closed" in {
       val data: Set[ObjectMetadata] = closureDataBuilder(
         closureType = Some("Closed"),
         closureStartDate = Some("2001-12-12"),
