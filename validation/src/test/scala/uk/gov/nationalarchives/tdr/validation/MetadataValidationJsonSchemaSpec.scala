@@ -330,11 +330,10 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       val data: Set[ObjectMetadata] = closureDataBuilder(
         closureType = Some("Open"),
         titleClosed = None,
-        descriptionClosed = Some(""),
+        descriptionClosed = Some("")
       )
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_OPEN, data)
       validationErrors("file1").size shouldBe 2
-      println( validationErrors("file1"))
       validationErrors("file1") should contain theSameElementsAs List(
         ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "const"),
         ValidationError(SCHEMA_CLOSURE_OPEN, "description_closed", "const")
@@ -345,23 +344,21 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       val data: Set[ObjectMetadata] = closureDataBuilder(
         closureType = Some("Open"),
         titleClosed = Some("Yes"),
-        descriptionClosed = Some("Yes"),
+        descriptionClosed = Some("Yes")
       )
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_OPEN, data)
       validationErrors("file1").size shouldBe 2
-      println( validationErrors("file1"))
       validationErrors("file1") should contain theSameElementsAs List(
         ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "const"),
         ValidationError(SCHEMA_CLOSURE_OPEN, "description_closed", "const")
       )
     }
 
-
     "don't allow title/description closed to be null for base" in {
       val data: Set[ObjectMetadata] = closureDataBuilder(
         closureType = Some("Open"),
         titleClosed = None,
-        descriptionClosed = Some(""),
+        descriptionClosed = Some("")
       )
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
       validationErrors("file1").size shouldBe 2
@@ -381,7 +378,7 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
         titleClosed = Some("No"),
         titleAlternative = Some("alt title"),
         descriptionClosed = Some("No"),
-        descriptionAlternative = Some("alt desc"),
+        descriptionAlternative = Some("alt desc")
       )
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_CLOSED, data)
       validationErrors("file1").size shouldBe 2
