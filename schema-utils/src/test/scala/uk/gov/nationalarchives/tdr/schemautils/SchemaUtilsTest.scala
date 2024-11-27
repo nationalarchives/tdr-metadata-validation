@@ -24,7 +24,7 @@ class SchemaUtilsTest extends AnyWordSpec {
 
   "baseSchemaNode" should {
 
-    "return the base schema property from the supplied '$ref' schema reference if property exists in base schema"  in {
+    "return the base schema property from the supplied '$ref' schema reference if property exists in base schema" in {
       val result = baseSchemaNode("classpath:/metadata-schema/baseSchema.schema.json#/properties/file_path")
       result.isDefined should be(true)
       result.get._1 should be("file_path")
