@@ -18,7 +18,7 @@ class SchemaUtilsTest extends AnyWordSpec {
       val otherSchemaNode: JsonNode = new ObjectMapper().readTree(getClass.getResourceAsStream(otherSchema))
 
       val properties = schemaProperties(otherSchemaNode)
-      properties.size should be(6)
+      properties.size should be(7)
     }
   }
 
