@@ -8,7 +8,7 @@ object Dependencies {
   lazy val ujson = "com.lihaoyi" % "ujson_native0.5_2.13" % "4.1.0"
   lazy val jacksonModule = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.2"
   lazy val metadataSchema = "uk.gov.nationalarchives" % "da-metadata-schema_3" % "0.0.44"
-  lazy val jsonSchemaValidator = "com.networknt" % "json-schema-validator" % "1.5.4"
+  lazy val jsonSchemaValidator = "com.networknt" % "json-schema-validator" % "1.5.5"
   lazy val pekkoActor = "org.apache.pekko" %% "pekko-actor-typed" % pekkoVersion
   lazy val pekkoConnectors = "org.apache.pekko" %% "pekko-connectors-csv" % pekkoVersion
   lazy val pekkoStream = "org.apache.pekko" %% "pekko-stream" % pekkoVersion
