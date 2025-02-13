@@ -57,8 +57,7 @@ class ClosurePeriodSpec extends AnyWordSpecLike {
       )
     }
 
-
-    //TODO: producing ValidationError(SCHEMA_BASE, "closure_period", "type") instead of  ValidationError(SCHEMA_BASE, "closure_period", "unionType")
+    // TODO: producing ValidationError(SCHEMA_BASE, "closure_period", "type") instead of  ValidationError(SCHEMA_BASE, "closure_period", "unionType")
 //    "error(s) if the value is a string" in {
 //      val closedTestFileRow = closedMetadataFileRow(closurePeriod = Some("one hundred as a string"))
 //      validationErrors(closedTestFileRow) should contain theSameElementsAs List(
