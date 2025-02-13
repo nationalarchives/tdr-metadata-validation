@@ -10,7 +10,7 @@ lazy val commonSettings = Seq(
   ),
   ThisBuild / organization := "uk.gov.nationalarchives",
   ThisBuild / organizationName := "National Archives",
-  scalaVersion := "2.13.15",
+  scalaVersion := "2.13.16",
   version := version.value,
   ThisBuild / scmInfo := Some(
     ScmInfo(
