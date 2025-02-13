@@ -34,46 +34,45 @@ class ClosureTypeSpec extends AnyWordSpecLike {
     "error(s) if the value is open (no capital O for Open) for an open record" in {
       val openTestFileRow = openMetadataFileRow(closureType = Some("open"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_type", "enum")  //Must be Open or Closed
+        ValidationError(SCHEMA_BASE, "closure_type", "enum") // Must be Open or Closed
       )
     }
 
     "error(s) if the value is closed (no capital C for Closed) for a closed record" in {
       val closedTestFileRow = closedMetadataFileRow(closureType = Some("closed"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_type", "enum")  //Must be Open or Closed
+        ValidationError(SCHEMA_BASE, "closure_type", "enum") // Must be Open or Closed
       )
     }
 
     "error(s) if the value is missing for an open record" in {
       val openTestFileRow = openMetadataFileRow(closureType = Some(""))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_type", "type"), //Must be either Open or Closed  //TODO: duplicated msgs?
-        ValidationError(SCHEMA_BASE, "closure_type", "enum")  //Must be Open or Closed
+        ValidationError(SCHEMA_BASE, "closure_type", "type"), // Must be either Open or Closed  //TODO: duplicated msgs?
+        ValidationError(SCHEMA_BASE, "closure_type", "enum") // Must be Open or Closed
       )
     }
 
     "error(s) if the value is missing for a closed record" in {
       val closedTestFileRow = closedMetadataFileRow(closureType = Some(""))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_type", "type"), //Must be either Open or Closed  //TODO: duplicated msgs?
-        ValidationError(SCHEMA_BASE, "closure_type", "enum")  //Must be Open or Closed
+        ValidationError(SCHEMA_BASE, "closure_type", "type"), // Must be either Open or Closed  //TODO: duplicated msgs?
+        ValidationError(SCHEMA_BASE, "closure_type", "enum") // Must be Open or Closed
       )
     }
 
     "error(s) if the value is invalid (neither Open nor Closed) for an open record" in {
       val openTestFileRow = openMetadataFileRow(closureType = Some("neither Open nor Closed"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_type", "enum")  //Must be Open or Closed
+        ValidationError(SCHEMA_BASE, "closure_type", "enum") // Must be Open or Closed
       )
     }
 
     "error(s) if the value is invalid (neither Open nor Closed) for a closed record" in {
       val closedTestFileRow = closedMetadataFileRow(closureType = Some("neither Open nor Closed"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_type", "enum")  //Must be Open or Closed
+        ValidationError(SCHEMA_BASE, "closure_type", "enum") // Must be Open or Closed
       )
     }
   }
 }
-

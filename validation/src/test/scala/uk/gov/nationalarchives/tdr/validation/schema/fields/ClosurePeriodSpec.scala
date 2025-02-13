@@ -39,61 +39,60 @@ class ClosurePeriodSpec extends AnyWordSpecLike {
     "error(s) if the value is less than one" in {
       val closedTestFileRow = closedMetadataFileRow(closurePeriod = Some("0"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_period", "minimum")   //Must be a number between 1 and 150
+        ValidationError(SCHEMA_BASE, "closure_period", "minimum") // Must be a number between 1 and 150
       )
     }
 
     "error(s) if the value is negative" in {
       val closedTestFileRow = closedMetadataFileRow(closurePeriod = Some("-99"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_period", "minimum")   //Must be a number between 1 and 150
+        ValidationError(SCHEMA_BASE, "closure_period", "minimum") // Must be a number between 1 and 150
       )
     }
 
     "error(s) if the value is greater than 150" in {
       val closedTestFileRow = closedMetadataFileRow(closurePeriod = Some("151"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_period", "maximum")   //Must be a number between 1 and 150
+        ValidationError(SCHEMA_BASE, "closure_period", "maximum") // Must be a number between 1 and 150
       )
     }
 
     "error(s) if the value is a string" in {
       val closedTestFileRow = closedMetadataFileRow(closurePeriod = Some("one hundred as a string"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_period", "unionType"),      //Must be a number between 1 and 150
-        ValidationError(SCHEMA_CLOSURE_CLOSED, "closure_period", "type")  //Must be provided for a closed record  //TODO: review double msgs (see below)
+        ValidationError(SCHEMA_BASE, "closure_period", "unionType"), // Must be a number between 1 and 150
+        ValidationError(SCHEMA_CLOSURE_CLOSED, "closure_period", "type") // Must be provided for a closed record  //TODO: review double msgs (see below)
       )
     }
 
     "error(s) if the value is a boolean" in {
       val closedTestFileRow = closedMetadataFileRow(closurePeriod = Some("Yes"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_period", "unionType"),      //Must be a number between 1 and 150
-        ValidationError(SCHEMA_CLOSURE_CLOSED, "closure_period", "type")  //Must be provided for a closed record  //TODO: review double msgs (see below)
+        ValidationError(SCHEMA_BASE, "closure_period", "unionType"), // Must be a number between 1 and 150
+        ValidationError(SCHEMA_CLOSURE_CLOSED, "closure_period", "type") // Must be provided for a closed record  //TODO: review double msgs (see below)
       )
     }
 
     "error(s) if the value is missing for a closed record" in {
       val closedTestFileRow = closedMetadataFileRow(closurePeriod = Some(""))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_CLOSURE_CLOSED, "closure_period", "type")  //Must be provided for a closed record
+        ValidationError(SCHEMA_CLOSURE_CLOSED, "closure_period", "type") // Must be provided for a closed record
       )
     }
 
     "error(s) if the value is present for an open record" in {
       val openTestFileRow = openMetadataFileRow(closurePeriod = Some("99"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_CLOSURE_OPEN, "closure_period", "type")  //Must be empty for an open record
+        ValidationError(SCHEMA_CLOSURE_OPEN, "closure_period", "type") // Must be empty for an open record
       )
     }
 
     "error(s) if the value is present (and also invalid) for an open record" in {
       val openTestFileRow = openMetadataFileRow(closurePeriod = Some("999"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_CLOSURE_OPEN, "closure_period", "type"),  //Must be empty for an open record
-        ValidationError(SCHEMA_BASE, "closure_period", "maximum")        //Must be a number between 1 and 150 //TODO: conflicting msgs a bit?
+        ValidationError(SCHEMA_CLOSURE_OPEN, "closure_period", "type"), // Must be empty for an open record
+        ValidationError(SCHEMA_BASE, "closure_period", "maximum") // Must be a number between 1 and 150 //TODO: conflicting msgs a bit?
       )
     }
   }
 }
-

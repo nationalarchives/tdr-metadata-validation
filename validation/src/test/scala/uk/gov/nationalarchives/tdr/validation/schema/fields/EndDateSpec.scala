@@ -43,55 +43,55 @@ class EndDateSpec extends AnyWordSpecLike {
     "error(s) if the value is invalid (in future)" in {
       val openTestFileRow = openMetadataFileRow(dateOfRecord = Some("3024-12-25"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "end_date", "daBeforeToday") //This date is in the future, please correct
+        ValidationError(SCHEMA_BASE, "end_date", "daBeforeToday") // This date is in the future, please correct
       )
       val closedTestFileRow = closedMetadataFileRow(dateOfRecord = Some("3024-12-25"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "end_date", "daBeforeToday") //This date is in the future, please correct
+        ValidationError(SCHEMA_BASE, "end_date", "daBeforeToday") // This date is in the future, please correct
       )
     }
 
     "error(s) if the value is invalid (not a date)" in {
       val openTestFileRow = openMetadataFileRow(dateOfRecord = Some("xmas last year"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "end_date", "format.date") //We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
+        ValidationError(SCHEMA_BASE, "end_date", "format.date") // We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
       )
       val closedTestFileRow = closedMetadataFileRow(dateOfRecord = Some("xmas last year"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "end_date", "format.date") //We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
+        ValidationError(SCHEMA_BASE, "end_date", "format.date") // We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
       )
     }
 
     "error(s) if the value is invalid (alt date format yyyy-dd-mm)" in {
       val openTestFileRow = openMetadataFileRow(dateOfRecord = Some("2024-25-12"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "end_date", "format.date") //We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
+        ValidationError(SCHEMA_BASE, "end_date", "format.date") // We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
       )
       val closedTestFileRow = closedMetadataFileRow(dateOfRecord = Some("2024-25-12"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "end_date", "format.date") //We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
+        ValidationError(SCHEMA_BASE, "end_date", "format.date") // We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
       )
     }
 
     "error(s) if the value is invalid (alt date format slash)" in {
       val openTestFileRow = openMetadataFileRow(dateOfRecord = Some("25/12/2024"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "end_date", "format.date") //We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
+        ValidationError(SCHEMA_BASE, "end_date", "format.date") // We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
       )
       val closedTestFileRow = closedMetadataFileRow(dateOfRecord = Some("25/12/2024"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "end_date", "format.date") //We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
+        ValidationError(SCHEMA_BASE, "end_date", "format.date") // We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
       )
     }
 
     "error(s) if the value is invalid (a boolean)" in {
       val openTestFileRow = openMetadataFileRow(dateOfRecord = Some("Yes"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "end_date", "format.date") //We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
+        ValidationError(SCHEMA_BASE, "end_date", "format.date") // We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
       )
       val closedTestFileRow = closedMetadataFileRow(dateOfRecord = Some("Yes"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "end_date", "format.date") //We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
+        ValidationError(SCHEMA_BASE, "end_date", "format.date") // We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
       )
     }
   }

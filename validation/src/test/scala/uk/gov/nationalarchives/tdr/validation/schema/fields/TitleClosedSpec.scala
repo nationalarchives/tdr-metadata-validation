@@ -44,41 +44,40 @@ class TitleClosedSpec extends AnyWordSpecLike {
     "error(s) if the value is yes for an open record" in {
       val openTestFileRow = openMetadataFileRow(titleClosed = Some("Yes"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "const")   //Must be No for an open record
+        ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "const") // Must be No for an open record
       )
     }
 
     "error(s) if the value is invalid for an open record" in {
       val openTestFileRow = openMetadataFileRow(titleClosed = Some("neither Yes nor No"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "title_closed", "type"),           //Must be Yes or No
-        ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "const")   //Must be No for an open record
+        ValidationError(SCHEMA_BASE, "title_closed", "type"), // Must be Yes or No
+        ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "const") // Must be No for an open record
       )
     }
 
     "error(s) if the value is missing for an open record" in {
       val openTestFileRow = openMetadataFileRow(titleClosed = Some(""))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "title_closed", "type"),           //Must be Yes or No
-        ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "const")   //Must be No for an open record
+        ValidationError(SCHEMA_BASE, "title_closed", "type"), // Must be Yes or No
+        ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "const") // Must be No for an open record
       )
     }
 
     "error(s) if the value is invalid for a closed record" in {
       val closedTestFileRow = closedMetadataFileRow(titleClosed = Some("neither Yes nor No"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "title_closed", "type"),           //Must be Yes or No
-        ValidationError(SCHEMA_CLOSURE_CLOSED, "title_closed", "type")  //Must be provided for a closed record //TODO: it is wrong not missing (see next test)
+        ValidationError(SCHEMA_BASE, "title_closed", "type"), // Must be Yes or No
+        ValidationError(SCHEMA_CLOSURE_CLOSED, "title_closed", "type") // Must be provided for a closed record //TODO: it is wrong not missing (see next test)
       )
     }
 
     "error(s) if the value is missing for a closed record" in {
       val closedTestFileRow = closedMetadataFileRow(titleClosed = Some(""))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "title_closed", "type"),           //Must be Yes or No
-        ValidationError(SCHEMA_CLOSURE_CLOSED, "title_closed", "type")  //Must be provided for a closed record
+        ValidationError(SCHEMA_BASE, "title_closed", "type"), // Must be Yes or No
+        ValidationError(SCHEMA_CLOSURE_CLOSED, "title_closed", "type") // Must be provided for a closed record
       )
     }
   }
 }
-

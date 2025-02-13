@@ -34,81 +34,81 @@ class ClosureStartDateSpec extends AnyWordSpecLike {
     "error(s) if a value is provided for an open record" in {
       val openTestFileRow = openMetadataFileRow(closureStartDate = Some("2024-12-25"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_CLOSURE_OPEN, "closure_start_date", "type")  //Must be empty for an open record
+        ValidationError(SCHEMA_CLOSURE_OPEN, "closure_start_date", "type") // Must be empty for an open record
       )
     }
 
     "error(s) if a value is provided for an open record, and the value is invalid (in future)" in {
       val openTestFileRow = openMetadataFileRow(closureStartDate = Some("3024-12-25"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_CLOSURE_OPEN, "closure_start_date", "type"),  //Must be empty for an open record
-        ValidationError(SCHEMA_BASE, "closure_start_date", "daBeforeToday")  //This date is in the future, please correct //TODO: look at 2 x msgs
+        ValidationError(SCHEMA_CLOSURE_OPEN, "closure_start_date", "type"), // Must be empty for an open record
+        ValidationError(SCHEMA_BASE, "closure_start_date", "daBeforeToday") // This date is in the future, please correct //TODO: look at 2 x msgs
       )
     }
 
     "error(s) if a value is provided for an open record, and the value is invalid (not a date)" in {
       val openTestFileRow = openMetadataFileRow(closureStartDate = Some("xmas last year"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_CLOSURE_OPEN, "closure_start_date", "type"),  //Must be empty for an open record //TODO: look at 2 x msgs
-        ValidationError(SCHEMA_BASE, "closure_start_date", "format.date")  //We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
+        ValidationError(SCHEMA_CLOSURE_OPEN, "closure_start_date", "type"), // Must be empty for an open record //TODO: look at 2 x msgs
+        ValidationError(SCHEMA_BASE, "closure_start_date", "format.date") // We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
       )
     }
 
     "error(s) if a value is provided for an open record, and the value is invalid (alt date format yyyy-dd-mm)" in {
       val openTestFileRow = openMetadataFileRow(closureStartDate = Some("2024-25-12"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_CLOSURE_OPEN, "closure_start_date", "type"),  //Must be empty for an open record //TODO: look at 2 x msgs
-        ValidationError(SCHEMA_BASE, "closure_start_date", "format.date")  //We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
+        ValidationError(SCHEMA_CLOSURE_OPEN, "closure_start_date", "type"), // Must be empty for an open record //TODO: look at 2 x msgs
+        ValidationError(SCHEMA_BASE, "closure_start_date", "format.date") // We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
       )
     }
 
     "error(s) if a value is provided for an open record, and the value is invalid (alt date format slash)" in {
       val openTestFileRow = openMetadataFileRow(closureStartDate = Some("25/12/2024"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_CLOSURE_OPEN, "closure_start_date", "type"),  //Must be empty for an open record //TODO: look at 2 x msgs
-        ValidationError(SCHEMA_BASE, "closure_start_date", "format.date")  //We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
+        ValidationError(SCHEMA_CLOSURE_OPEN, "closure_start_date", "type"), // Must be empty for an open record //TODO: look at 2 x msgs
+        ValidationError(SCHEMA_BASE, "closure_start_date", "format.date") // We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
       )
     }
 
     "error(s) if the value is missing for a closed record" in {
       val closedTestFileRow = closedMetadataFileRow(closureStartDate = Some(""))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_CLOSURE_CLOSED, "closure_start_date", "type")  //Must be provided for a closed record
+        ValidationError(SCHEMA_CLOSURE_CLOSED, "closure_start_date", "type") // Must be provided for a closed record
       )
     }
 
     "error(s) if the value is invalid (in future)" in {
       val closedTestFileRow = closedMetadataFileRow(closureStartDate = Some("3024-12-25"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_start_date", "daBeforeToday")  //This date is in the future, please correct //TODO: look at 2 x msgs
+        ValidationError(SCHEMA_BASE, "closure_start_date", "daBeforeToday") // This date is in the future, please correct //TODO: look at 2 x msgs
       )
     }
 
     "error(s) if the value is invalid (not a date)" in {
       val closedTestFileRow = closedMetadataFileRow(closureStartDate = Some("xmas last year"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_start_date", "format.date")  //We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
+        ValidationError(SCHEMA_BASE, "closure_start_date", "format.date") // We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
       )
     }
 
     "error(s) if the value is invalid (alt date format yyyy-dd-mm)" in {
       val closedTestFileRow = closedMetadataFileRow(closureStartDate = Some("2024-25-12"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_start_date", "format.date")  //We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
+        ValidationError(SCHEMA_BASE, "closure_start_date", "format.date") // We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
       )
     }
 
     "error(s) if the value is invalid (alt date format slash)" in {
       val closedTestFileRow = closedMetadataFileRow(closureStartDate = Some("25/12/2024"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_start_date", "format.date") //We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
+        ValidationError(SCHEMA_BASE, "closure_start_date", "format.date") // We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
       )
     }
 
     "error(s) if the value is invalid (a boolean)" in {
       val closedTestFileRow = closedMetadataFileRow(closureStartDate = Some("Yes"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_start_date", "format.date") //We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
+        ValidationError(SCHEMA_BASE, "closure_start_date", "format.date") // We are unable to recognise this as a valid date format, please provide a date in the format yyyy-mm-dd
       )
     }
   }

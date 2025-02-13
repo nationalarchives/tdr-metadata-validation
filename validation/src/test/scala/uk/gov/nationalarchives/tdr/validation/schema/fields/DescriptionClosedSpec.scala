@@ -35,12 +35,12 @@ class DescriptionClosedSpec extends AnyWordSpecLike {
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
-    "successful treatment of false as a string" in  {
+    "successful treatment of false as a string" in {
       val closedTestFileRow = closedMetadataFileRow(descriptionClosed = Some("Yes"), descriptionAlternative = Some("false"))
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
-    "successful treatment of 123 as a string" in  {
+    "successful treatment of 123 as a string" in {
       val closedTestFileRow = closedMetadataFileRow(descriptionClosed = Some("Yes"), descriptionAlternative = Some("123"))
       validationErrors(closedTestFileRow).size shouldBe 0
     }
@@ -59,41 +59,40 @@ class DescriptionClosedSpec extends AnyWordSpecLike {
     "error(s) if the value is yes for an open record" in {
       val openTestFileRow = openMetadataFileRow(descriptionClosed = Some("Yes"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_CLOSURE_OPEN, "description_closed", "const")   //Must be No for an open record
+        ValidationError(SCHEMA_CLOSURE_OPEN, "description_closed", "const") // Must be No for an open record
       )
     }
 
     "error(s) if the value is invalid for an open record" in {
       val openTestFileRow = openMetadataFileRow(descriptionClosed = Some("neither Yes nor No"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "description_closed", "type"),           //Must be Yes or No
-        ValidationError(SCHEMA_CLOSURE_OPEN, "description_closed", "const")   //Must be No for an open record
+        ValidationError(SCHEMA_BASE, "description_closed", "type"), // Must be Yes or No
+        ValidationError(SCHEMA_CLOSURE_OPEN, "description_closed", "const") // Must be No for an open record
       )
     }
 
     "error(s) if the value is missing for an open record" in {
       val openTestFileRow = openMetadataFileRow(descriptionClosed = Some(""))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "description_closed", "type"),           //Must be Yes or No
-        ValidationError(SCHEMA_CLOSURE_OPEN, "description_closed", "const")   //Must be No for an open record
+        ValidationError(SCHEMA_BASE, "description_closed", "type"), // Must be Yes or No
+        ValidationError(SCHEMA_CLOSURE_OPEN, "description_closed", "const") // Must be No for an open record
       )
     }
 
     "error(s) if the value is invalid for a closed record" in {
       val closedTestFileRow = closedMetadataFileRow(descriptionClosed = Some("neither Yes nor No"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "description_closed", "type"),           //Must be Yes or No
-        ValidationError(SCHEMA_CLOSURE_CLOSED, "description_closed", "type")  //Must be provided for a closed record //TODO: it is wrong not missing (see next test)
+        ValidationError(SCHEMA_BASE, "description_closed", "type"), // Must be Yes or No
+        ValidationError(SCHEMA_CLOSURE_CLOSED, "description_closed", "type") // Must be provided for a closed record //TODO: it is wrong not missing (see next test)
       )
     }
 
     "error(s) if the value is missing for a closed record" in {
       val closedTestFileRow = closedMetadataFileRow(descriptionClosed = Some(""))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "description_closed", "type"),           //Must be Yes or No
-        ValidationError(SCHEMA_CLOSURE_CLOSED, "description_closed", "type")  //Must be provided for a closed record
+        ValidationError(SCHEMA_BASE, "description_closed", "type"), // Must be Yes or No
+        ValidationError(SCHEMA_CLOSURE_CLOSED, "description_closed", "type") // Must be provided for a closed record
       )
     }
   }
 }
-

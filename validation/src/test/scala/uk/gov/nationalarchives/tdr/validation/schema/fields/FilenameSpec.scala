@@ -34,11 +34,11 @@ class FilenameSpec extends AnyWordSpecLike {
     "error(s) if the cell itself is empty" in {
       val openTestFileRow = openMetadataFileRow(fileName = Some(""))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "file_name", "type") //Must not be empty
+        ValidationError(SCHEMA_BASE, "file_name", "type") // Must not be empty
       )
       val closedTestFileRow = closedMetadataFileRow(fileName = Some(""))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "file_name", "type") //Must not be empty
+        ValidationError(SCHEMA_BASE, "file_name", "type") // Must not be empty
       )
     }
   }
