@@ -10,7 +10,7 @@ class FilenameSpec extends AnyWordSpecLike {
 
   "When validating against all schema we see" should {
 
-    "success if whole column may be missing" in {
+    "success if whole column is missing" in {
       val openTestFileRow = openMetadataFileRow(fileName = None)
       validationErrors(openTestFileRow).size shouldBe 0
       val closedTestFileRow = closedMetadataFileRow(fileName = None)
@@ -28,6 +28,13 @@ class FilenameSpec extends AnyWordSpecLike {
       val openTestFileRow = openMetadataFileRow(fileName = Some("a"))
       validationErrors(openTestFileRow).size shouldBe 0
       val closedTestFileRow = closedMetadataFileRow(fileName = Some("a"))
+      validationErrors(closedTestFileRow).size shouldBe 0
+    }
+
+    "success if a long filepath is provided (no max - this tests 8,001 char)" in {
+      val openTestFileRow = openMetadataFileRow(fileName = Some(eightThousandCharString + "1"))
+      validationErrors(openTestFileRow).size shouldBe 0
+      val closedTestFileRow = closedMetadataFileRow(fileName = Some(eightThousandCharString + "1"))
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
