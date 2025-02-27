@@ -11,7 +11,7 @@ class ClosurePeriodSpec extends AnyWordSpecLike {
   "When validating against all schema we see " should {
 
     "success if the value is 1 (the min allowed) for a closed record" in {
-      val closedTestFileRow = closedMetadataFileRow(closurePeriod = Some("99"))
+      val closedTestFileRow = closedMetadataFileRow(closurePeriod = Some("1"))
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 

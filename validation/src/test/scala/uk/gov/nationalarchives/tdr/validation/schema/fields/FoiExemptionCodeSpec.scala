@@ -26,7 +26,7 @@ class FoiExemptionCodeSpec extends AnyWordSpecLike {
     }
 
     "success if two valid values are provided" in {
-      val closedTestFileRow = closedMetadataFileRow(foiCodes = Some("38|EIRs 12(3) & 13"))
+      val closedTestFileRow = closedMetadataFileRow(foiCodes = Some("38|EIR 12(5)(c)"))
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
@@ -34,8 +34,8 @@ class FoiExemptionCodeSpec extends AnyWordSpecLike {
       val closedTestFileRow = closedMetadataFileRow(foiCodes =
         Some(
           "23|24|26|27(1)|27(2)|28|29|30(1)|30(2)|31|32|33|34|35(1)(a)" +
-            "|35(1)(b)|35(1)(c)|35(1)(d)|36|37(1)(a)|37(1)(aa)|37(1)(ac)" +
-            "|37(1)(ad)|37(1)(b)|38|39|40(2)|41|42|43|43(1)|43(2)|44|EIRs 12(3) & 13|EIR 12(5)(a)|" +
+            "|35(1)(b)|35(1)(c)|35(1)(d)|36|37(1)(a)|37(1)(aa)|37(1)(ab)|37(1)(ac)" +
+            "|37(1)(ad)|37(1)(b)|38|39|40(2)|41|42|43(1)|43(2)|44|EIR 12(5)(a)|" +
             "EIR 12(5)(b)|EIR 12(5)(c)|EIR 12(5)(d)|EIR 12(5)(e)|EIR 12(5)(f)|EIR 12(5)(g)"
         )
       )
