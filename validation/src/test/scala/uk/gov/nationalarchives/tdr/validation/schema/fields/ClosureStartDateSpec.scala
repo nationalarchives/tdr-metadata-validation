@@ -80,7 +80,7 @@ class ClosureStartDateSpec extends AnyWordSpecLike {
     "error(s) if the value is invalid (in future)" in {
       val closedTestFileRow = closedMetadataFileRow(closureStartDate = Some("3024-12-25"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "closure_start_date", "daBeforeToday") // This date is in the future, please correct //TODO: look at 2 x msgs
+        ValidationError(SCHEMA_BASE, "closure_start_date", "daBeforeToday") // This date is in the future, please correct
       )
     }
 
