@@ -38,7 +38,7 @@ class DescriptionSpec extends AnyWordSpecLike {
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
-    "succeeds with a carriage return in  the description" in {
+    "succeeds with a carriage return in the description" in {
       val openTestFileRow = openMetadataFileRow(description = Some("a description \n including a carriage return"))
       validationErrors(openTestFileRow).size shouldBe 0
       val closedTestFileRow = closedMetadataFileRow(description = Some("a description \n including a carriage return"))
