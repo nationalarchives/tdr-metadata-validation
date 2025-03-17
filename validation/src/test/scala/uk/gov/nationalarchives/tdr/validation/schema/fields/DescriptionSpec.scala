@@ -31,17 +31,17 @@ class DescriptionSpec extends AnyWordSpecLike {
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
-    "succeeds if a single char description is provided " in {
-      val openTestFileRow = openMetadataFileRow(description = Some("a"))
-      validationErrors(openTestFileRow).size shouldBe 0
-      val closedTestFileRow = closedMetadataFileRow(description = Some("a"))
-      validationErrors(closedTestFileRow).size shouldBe 0
-    }
-
     "succeeds if a 8,000 char description is provided " in {
       val openTestFileRow = openMetadataFileRow(description = Some(eightThousandCharString))
       validationErrors(openTestFileRow).size shouldBe 0
       val closedTestFileRow = closedMetadataFileRow(description = Some(eightThousandCharString))
+      validationErrors(closedTestFileRow).size shouldBe 0
+    }
+
+    "succeeds with a carriage return in the description" in {
+      val openTestFileRow = openMetadataFileRow(description = Some("a description \n including a carriage return"))
+      validationErrors(openTestFileRow).size shouldBe 0
+      val closedTestFileRow = closedMetadataFileRow(description = Some("a description \n including a carriage return"))
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
