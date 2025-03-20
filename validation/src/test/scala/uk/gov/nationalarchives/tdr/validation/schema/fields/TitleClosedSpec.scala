@@ -52,7 +52,7 @@ class TitleClosedSpec extends AnyWordSpecLike {
       val openTestFileRow = openMetadataFileRow(titleClosed = Some("neither Yes nor No"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
         ValidationError(SCHEMA_BASE, "title_closed", "type"), // Must be Yes or No
-        ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "const") // Must be No for an open record
+        ValidationError(SCHEMA_CLOSURE_OPEN, "title_closed", "const") // Must be No for an open record  //TODO: duplicate msgs?
       )
     }
 

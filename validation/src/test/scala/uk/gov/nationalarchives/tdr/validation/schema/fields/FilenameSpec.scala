@@ -31,7 +31,7 @@ class FilenameSpec extends AnyWordSpecLike {
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
-    "success if a long filepath is provided (no max - this tests 8,001 char)" in {
+    "success if a long filename is provided (no max - this tests 8,001 char)" in {
       val openTestFileRow = openMetadataFileRow(fileName = Some(eightThousandCharString + "1"))
       validationErrors(openTestFileRow).size shouldBe 0
       val closedTestFileRow = closedMetadataFileRow(fileName = Some(eightThousandCharString + "1"))
