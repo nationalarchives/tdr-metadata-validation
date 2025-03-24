@@ -1,7 +1,7 @@
 package uk.gov.nationalarchives.tdr.validation.schema
 
 import com.networknt.schema._
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN, REQUIRED_SCHEMA}
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN, RELATIONSHIP_SCHEMA, REQUIRED_SCHEMA}
 import uk.gov.nationalarchives.tdr.validation.schema.extensions.DaBeforeToday
 
 import scala.jdk.CollectionConverters._
@@ -13,13 +13,15 @@ object JsonSchemaValidators {
       BASE_SCHEMA -> baseJsonSchemaValidator,
       CLOSURE_SCHEMA_CLOSED -> closureClosedJsonSchemaValidator,
       CLOSURE_SCHEMA_OPEN -> closureOpenJsonSchemaValidator,
-      REQUIRED_SCHEMA -> requiredJsonSchemaValidator
+      REQUIRED_SCHEMA -> requiredJsonSchemaValidator,
+      RELATIONSHIP_SCHEMA -> relationshipJsonSchemaValidator
     )
 
   private lazy val baseJsonSchemaValidator: JsonSchema = getJsonSchema(BASE_SCHEMA, Map("daBeforeToday" -> new DaBeforeToday))
   private lazy val closureClosedJsonSchemaValidator: JsonSchema = getJsonSchema(CLOSURE_SCHEMA_CLOSED)
   private lazy val closureOpenJsonSchemaValidator: JsonSchema = getJsonSchema(CLOSURE_SCHEMA_OPEN)
   private lazy val requiredJsonSchemaValidator: JsonSchema = getJsonSchema(REQUIRED_SCHEMA)
+  private lazy val relationshipJsonSchemaValidator: JsonSchema = getJsonSchema(RELATIONSHIP_SCHEMA)
 
   def validateJson(jsonSchemaDefinitions: JsonSchemaDefinition, json: String): Set[ValidationMessage] = {
     validators(jsonSchemaDefinitions).validate(json, InputFormat.JSON).asScala.toSet

@@ -2,7 +2,7 @@ package uk.gov.nationalarchives.tdr.validation
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, RELATIONSHIP_SCHEMA}
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaValidators
 
 class JsonSchemaValidatorsSpec extends AnyWordSpec with Matchers {
@@ -42,6 +42,19 @@ class JsonSchemaValidatorsSpec extends AnyWordSpec with Matchers {
         }"""
         val errors = JsonSchemaValidators.validateJson(BASE_SCHEMA, json)
         errors.size shouldBe 1
+      }
+      "validating using relationship schema" should {
+        "produce a type error for empty description when alternate description set" in {
+          val json =
+            """{
+          "description_alternate":"alternate",
+          "description": null
+          }"""
+          val errors = JsonSchemaValidators.validateJson(RELATIONSHIP_SCHEMA, json)
+          val error = errors.iterator.next()
+          error.getInstanceLocation.getName(0) shouldBe "description"
+          error.getMessageKey shouldBe "type"
+        }
       }
     }
   }

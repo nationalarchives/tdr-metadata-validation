@@ -4,7 +4,7 @@ import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.testkit.{ImplicitSender, TestKit}
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpecLike
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN, REQUIRED_SCHEMA}
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition._
 import uk.gov.nationalarchives.tdr.validation.schema.MetadataValidationJsonSchema.ObjectMetadata
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.{SCHEMA_BASE, _}
 import uk.gov.nationalarchives.tdr.validation.schema.{MetadataValidationJsonSchema, ValidationError}
@@ -479,10 +479,30 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       errors("file_a") should contain(ValidationError(SCHEMA_REQUIRED, "description", "required"))
     }
   }
+  "MetadataValidationJsonSchema with RELATIONSHIP_SCHEMA" should {
+    "validate error when no description and description alternate provided" in {
+      val values = List(("Alternative description", "set alternate description"), ("description", ""))
+      val data: Set[ObjectMetadata] = dataBuilderMultipleValues(values)
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(RELATIONSHIP_SCHEMA, data)
+      validationErrors("file1").size shouldBe 1
+      singleErrorCheck(validationErrors, "description", "type", SCHEMA_RELATIONSHIP)
+    }
+    "validate valid when no description and no description alternate" in {
+      val values = List(("Alternative description", ""), ("description", ""))
+      val data: Set[ObjectMetadata] = dataBuilderMultipleValues(values)
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(RELATIONSHIP_SCHEMA, data)
+      validationErrors("file1").size shouldBe 0
+    }
+  }
 
   private def dataBuilder(key: String, value: String): Set[ObjectMetadata] = {
     val metadata = Metadata(key, value)
     Set(ObjectMetadata("file1", Set(metadata)))
+  }
+
+  private def dataBuilderMultipleValues(data: List[(String, String)]): Set[ObjectMetadata] = {
+    val metadata = data.map(value => Metadata(value._1, value._2))
+    Set(ObjectMetadata("file1", metadata.toSet))
   }
 
   private def closureDataBuilder(
