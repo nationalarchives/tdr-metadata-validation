@@ -1,7 +1,13 @@
 package uk.gov.nationalarchives.tdr.validation.schema
 
-import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.{SCHEMA_BASE, SCHEMA_CLOSURE_CLOSED, SCHEMA_CLOSURE_OPEN, SCHEMA_REQUIRED, SCHEMA_RELATIONSHIP,  ValidationProcess}
-
+import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.{
+  SCHEMA_BASE,
+  SCHEMA_CLOSURE_CLOSED,
+  SCHEMA_CLOSURE_OPEN,
+  SCHEMA_REQUIRED,
+  SCHEMA_RELATIONSHIP,
+  ValidationProcess
+}
 
 sealed abstract class JsonSchemaDefinition(val schemaLocation: String, val validationProcess: ValidationProcess)
 
