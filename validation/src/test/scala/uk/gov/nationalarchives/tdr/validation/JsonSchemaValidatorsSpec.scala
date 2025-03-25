@@ -43,6 +43,24 @@ class JsonSchemaValidatorsSpec extends AnyWordSpec with Matchers {
         val errors = JsonSchemaValidators.validateJson(BASE_SCHEMA, json)
         errors.size shouldBe 1
       }
+      "produce a pattern error for former_reference_department, file_name_translation and title_alternate if it contains linebreaks" in {
+        val json =
+          """{
+          "former_reference_department":"hello\nworld",
+          "file_name_translation":"hello\nworld",
+          "title_alternate":"hello\nworld"
+        }"""
+        val errors = JsonSchemaValidators.validateJson(BASE_SCHEMA, json)
+        errors.size shouldBe 3
+        errors.foreach { error =>
+          error.getInstanceLocation.getName(0) should (
+            be("former_reference_department") or
+              be("file_name_translation") or
+              be("title_alternate")
+          )
+          error.getMessageKey shouldBe "pattern"
+        }
+      }
       "validating using relationship schema" should {
         "produce a type error for empty description when alternate description set" in {
           val json =
