@@ -57,7 +57,7 @@ class JsonSchemaValidatorsSpec extends AnyWordSpec with Matchers {
             be("former_reference_department") or
               be("file_name_translation") or
               be("title_alternate")
-            )
+          )
           error.getMessageKey shouldBe "pattern"
         }
       }
