@@ -133,6 +133,36 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       validationErrors("file1").size shouldBe 1
       singleErrorCheck(validationErrors, "former_reference_department", "maxLength", SCHEMA_BASE)
     }
+
+    "validate former_reference_department can't have line breaks'" in {
+      val data: Set[ObjectMetadata] = dataBuilder(
+        "former_reference_department",
+        "This is an example.\nwith line break"
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 1
+      singleErrorCheck(validationErrors, "former_reference_department", "pattern", SCHEMA_BASE)
+    }
+
+    "validate file_name_translation can't have line breaks'" in {
+      val data: Set[ObjectMetadata] = dataBuilder(
+        "file_name_translation",
+        "This is an example.\nwith line break"
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 1
+      singleErrorCheck(validationErrors, "file_name_translation", "pattern", SCHEMA_BASE)
+    }
+    "validate title_alternate can't have line breaks'" in {
+      val data: Set[ObjectMetadata] = dataBuilder(
+        "title_alternate",
+        "This is an example.\nwith line break"
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 1
+      singleErrorCheck(validationErrors, "title_alternate", "pattern", SCHEMA_BASE)
+    }
+
   }
 
   "MetadataValidationJsonSchema with CLOSURE_SCHEMA" should {
