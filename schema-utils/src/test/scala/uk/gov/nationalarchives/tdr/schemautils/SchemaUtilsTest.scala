@@ -2,7 +2,7 @@ package uk.gov.nationalarchives.tdr.schemautils
 
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
-import SchemaUtils.{convertToAlternateKey, convertToValidationKey}
+import SchemaUtils.{convertToAlternateKey, convertToValidationKey, getMetadataProperties}
 
 class SchemaUtilsTest extends AnyWordSpec {
 
@@ -19,6 +19,12 @@ class SchemaUtilsTest extends AnyWordSpec {
 
     "return empty string if the alternate value name is not valid" in {
       convertToValidationKey("tdrFileHeader", "ddddd") should be("")
+    }
+  }
+
+  "getMetadataProperties" should {
+    "return list of properties by given propertyType" in {
+      getMetadataProperties("System").size should be(6)
     }
   }
 
