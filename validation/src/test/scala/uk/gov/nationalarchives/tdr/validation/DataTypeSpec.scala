@@ -1,8 +1,15 @@
 package uk.gov.nationalarchives.tdr.validation
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.nationalarchives.tdr.validation.ErrorCode._
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
+
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import scala.io.Source
+import scala.util.Using
 
 class DataTypeSpec extends AnyWordSpec {
 
@@ -28,6 +35,37 @@ class DataTypeSpec extends AnyWordSpec {
 
     "checkValue should not return any errors if the value is a valid number" in {
       Integer.checkValue("1", criteria) should be(None)
+    }
+  }
+
+  "dateformat" should {
+    "be ok for  1990/12/10" in {
+      extractDate("1990/12/10") should be("1990-12-10T00:00")
+      extractDate("1990-12-10T00:00:00") should be("1990-12-10T00:00")
+    }
+  }
+
+  "check can get values form config" should {
+    "be ok for column order" in {
+      val nodeSchema = Using(Source.fromResource("config.json"))(_.mkString)
+      val mapper = new ObjectMapper()
+      val data = mapper.readTree(nodeSchema.get).toPrettyString
+      case class DownloadFilesOutput(domain: String, columnIndex: Int)
+      case class ConfigItem(key: String, downloadFilesOutputs: List[DownloadFilesOutput])
+      case class Config(configItems: List[ConfigItem])
+
+      import io.circe.generic.auto._
+      import io.circe.parser.decode
+
+      val configItems: List[(String, Int)] = decode[Config](data)
+        .getOrElse(Config(List.empty))
+        .configItems
+        .flatMap(item =>
+          item.downloadFilesOutputs
+            .filter(_.domain == "BaseDownload")
+            .map(output => (item.key, output.columnIndex))
+        )
+      configItems.minBy(-_._2) should be("date_last_modified", 3)
     }
   }
 
@@ -168,5 +206,24 @@ class DataTypeSpec extends AnyWordSpec {
     "checkValue should return an error if the required property value is empty" in {
       Boolean.checkValue("yes", criteria.copy(requiredProperty = Some("property2")), Some(Metadata("property2", ""))) should be(Some(REQUIRED_PROPERTY_IS_EMPTY))
     }
+  }
+
+  def extractDate(date: String): String = {
+
+    val regex = """\d{4}([-]|[.])\d{2}\1\d{2}(T\d{2}:\d{2}:\d{2}([.]\d{1,3})?)?""".r
+    val slashRegex = """\d{4}/\d{2}/\d{2}""".r
+    val parseFormatterTimeStamp = DateTimeFormatter.ofPattern("yyyy-MM-dd[ ]['T']HH:mm:ss[.SSS][.SS][.S]")
+
+    val convertedDate: String = date match {
+      case regex(_*) =>
+        val dateTime = LocalDateTime.parse(date, parseFormatterTimeStamp)
+        dateTime.toString
+      case slashRegex(_*) =>
+        val dateTime = LocalDateTime.parse(date.replaceAll("/", "-") + "T00:00:00", parseFormatterTimeStamp)
+        dateTime.toString
+      case _ =>
+        "Invalid date format"
+    }
+    convertedDate
   }
 }

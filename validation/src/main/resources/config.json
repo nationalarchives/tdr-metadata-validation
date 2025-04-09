@@ -1,0 +1,45 @@
+{
+  "$id": "/schema/config",
+  "type": "object",
+  "configItems": [
+    {
+      "key": "file_path",
+      "downloadFilesOutputs": [
+        {
+          "domain": "BaseDownload",
+          "columnIndex": 1
+        },
+        {
+          "domain": "Reviewer",
+          "columnIndex": 1
+        }
+      ]
+    },
+    {
+      "key": "file_name",
+      "downloadFilesOutputs": [
+        {
+          "domain": "BaseDownload",
+          "columnIndex": 2
+        },
+        {
+          "domain": "Reviewer",
+          "columnIndex": 3
+        }
+      ]
+    },
+    {
+      "key": "date_last_modified",
+      "downloadFilesOutputs": [
+        {
+          "domain": "BaseDownload",
+          "columnIndex": 3
+        },
+        {
+          "domain": "Reviewer",
+          "columnIndex": 2
+        }
+      ]
+    }
+  ]
+}

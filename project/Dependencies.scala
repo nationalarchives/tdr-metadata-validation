@@ -15,5 +15,8 @@ object Dependencies {
   lazy val pekkoTestKit = "org.apache.pekko" %% "pekko-testkit" % pekkoVersion
   lazy val catsEffect = "org.typelevel" %% "cats-effect" % "3.6.0"
   lazy val nscalaTime = "com.github.nscala-time" %% "nscala-time" % "3.0.0"
+  lazy val circeCore = "io.circe" %% "circe-core" % "0.14.12"
+  val circeGeneric = "io.circe" %% "circe-generic" % "0.14.12"
+  val circeParser = "io.circe" %% "circe-parser" % "0.14.12"
 
 }

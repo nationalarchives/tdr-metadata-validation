@@ -44,7 +44,7 @@ lazy val commonSettings = Seq(
     releaseStepCommand("sonatypeBundleRelease"),
     setNextVersion,
     commitNextVersion,
-    pushChanges
+    pushChanges,
   ),
   resolvers +=
     "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
@@ -61,7 +61,10 @@ lazy val validation = (project in file("validation"))
       jsonSchemaValidator,
       pekkoTestKit % Test,
       catsEffect,
-      nscalaTime
+      nscalaTime,
+      circeCore,
+      circeGeneric,
+      circeParser
     )
   )
 
