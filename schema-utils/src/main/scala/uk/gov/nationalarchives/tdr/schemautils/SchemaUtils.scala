@@ -22,4 +22,11 @@ object SchemaUtils {
   def convertToAlternateKey(alternateKeyName: String, propertyKey: String): String = {
     schemaNode.at(s"/properties/$propertyKey/alternateKeys/0/$alternateKeyName").asText()
   }
+
+  def getMetadataProperties(propertyType: String): List[String] = {
+    schemaNode
+      .at("/properties")
+      .properties()
+      .asScala.filter(_.getValue.at("/propertyType").asText() == propertyType).map(_.getKey).toList
+  }
 }
