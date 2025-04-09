@@ -20,7 +20,7 @@ class ClosureStartDateSpec extends AnyWordSpecLike {
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
-    "success if the closure_start_date matches to end_date" in {
+    "success if the closure_start_date matches the end_date" in {
       val closedTestFileRow = closedMetadataFileRow(closureStartDate = Some("2024-12-25"), dateOfRecord = Some("2024-12-25"))
       validationErrors(closedTestFileRow).size shouldBe 0
     }
@@ -40,7 +40,7 @@ class ClosureStartDateSpec extends AnyWordSpecLike {
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
-    "error(s) if the closure_start_date doesn't match to end_date but matches the date_last_modified" in {
+    "error(s) if the closure_start_date doesn't match the end_date but matches the date_last_modified" in {
       val closedTestFileRow = closedMetadataFileRow(closureStartDate = Some("2024-12-25"), dateOfRecord = Some("2023-02-25"), dateLastModified = Some("2024-12-25"))
       validationErrors(closedTestFileRow).size shouldBe 1
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
@@ -48,7 +48,7 @@ class ClosureStartDateSpec extends AnyWordSpecLike {
       )
     }
 
-    "error(s) if the closure_start_date doesn't match to end_date or its 31st Dec of the year" in {
+    "error(s) if the closure_start_date doesn't match the end_date or its 31st Dec of the year" in {
       val closedTestFileRow = closedMetadataFileRow(closureStartDate = Some("2024-12-31"), dateOfRecord = Some("2023-04-25"))
       validationErrors(closedTestFileRow).size shouldBe 1
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
@@ -56,7 +56,7 @@ class ClosureStartDateSpec extends AnyWordSpecLike {
       )
     }
 
-    "error(s) if the closure_start_date doesn't match to date_last_modified or its 31st Dec of the year" in {
+    "error(s) if the closure_start_date doesn't match the date_last_modified or its 31st Dec of the year" in {
       val closedTestFileRow = closedMetadataFileRow(closureStartDate = Some("2024-12-31"), dateLastModified = Some("2023-04-25"))
       validationErrors(closedTestFileRow).size shouldBe 1
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
