@@ -2,7 +2,7 @@ package uk.gov.nationalarchives.tdr.validation.schema
 
 import com.networknt.schema._
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN, RELATIONSHIP_SCHEMA, REQUIRED_SCHEMA}
-import uk.gov.nationalarchives.tdr.validation.schema.extensions.DaBeforeToday
+import uk.gov.nationalarchives.tdr.validation.schema.extensions.{DaBeforeToday, MatchEndDateOrDateLastModified}
 
 import scala.jdk.CollectionConverters._
 
@@ -17,7 +17,8 @@ object JsonSchemaValidators {
       RELATIONSHIP_SCHEMA -> relationshipJsonSchemaValidator
     )
 
-  private lazy val baseJsonSchemaValidator: JsonSchema = getJsonSchema(BASE_SCHEMA, Map("daBeforeToday" -> new DaBeforeToday))
+  private lazy val baseJsonSchemaValidator: JsonSchema =
+    getJsonSchema(BASE_SCHEMA, Map("daBeforeToday" -> new DaBeforeToday, "matchEndDateOrDateLastModified" -> new MatchEndDateOrDateLastModified))
   private lazy val closureClosedJsonSchemaValidator: JsonSchema = getJsonSchema(CLOSURE_SCHEMA_CLOSED)
   private lazy val closureOpenJsonSchemaValidator: JsonSchema = getJsonSchema(CLOSURE_SCHEMA_OPEN)
   private lazy val requiredJsonSchemaValidator: JsonSchema = getJsonSchema(REQUIRED_SCHEMA)
