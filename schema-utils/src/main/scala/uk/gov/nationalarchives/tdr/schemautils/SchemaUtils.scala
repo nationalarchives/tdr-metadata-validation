@@ -27,6 +27,9 @@ object SchemaUtils {
     schemaNode
       .at("/properties")
       .properties()
-      .asScala.filter(_.getValue.at("/propertyType").asText() == propertyType).map(_.getKey).toList
+      .asScala
+      .filter(_.getValue.at("/propertyType").asText() == propertyType)
+      .map(_.getKey)
+      .toList
   }
 }
