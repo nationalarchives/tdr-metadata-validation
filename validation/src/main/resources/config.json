@@ -4,9 +4,10 @@
   "configItems": [
     {
       "key": "file_path",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/file_path",
       "downloadFilesOutputs": [
         {
-          "domain": "BaseDownload",
+          "domain": "Base",
           "columnIndex": 1
         },
         {
@@ -17,9 +18,10 @@
     },
     {
       "key": "file_name",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/file_name",
       "downloadFilesOutputs": [
         {
-          "domain": "BaseDownload",
+          "domain": "Base",
           "columnIndex": 2
         },
         {
@@ -30,14 +32,35 @@
     },
     {
       "key": "date_last_modified",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/date_last_modified",
       "downloadFilesOutputs": [
         {
-          "domain": "BaseDownload",
+          "domain": "Base",
           "columnIndex": 3
         },
         {
           "domain": "Reviewer",
           "columnIndex": 2
+        }
+      ]
+    },
+    {
+      "key": "description_closed",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/description_closed",
+      "downloadFilesOutputs": [
+        {
+          "domain": "ClosureInformation",
+          "columnIndex": 11
+        }
+      ]
+    },
+    {
+      "key": "closure_type",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/closure_type",
+      "downloadFilesOutputs": [
+        {
+          "domain": "ClosureInformation",
+          "columnIndex": 10
         }
       ]
     }
