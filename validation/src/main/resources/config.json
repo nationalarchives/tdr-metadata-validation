@@ -59,7 +59,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/closure_type",
       "downloadFilesOutputs": [
         {
-          "domain": "ClosureInformation",
+          "domain": "Base",
           "columnIndex": 10
         }
       ]

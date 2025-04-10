@@ -2,6 +2,7 @@ package uk.gov.nationalarchives.tdr.validation.utils
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import ujson.Value.Value
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
 
 import java.io.InputStream
@@ -10,8 +11,8 @@ import scala.util.Try
 class CSVtoJsonUtils {
 
   private case class ConvertedProperty(propertyName: String, convertValueFunc: String => Any)
-  private val nodeSchema = getJsonNodeFromStreamContent(getClass.getResourceAsStream(BASE_SCHEMA.schemaLocation))
-  private val json = ujson.read(nodeSchema.toPrettyString)
+  val nodeSchema: JsonNode = getJsonNodeFromStreamContent(getClass.getResourceAsStream(BASE_SCHEMA.schemaLocation))
+  private val json: Value = ujson.read(nodeSchema.toPrettyString)
 
   private def getJsonNodeFromStreamContent(content: InputStream): JsonNode = {
     val mapper = new ObjectMapper()
@@ -42,7 +43,8 @@ class CSVtoJsonUtils {
     }
   }
 
-  private val propertyValueConverterMap: Map[String, ConvertedProperty] = (for {
+  private val propertyValueConverterMap: Map[String, ConvertedProperty] = (
+    for {
     (propertyName, propertyValue) <- json("properties").obj
     propertyTypes = getPropertyType(propertyValue.obj)
     // Use propertyName if alternateKeys is absent
