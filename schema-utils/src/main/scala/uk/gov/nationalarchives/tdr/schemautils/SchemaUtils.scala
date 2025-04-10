@@ -32,4 +32,9 @@ object SchemaUtils {
       .map(_.getKey)
       .toList
   }
+
+  def getPropertyField(propertyKey: String, fieldName: String): JsonNode = {
+    schemaNode.at(s"/properties/$propertyKey/$fieldName")
+  }
+
 }

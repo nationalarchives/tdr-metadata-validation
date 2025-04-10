@@ -2,7 +2,7 @@ package uk.gov.nationalarchives.tdr.schemautils
 
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
-import SchemaUtils.{convertToAlternateKey, convertToValidationKey, getMetadataProperties}
+import SchemaUtils._
 
 class SchemaUtilsTest extends AnyWordSpec {
 
@@ -41,6 +41,17 @@ class SchemaUtilsTest extends AnyWordSpec {
 
     "return empty string if the property key is valid but the alternate key name is not valid" in {
       convertToValidationKey("dddd", "date_last_modified") should be("")
+    }
+  }
+
+  "getPropertyField" should {
+
+    "return empty string if the property field is not present" in {
+      getPropertyField("file_path", "null_field").asText("") should be("")
+    }
+
+    "return correct value if property field is present" in {
+      getPropertyField("file_path", "propertyType").asText() should be("System")
     }
   }
 
