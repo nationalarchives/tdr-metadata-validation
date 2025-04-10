@@ -18,27 +18,24 @@ object ConfigUtils {
       altHeaderToPropertyMapper <- Reader(inputToPropertyMapper)
       propertyToAltHeaderMapper <- Reader(propertyToOutputMapper)
       downloadProperties <- Reader(getRequiredColumns)
-    } yield MetadataConfiguration(altHeaderToPropertyMapper, propertyToAltHeaderMapper,downloadProperties)
+    } yield MetadataConfiguration(altHeaderToPropertyMapper, propertyToAltHeaderMapper, downloadProperties)
     csvConfigurationReader.run(configurationParameters)
   }
 
   def inputToPropertyMapper(configurationParameters: ConfigParameters): (String, String) => String = {
 
-    val mapped = configurationParameters.baseSchema("properties").obj.foldLeft(Map.empty[String, Map[String, String]]) {
-      case (acc, (propertyName, propertyValue)) =>
-        propertyValue.obj.get("alternateKeys") match {
-          case Some(alternateKeys) =>
-            val updatedMap = alternateKeys.arr.foldLeft(acc) {
-              (innerAcc, key) =>
-                key.obj.foldLeft(innerAcc) {
-                  case (innerMap, (alternateKey, alternateValue)) =>
-                    val existingMap = innerMap.getOrElse(alternateKey, Map.empty)
-                    innerMap + (alternateKey -> (existingMap + (alternateValue.str -> propertyName)))
-                }
+    val mapped = configurationParameters.baseSchema("properties").obj.foldLeft(Map.empty[String, Map[String, String]]) { case (acc, (propertyName, propertyValue)) =>
+      propertyValue.obj.get("alternateKeys") match {
+        case Some(alternateKeys) =>
+          val updatedMap = alternateKeys.arr.foldLeft(acc) { (innerAcc, key) =>
+            key.obj.foldLeft(innerAcc) { case (innerMap, (alternateKey, alternateValue)) =>
+              val existingMap = innerMap.getOrElse(alternateKey, Map.empty)
+              innerMap + (alternateKey -> (existingMap + (alternateValue.str -> propertyName)))
             }
-            updatedMap
-          case None => acc
-        }
+          }
+          updatedMap
+        case None => acc
+      }
     }
     (domain: String, key: String) => mapped.get(domain).flatMap(_.get(key)).getOrElse(key)
   }
@@ -62,11 +59,10 @@ object ConfigUtils {
   }
 
   private def getRequiredColumns(configurationParameters: ConfigParameters): String => List[(String, Int)] = {
-    val configItems: Map[String, List[(String, Int)]] = configurationParameters.baseConfig.getOrElse(Config(List.empty[ConfigItem]))
+    val configItems: Map[String, List[(String, Int)]] = configurationParameters.baseConfig
+      .getOrElse(Config(List.empty[ConfigItem]))
       .configItems
-      .flatMap(item =>
-        item.downloadFilesOutputs.map(output => (output.domain, (item.key, output.columnIndex)))
-      )
+      .flatMap(item => item.downloadFilesOutputs.map(output => (output.domain, (item.key, output.columnIndex))))
       .groupBy(_._1)
       .view
       .mapValues(_.map(_._2))
@@ -88,7 +84,11 @@ object ConfigUtils {
     decode[Config](data)
   }
 
-  case class MetadataConfiguration(inputToPropertyMapper: (String, String) => String, propertyToOutputMapper: (String, String) => String, downloadProperties: String => List[(String,Int)])
+  case class MetadataConfiguration(
+      inputToPropertyMapper: (String, String) => String,
+      propertyToOutputMapper: (String, String) => String,
+      downloadProperties: String => List[(String, Int)]
+  )
 
   case class ConfigParameters(baseSchema: Value, baseConfig: Either[io.circe.Error, Config])
 

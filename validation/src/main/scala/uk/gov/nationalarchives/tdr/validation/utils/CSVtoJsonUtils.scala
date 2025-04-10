@@ -43,8 +43,7 @@ class CSVtoJsonUtils {
     }
   }
 
-  private val propertyValueConverterMap: Map[String, ConvertedProperty] = (
-    for {
+  private val propertyValueConverterMap: Map[String, ConvertedProperty] = (for {
     (propertyName, propertyValue) <- json("properties").obj
     propertyTypes = getPropertyType(propertyValue.obj)
     // Use propertyName if alternateKeys is absent
