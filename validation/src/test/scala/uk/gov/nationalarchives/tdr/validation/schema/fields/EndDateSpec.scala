@@ -47,7 +47,8 @@ class EndDateSpec extends AnyWordSpecLike {
       )
       val closedTestFileRow = closedMetadataFileRow(dateOfRecord = Some("3024-12-25"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "end_date", "daBeforeToday") // This date is in the future, please correct
+        ValidationError(SCHEMA_BASE, "end_date", "daBeforeToday"), // This date is in the future, please correct
+        ValidationError(SCHEMA_BASE, "closure_start_date", "matchEndDateOrDateLastModified")
       )
     }
 
