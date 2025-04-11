@@ -61,7 +61,10 @@ lazy val validation = (project in file("validation"))
       jsonSchemaValidator,
       pekkoTestKit % Test,
       catsEffect,
-      nscalaTime
+      nscalaTime,
+      circeCore,
+      circeGeneric,
+      circeParser
     )
   )
 
