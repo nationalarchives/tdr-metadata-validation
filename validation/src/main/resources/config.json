@@ -7,7 +7,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/file_path",
       "downloadFilesOutputs": [
         {
-          "domain": "Base",
+          "domain": "ClientTemplate",
           "columnIndex": 1
         },
         {
@@ -21,12 +21,8 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/file_name",
       "downloadFilesOutputs": [
         {
-          "domain": "Base",
+          "domain": "ClientTemplate",
           "columnIndex": 2
-        },
-        {
-          "domain": "Reviewer",
-          "columnIndex": 3
         }
       ]
     },
@@ -35,22 +31,38 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/date_last_modified",
       "downloadFilesOutputs": [
         {
-          "domain": "Base",
+          "domain": "ClientTemplate",
           "columnIndex": 3
-        },
-        {
-          "domain": "Reviewer",
-          "columnIndex": 2
         }
       ]
     },
     {
-      "key": "description_closed",
-      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/description_closed",
+      "key": "end_date",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/end_date",
       "downloadFilesOutputs": [
         {
-          "domain": "ClosureInformation",
-          "columnIndex": 11
+          "domain": "ClientTemplate",
+          "columnIndex": 4
+        }
+      ]
+    },
+    {
+      "key": "description",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/description",
+      "downloadFilesOutputs": [
+        {
+          "domain": "ClientTemplate",
+          "columnIndex": 5
+        }
+      ]
+    },
+    {
+      "key": "former_reference_department",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/former_reference_department",
+      "downloadFilesOutputs": [
+        {
+          "domain": "ClientTemplate",
+          "columnIndex": 6
         }
       ]
     },
@@ -59,8 +71,108 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/closure_type",
       "downloadFilesOutputs": [
         {
-          "domain": "Base",
+          "domain": "ClientTemplate",
+          "columnIndex": 7
+        }
+      ]
+    },
+    {
+      "key": "closure_start_date",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/closure_start_date",
+      "downloadFilesOutputs": [
+        {
+          "domain": "ClientTemplate",
+          "columnIndex": 8
+        }
+      ]
+    },
+    {
+      "key": "closure_period",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/closure_period",
+      "downloadFilesOutputs": [
+        {
+          "domain": "ClientTemplate",
+          "columnIndex": 9
+        }
+      ]
+    },
+    {
+      "key": "foi_exemption_code",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/foi_exemption_code",
+      "downloadFilesOutputs": [
+        {
+          "domain": "ClientTemplate",
           "columnIndex": 10
+        }
+      ]
+    },
+    {
+      "key": "foi_exemption_asserted",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/foi_exemption_asserted",
+      "downloadFilesOutputs": [
+        {
+          "domain": "ClientTemplate",
+          "columnIndex": 11
+        }
+      ]
+    },
+    {
+      "key": "title_closed",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/title_closed",
+      "downloadFilesOutputs": [
+        {
+          "domain": "ClientTemplate",
+          "columnIndex": 12
+        }
+      ]
+    },
+    {
+      "key": "descriptionClosed",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/descriptionClosed",
+      "downloadFilesOutputs": [
+        {
+          "domain": "ClientTemplate",
+          "columnIndex": 14
+        }
+      ]
+    },
+    {
+      "key": "description_alternate",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/description_alternate",
+      "downloadFilesOutputs": [
+        {
+          "domain": "ClientTemplate",
+          "columnIndex": 15
+        }
+      ]
+    },
+    {
+      "key": "title_alternate",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/title_alternate",
+      "downloadFilesOutputs": [
+        {
+          "domain": "ClientTemplate",
+          "columnIndex": 13
+        }
+      ]
+    },
+    {
+      "key": "language",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/language",
+      "downloadFilesOutputs": [
+        {
+          "domain": "ClientTemplate",
+          "columnIndex": 16
+        }
+      ]
+    },
+    {
+      "key": "file_name_translation",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/file_name_translation",
+      "downloadFilesOutputs": [
+        {
+          "domain": "ClientTemplate",
+          "columnIndex": 17
         }
       ]
     }

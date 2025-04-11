@@ -6,27 +6,31 @@ import uk.gov.nationalarchives.tdr.validation.utils.ConfigUtils.{ConfigParameter
 
 class ConfigUtilsSpec extends AnyWordSpec {
 
-  "ConfigUtils" should {
-
-    "correctly convert a domain key to a property`" in {
-      val configParameters: ConfigParameters = ConfigParameters(loadBaseSchema, loadConfigFile)
-      val inputToPropertyMapper: (String, String) => String = ConfigUtils.inputToPropertyMapper(configParameters)
-      inputToPropertyMapper("number", "123") shouldBe "123"
-      inputToPropertyMapper("tdrFileHeader", "Former reference") shouldBe "former_reference_department"
-    }
-  }
-  "correctly convert a property to a domain key`" in {
-    val configParameters: ConfigParameters = ConfigParameters(loadBaseSchema, loadConfigFile)
-    val propertyToOutputMapper: (String, String) => String = ConfigUtils.propertyToOutputMapper(configParameters)
-    propertyToOutputMapper("number", "123") shouldBe "123"
-    propertyToOutputMapper("tdrFileHeader", "former_reference_department") shouldBe "Former reference"
-  }
-
-  "load configuration" in {
-    val configParameters: ConfigParameters = ConfigParameters(loadBaseSchema, loadConfigFile)
-    val metadataConfiguration = ConfigUtils.loadConfiguration(configParameters)
+  "load configuration inputToPropertyMapper" in {
+    val metadataConfiguration = ConfigUtils.loadConfiguration
     metadataConfiguration.inputToPropertyMapper("tdrFileHeader", "Former reference") shouldBe "former_reference_department"
+    metadataConfiguration.inputToPropertyMapper("tdrDataLoadHeader", "former_reference_department") shouldBe "former_reference_department"
+    metadataConfiguration.inputToPropertyMapper("tdrFileHeader", "Add alternative title without the file extension") shouldBe "title_alternate"
+    metadataConfiguration.inputToPropertyMapper("tdrDataLoadHeader", "TitleAlternate") shouldBe "title_alternate"
+  }
+
+  "load configuration propertyToOutputMapper" in {
+    val metadataConfiguration = ConfigUtils.loadConfiguration
     metadataConfiguration.propertyToOutputMapper("tdrFileHeader", "former_reference_department") shouldBe "Former reference"
-    metadataConfiguration.downloadProperties("Base") shouldBe List(("file_path", 1), ("file_name", 2), ("date_last_modified", 3), ("closure_type", 10))
+    metadataConfiguration.propertyToOutputMapper("tdrDataLoadHeader", "date_last_modified") shouldBe "ClientSideFileLastModifiedDate"
+    metadataConfiguration.propertyToOutputMapper("blah", "blahBlah") shouldBe "blahBlah"
+  }
+
+  "load configuration downloadProperties" in {
+    val metadataConfiguration = ConfigUtils.loadConfiguration
+    metadataConfiguration.downloadProperties("ClientTemplate").length shouldBe 17
+    metadataConfiguration.downloadProperties("UnknownClientTemplate").length shouldBe 0
+  }
+
+  "load configuration getPropertyType" in {
+    val metadataConfiguration = ConfigUtils.loadConfiguration
+    metadataConfiguration.getPropertyType("file_path") shouldBe "string"
+    metadataConfiguration.getPropertyType("end_date") shouldBe "date"
+    metadataConfiguration.getPropertyType("end_dates") shouldBe ""
   }
 }
