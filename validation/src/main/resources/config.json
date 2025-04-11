@@ -9,10 +9,6 @@
         {
           "domain": "ClientTemplate",
           "columnIndex": 1
-        },
-        {
-          "domain": "Reviewer",
-          "columnIndex": 1
         }
       ]
     },
@@ -127,8 +123,8 @@
       ]
     },
     {
-      "key": "descriptionClosed",
-      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/descriptionClosed",
+      "key": "description_closed",
+      "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/description_closed",
       "downloadFilesOutputs": [
         {
           "domain": "ClientTemplate",
