@@ -34,16 +34,18 @@ object ConfigUtils {
     csvConfigurationReader.run(configParameters)
   }
 
-  /** This method takes configuration parameters and returns a function that maps a domain key to a property name. It uses the configuration file to create a mapping of alternate
-    * keys to property names.
+  /** This method takes configuration parameters and returns a curried function that maps a domain key to a property name.
+    *
+    * The returned function is curried, where the first parameter is the domain, and the second parameter is the key. It uses the configuration file to create a mapping of
+    * alternate keys to property names.
     *
     * @param configurationParameters
     *   The configuration parameters containing the base schema and configuration data.
     * @return
-    *   A function that takes two parameters: the domain and the key, and returns the corresponding property name. Example: ("tdrFileHeader", "Date last modified") =>
-    *   "date_last_modified".
+    *   A curried function that takes two parameters: the domain and the key, and returns the corresponding property name. Example:
+    *   `inputToPropertyMapper(configParams)("tdrFileHeader")("Date last modified")` => `"date_last_modified"`.
     */
-  def inputToPropertyMapper(configurationParameters: ConfigParameters): (String, String) => String = {
+  def inputToPropertyMapper(configurationParameters: ConfigParameters): String => String => String = {
     val mapped = configurationParameters.baseSchema("properties").obj.foldLeft(Map.empty[String, Map[String, String]]) { case (acc, (propertyName, propertyValue)) =>
       propertyValue.obj.get("alternateKeys") match {
         case Some(alternateKeys) =>
@@ -57,19 +59,21 @@ object ConfigUtils {
         case None => acc
       }
     }
-    (domain: String, key: String) => mapped.get(domain).flatMap(_.get(key)).getOrElse(key)
+    domain => key => mapped.get(domain).flatMap(_.get(key)).getOrElse(key)
   }
 
-  /** This method takes configuration parameters and returns a function that maps a property name to an alternate key. It uses the configuration file to create a mapping of
-    * property names to alternate keys.
+  /** This method takes configuration parameters and returns a function that maps a property name to an alternate key.
+    *
+    * The returned function is curried, where the first parameter is the domain, and the second parameter is the property name. It uses the configuration file to create a mapping
+    * of property names to alternate keys.
     *
     * @param configurationParameters
     *   The configuration parameters containing the base schema and configuration data.
     * @return
-    *   A function that takes two parameters: the domain and the property name, and returns the corresponding alternate key. Example: ("tdrFileHeader", "date_last_modified") =>
-    *   "Date last modified".
+    *   A curried function that takes two parameters: the domain and the property name, and returns the corresponding alternate key. Example:
+    *   `propertyToOutputMapper(configParams)("tdrFileHeader")("date_last_modified")` => `"Date last modified"`.
     */
-  def propertyToOutputMapper(configurationParameters: ConfigParameters): (String, String) => String = {
+  def propertyToOutputMapper(configurationParameters: ConfigParameters): String => String => String = {
 
     val propertyToOutputsMap = configurationParameters.baseSchema("properties").obj.foldLeft(Map.empty[String, Map[String, String]]) { case (acc, (propertyName, propertyValue)) =>
       propertyValue.obj.get("alternateKeys") match {
@@ -84,7 +88,7 @@ object ConfigUtils {
         case None => acc
       }
     }
-    (domain: String, propertyName: String) => propertyToOutputsMap.get(domain).flatMap(_.get(propertyName)).getOrElse(propertyName)
+    domain => propertyName => propertyToOutputsMap.get(domain).flatMap(_.get(propertyName)).getOrElse(propertyName)
   }
 
   /** This method takes configuration parameters and returns a function that retrieves the required columns for a given domain metadata download. It uses the configuration file to
@@ -145,8 +149,8 @@ object ConfigUtils {
   }
 
   case class MetadataConfiguration(
-      inputToPropertyMapper: (String, String) => String,
-      propertyToOutputMapper: (String, String) => String,
+      inputToPropertyMapper: String => String => String,
+      propertyToOutputMapper: String => String => String,
       downloadProperties: String => List[(String, Int)],
       getPropertyType: String => String
   )
