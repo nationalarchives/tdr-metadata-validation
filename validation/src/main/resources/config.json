@@ -7,7 +7,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/file_path",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 1
         }
       ]
@@ -17,7 +17,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/file_name",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 2
         }
       ]
@@ -27,7 +27,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/date_last_modified",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 3
         }
       ]
@@ -37,7 +37,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/end_date",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 4
         }
       ]
@@ -47,7 +47,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/description",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 5
         }
       ]
@@ -57,7 +57,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/former_reference_department",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 6
         }
       ]
@@ -67,7 +67,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/closure_type",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 7
         }
       ]
@@ -77,7 +77,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/closure_start_date",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 8
         }
       ]
@@ -87,7 +87,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/closure_period",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 9
         }
       ]
@@ -97,7 +97,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/foi_exemption_code",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 10
         }
       ]
@@ -107,7 +107,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/foi_exemption_asserted",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 11
         }
       ]
@@ -117,7 +117,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/title_closed",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 12
         }
       ]
@@ -127,7 +127,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/description_closed",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 14
         }
       ]
@@ -137,7 +137,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/description_alternate",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 15
         }
       ]
@@ -147,7 +147,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/title_alternate",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 13
         }
       ]
@@ -157,7 +157,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/language",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 16
         }
       ]
@@ -167,7 +167,7 @@
       "$ref": "classpath:/metadata-schema/baseSchema.schema.json#/properties/file_name_translation",
       "downloadFilesOutputs": [
         {
-          "domain": "ClientTemplate",
+          "domain": "MetadataDownloadTemplate",
           "columnIndex": 17
         }
       ]

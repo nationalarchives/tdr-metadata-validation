@@ -12,6 +12,8 @@ import scala.util.Using
 object ConfigUtils {
 
   private lazy val configParameters: ConfigParameters = ConfigParameters(loadBaseSchema, loadConfigFile)
+  private val baseSchemaPropertiesKey = "properties"
+  private val baseSchemaAlternateKeysKey = "alternateKeys"
 
   /** Loads the configuration files and returns a `MetadataConfiguration` object.
     *
@@ -42,12 +44,16 @@ object ConfigUtils {
     * @param configurationParameters
     *   The configuration parameters containing the base schema and configuration data.
     * @return
-    *   A curried function that takes two parameters: the domain and the key, and returns the corresponding property name. Example:
-    *   `inputToPropertyMapper(configParams)("tdrFileHeader")("Date last modified")` => `"date_last_modified"`.
+    *   A curried function that takes two parameters: the domain and the key, and returns the corresponding property name.
+    * @example
+    *   - val configParams = ConfigParameters(baseSchema, baseConfig)
+    *   - val inputMapper = inputToPropertyMapper(configParams)
+    *   - val tdrFileHeaderMapper = inputMapper("tdrFileHeader")
+    *   - tdrFileHeaderMapper("Date last modified") // Returns: "date_last_modified"
     */
   def inputToPropertyMapper(configurationParameters: ConfigParameters): String => String => String = {
-    val mapped = configurationParameters.baseSchema("properties").obj.foldLeft(Map.empty[String, Map[String, String]]) { case (acc, (propertyName, propertyValue)) =>
-      propertyValue.obj.get("alternateKeys") match {
+    val mapped = configurationParameters.baseSchema(baseSchemaPropertiesKey).obj.foldLeft(Map.empty[String, Map[String, String]]) { case (acc, (propertyName, propertyValue)) =>
+      propertyValue.obj.get(baseSchemaAlternateKeysKey) match {
         case Some(alternateKeys) =>
           val updatedMap = alternateKeys.arr.foldLeft(acc) { (innerAcc, key) =>
             key.obj.foldLeft(innerAcc) { case (innerMap, (alternateKey, alternateValue)) =>
@@ -70,24 +76,29 @@ object ConfigUtils {
     * @param configurationParameters
     *   The configuration parameters containing the base schema and configuration data.
     * @return
-    *   A curried function that takes two parameters: the domain and the property name, and returns the corresponding alternate key. Example:
-    *   `propertyToOutputMapper(configParams)("tdrFileHeader")("date_last_modified")` => `"Date last modified"`.
+    *   A curried function that takes two parameters: the domain and the property name, and returns the corresponding alternate key.
+    * @example
+    *   - val configParams = ConfigParameters(baseSchema, baseConfig)
+    *   - val propertyMapper = propertyToOutputMapper(configParams)
+    *   - val tdrPropertyFileHeaderMapper("tdrFileHeader")
+    *   - tdrPropertyFileHeaderMapper("date_last_modified") // Returns: "Date last modified"
     */
   def propertyToOutputMapper(configurationParameters: ConfigParameters): String => String => String = {
 
-    val propertyToOutputsMap = configurationParameters.baseSchema("properties").obj.foldLeft(Map.empty[String, Map[String, String]]) { case (acc, (propertyName, propertyValue)) =>
-      propertyValue.obj.get("alternateKeys") match {
-        case Some(alternateKeys) =>
-          val updatedMap = alternateKeys.arr.foldLeft(acc) { (innerAcc, key) =>
-            key.obj.foldLeft(innerAcc) { case (innerMap, (alternateKey, alternateValue)) =>
-              val existingMap = innerMap.getOrElse(alternateKey, Map.empty)
-              innerMap + (alternateKey -> (existingMap + (propertyName -> alternateValue.str)))
+    val propertyToOutputsMap =
+      configurationParameters.baseSchema(baseSchemaPropertiesKey).obj.foldLeft(Map.empty[String, Map[String, String]]) { case (acc, (propertyName, propertyValue)) =>
+        propertyValue.obj.get(baseSchemaAlternateKeysKey) match {
+          case Some(alternateKeys) =>
+            val updatedMap = alternateKeys.arr.foldLeft(acc) { (innerAcc, key) =>
+              key.obj.foldLeft(innerAcc) { case (innerMap, (alternateKey, alternateValue)) =>
+                val existingMap = innerMap.getOrElse(alternateKey, Map.empty)
+                innerMap + (alternateKey -> (existingMap + (propertyName -> alternateValue.str)))
+              }
             }
-          }
-          updatedMap
-        case None => acc
+            updatedMap
+          case None => acc
+        }
       }
-    }
     domain => propertyName => propertyToOutputsMap.get(domain).flatMap(_.get(propertyName)).getOrElse(propertyName)
   }
 
@@ -98,6 +109,10 @@ object ConfigUtils {
     *   The configuration parameters containing the base schema and configuration data.
     * @return
     *   A function that takes a domain as a parameter and returns a list of tuples containing the property name and column index.
+    * @example
+    *   - val configParams = ConfigParameters(baseSchema, baseConfig)
+    *   - val getColumns = getRequiredColumns(configParams)
+    *   - getColumns("MetadataDownloadTemplate") // Returns: List(("file_path", 1), ("file_name", 2), ("date_last_modified", 3), ...)
     */
   private def getRequiredColumns(configurationParameters: ConfigParameters): String => List[(String, Int)] = {
     val configItems: Map[String, List[(String, Int)]] = configurationParameters.baseConfig
@@ -119,8 +134,10 @@ object ConfigUtils {
     *
     * @param configParameters
     *   The configuration parameters containing the base schema.
-    * @return
-    *   A function that takes a property name (domain) as input and returns its type as a string.
+    * @example
+    *   - val configParams = ConfigParameters(baseSchema, baseConfig)
+    *   - val getType = getPropertyType(configParams)
+    *   - getType("file_name") // Returns: "string"
     */
   private def getPropertyType(configParameters: ConfigParameters): String => String = {
     val propertyTypeMap = configParameters.baseSchema("properties").obj.foldLeft(Map.empty[String, String]) { case (acc, (propertyName, propertyValue)) =>
