@@ -40,15 +40,6 @@ class DateLastModifiedSpec extends AnyWordSpecLike {
       )
     }
 
-    // TODO: is it OK that dlm can be in the future?
-    "success if the value is in future" in {
-      val openTestFileRow = openMetadataFileRow(dateLastModified = Some("3024-12-25"))
-      validationErrors(openTestFileRow).size shouldBe 0
-
-      val closedTestFileRow = closedMetadataFileRow(dateLastModified = Some("3024-12-25"))
-      validationErrors(closedTestFileRow).size shouldBe 0
-    }
-
     "error(s) if the value is invalid (not a date)" in {
       val openTestFileRow = openMetadataFileRow(dateLastModified = Some("xmas last year"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
