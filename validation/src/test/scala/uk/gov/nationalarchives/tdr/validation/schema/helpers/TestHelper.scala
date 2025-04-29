@@ -123,24 +123,24 @@ object TestHelper {
   ): FileRow = {
     val metadata = List(
       // required
-      filePath.map(Metadata("Filepath", _)), // file_path
-      dateOfRecord.map(Metadata("Date of the record", _)), // end_date
-      description.map(Metadata("Description", _)), // description
-      closureType.map(Metadata("Closure status", _)), // closure_type
-      closurePeriod.map(Metadata("Closure Period", _)), // closure_period
-      closureStartDate.map(Metadata("Closure Start Date", _)), // closure_start_date
-      descriptionClosed.map(Metadata("Is the description sensitive for the public?", _)), // description_closed
-      foiExemptionAsserted.map(Metadata("FOI decision asserted", _)), // foi_exemption_asserted
-      foiCodes.map(Metadata("FOI exemption code", _)), // foi_exemption_code
-      titleClosed.map(Metadata("Is the title sensitive for the public?", _)), // title_closed
-      titleAlternative.map(Metadata("Add alternative title without the file extension", _)), // title_alternative
-      descriptionAlternative.map(Metadata("Alternative description", _)), // description_alternate
+      filePath.map(Metadata("filepath", _)), // file_path
+      dateOfRecord.map(Metadata("date of the record", _)), // end_date
+      description.map(Metadata("description", _)), // description
+      closureType.map(Metadata("closure status", _)), // closure_type
+      closurePeriod.map(Metadata("closure period", _)), // closure_period
+      closureStartDate.map(Metadata("closure start date", _)), // closure_start_date
+      descriptionClosed.map(Metadata("is description closed", _)), // description_closed
+      foiExemptionAsserted.map(Metadata("foi schedule date", _)), // foi_exemption_asserted
+      foiCodes.map(Metadata("foi exemption code", _)), // foi_exemption_code
+      titleClosed.map(Metadata("is filename closed", _)), // title_closed
+      titleAlternative.map(Metadata("alternate filename", _)), // title_alternative
+      descriptionAlternative.map(Metadata("alternate description", _)), // description_alternate
       // not required
       fileName.map(Metadata("Filename", _)),
-      dateLastModified.map(Metadata("Date last modified", _)),
-      formerReference.map(Metadata("Former reference", _)),
-      language.map(Metadata("Language", _)),
-      translatedTitleOfRecord.map(Metadata("Translated title of record", _)),
+      dateLastModified.map(Metadata("date last modified", _)),
+      formerReference.map(Metadata("former reference", _)),
+      language.map(Metadata("language", _)),
+      translatedTitleOfRecord.map(Metadata("translated filename", _)),
       invalidColumnTitle.map(Metadata("AN INVALID COLUMN TITLE", _)),
       uuid.map(Metadata("UUID", _))
     ).flatten
