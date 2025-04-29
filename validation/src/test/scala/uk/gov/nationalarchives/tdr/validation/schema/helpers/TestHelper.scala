@@ -136,7 +136,7 @@ object TestHelper {
       titleAlternative.map(Metadata("alternate filename", _)), // title_alternative
       descriptionAlternative.map(Metadata("alternate description", _)), // description_alternate
       // not required
-      fileName.map(Metadata("Filename", _)),
+      fileName.map(Metadata("filename", _)),
       dateLastModified.map(Metadata("date last modified", _)),
       formerReference.map(Metadata("former reference", _)),
       language.map(Metadata("language", _)),
