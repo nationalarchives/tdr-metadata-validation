@@ -108,11 +108,11 @@ object ConfigUtils {
     * @param configurationParameters
     *   The configuration parameters containing the base schema and configuration data.
     * @return
-    *   A function that takes a domain as a parameter and returns a list of tuples containing the property name and column index.
+    *   A function that takes a domain as a parameter and returns a list of DownloadFileDisplayProperties.
     * @example
     *   - val configParams = ConfigParameters(baseSchema, baseConfig)
-    *   - val getColumns = getDownloadFilesOutputs(configParams)
-    *   - getColumns("MetadataDownloadTemplate") // Returns: List(("file_path", 1), ("file_name", 2), ("date_last_modified", 3), ...)
+    *   - val downloadFilesOutputs = getDownloadFilesOutputs(configParams)
+    *   - downloadFilesOutputs("MetadataDownloadTemplate") // Returns: List(DownloadFileDisplayProperties("file_path", 1, false), ...)
     */
   private def getDownloadFilesOutputs(configurationParameters: ConfigParameters): String => List[DownloadFileDisplayProperties] = {
     val configItems: Map[String, List[DownloadFileDisplayProperties]] = configurationParameters.baseConfig
