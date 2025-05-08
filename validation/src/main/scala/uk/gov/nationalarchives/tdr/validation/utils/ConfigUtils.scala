@@ -30,9 +30,9 @@ object ConfigUtils {
     val csvConfigurationReader = for {
       altHeaderToPropertyMapper <- Reader(inputToPropertyMapper)
       propertyToAltHeaderMapper <- Reader(propertyToOutputMapper)
-      downloadProperties <- Reader(getRequiredColumns)
+      downloadFileOutputs <- Reader(getDownloadFilesOutputs)
       propertyType <- Reader(getPropertyType)
-    } yield MetadataConfiguration(altHeaderToPropertyMapper, propertyToAltHeaderMapper, downloadProperties, propertyType)
+    } yield MetadataConfiguration(altHeaderToPropertyMapper, propertyToAltHeaderMapper, downloadFileOutputs, propertyType)
     csvConfigurationReader.run(configParameters)
   }
 
@@ -108,23 +108,23 @@ object ConfigUtils {
     * @param configurationParameters
     *   The configuration parameters containing the base schema and configuration data.
     * @return
-    *   A function that takes a domain as a parameter and returns a list of tuples containing the property name and column index.
+    *   A function that takes a domain as a parameter and returns a list of DownloadFileDisplayProperties.
     * @example
     *   - val configParams = ConfigParameters(baseSchema, baseConfig)
-    *   - val getColumns = getRequiredColumns(configParams)
-    *   - getColumns("MetadataDownloadTemplate") // Returns: List(("file_path", 1), ("file_name", 2), ("date_last_modified", 3), ...)
+    *   - val downloadFilesOutputs = getDownloadFilesOutputs(configParams)
+    *   - downloadFilesOutputs("MetadataDownloadTemplate") // Returns: List(DownloadFileDisplayProperties("file_path", 1, false), ...)
     */
-  private def getRequiredColumns(configurationParameters: ConfigParameters): String => List[(String, Int)] = {
-    val configItems: Map[String, List[(String, Int)]] = configurationParameters.baseConfig
+  private def getDownloadFilesOutputs(configurationParameters: ConfigParameters): String => List[DownloadFileDisplayProperty] = {
+    val configItems: Map[String, List[DownloadFileDisplayProperty]] = configurationParameters.baseConfig
       .getOrElse(Config(List.empty[ConfigItem]))
       .configItems
-      .flatMap(item => item.downloadFilesOutputs.map(output => (output.domain, (item.key, output.columnIndex))))
+      .flatMap(item => item.downloadFilesOutputs.map(output => (output.domain, DownloadFileDisplayProperty(item.key, output.columnIndex, output.editable))))
       .groupBy(_._1)
       .view
       .mapValues(_.map(_._2))
       .toMap
 
-    domain => configItems.getOrElse(domain, List.empty[(String, Int)]).sortBy(_._2)
+    domain => configItems.getOrElse(domain, List.empty[DownloadFileDisplayProperty]).sortBy(_.columnIndex)
   }
 
   /** Retrieves the property type for a given property based on the configuration parameters.
@@ -168,16 +168,18 @@ object ConfigUtils {
   case class MetadataConfiguration(
       inputToPropertyMapper: String => String => String,
       propertyToOutputMapper: String => String => String,
-      downloadProperties: String => List[(String, Int)],
+      downloadFileDisplayProperties: String => List[DownloadFileDisplayProperty],
       getPropertyType: String => String
   )
 
   case class ConfigParameters(baseSchema: Value, baseConfig: Either[io.circe.Error, Config])
 
-  case class DownloadFilesOutput(domain: String, columnIndex: Int)
+  case class DownloadFilesOutput(domain: String, columnIndex: Int, editable: Boolean)
 
   case class ConfigItem(key: String, downloadFilesOutputs: List[DownloadFilesOutput])
 
   case class Config(configItems: List[ConfigItem])
+
+  case class DownloadFileDisplayProperty(key: String, columnIndex: Int, editable: Boolean)
 
 }
