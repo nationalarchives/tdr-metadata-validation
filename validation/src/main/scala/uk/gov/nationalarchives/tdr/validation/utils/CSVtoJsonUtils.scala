@@ -11,40 +11,8 @@ import scala.util.Try
 
 class CSVtoJsonUtils {
 
-  private case class ConvertedProperty(propertyName: String, convertValueFunc: String => Any)
-
   val nodeSchema: JsonNode = getJsonNodeFromStreamContent(getClass.getResourceAsStream(BASE_SCHEMA.schemaLocation))
   private val json: Value = ujson.read(nodeSchema.toPrettyString)
-
-  private def getJsonNodeFromStreamContent(content: InputStream): JsonNode = {
-    val mapper = new ObjectMapper()
-    mapper.readTree(content)
-  }
-
-  // Extracts type from JSON value
-  private def getPropertyType(propertyValue: ujson.Obj): String = {
-    propertyValue.obj.get("type") match {
-      case Some(ujson.Str(singleType))              => singleType
-      case Some(ujson.Arr(types)) if types.nonEmpty => types.head.str
-      case _                                        => "unknown"
-    }
-  }
-
-  private def convertValueFunction(propertyType: String): String => Any = {
-    propertyType match {
-      case "integer" => (str: String) => Try(str.toInt).getOrElse(str)
-      case "array"   => (str: String) => if (str.isEmpty) "" else str.split(ARRAY_SPLIT_CHAR)
-      case "boolean" =>
-        (str: String) =>
-          str.toUpperCase match {
-            case "YES" => true
-            case "NO"  => false
-            case _     => str
-          }
-      case _ => (str: String) => str
-    }
-  }
-
   private val propertyValueConverterMap: Map[String, ConvertedProperty] = (for {
     (propertyName, propertyValue) <- json("properties").obj
     propertyTypes = getPropertyType(propertyValue.obj)
@@ -75,4 +43,39 @@ class CSVtoJsonUtils {
     val generatedJson = mapper.writeValueAsString(dataConvertedToSchemaDefinitions)
     generatedJson
   }
+
+  private def getJsonNodeFromStreamContent(content: InputStream): JsonNode = {
+    val mapper = new ObjectMapper()
+    mapper.readTree(content)
+  }
+
+  // Extracts type from JSON value
+  private def getPropertyType(propertyValue: ujson.Obj): String = {
+    propertyValue.obj.get("type") match {
+      case Some(ujson.Str(singleType)) => singleType
+      case Some(ujson.Arr(types)) if types.nonEmpty =>
+        val itemsType = propertyValue.obj.get("items").flatMap(_.obj.get("type")).map(_.str)
+        s"${types.head.str}${itemsType.map("_" + _).getOrElse("")}"
+      case _ => "unknown"
+    }
+  }
+
+  private def convertValueFunction(propertyType: String): String => Any = {
+    propertyType match {
+      case "integer"       => (str: String) => Try(str.toInt).getOrElse(str)
+      case "array"         => (str: String) => if (str.isEmpty) "" else str.split(ARRAY_SPLIT_CHAR)
+      case "array_string"  => (str: String) => if (str.isEmpty) "" else str.split(ARRAY_SPLIT_CHAR)
+      case "array_integer" => (str: String) => if (str.isEmpty) "" else str.split(ARRAY_SPLIT_CHAR).map(s => Try(s.toInt).getOrElse(s))
+      case "boolean" =>
+        (str: String) =>
+          str.toUpperCase match {
+            case "YES" => true
+            case "NO"  => false
+            case _     => str
+          }
+      case _ => (str: String) => str
+    }
+  }
+
+  private case class ConvertedProperty(propertyName: String, convertValueFunc: String => Any)
 }

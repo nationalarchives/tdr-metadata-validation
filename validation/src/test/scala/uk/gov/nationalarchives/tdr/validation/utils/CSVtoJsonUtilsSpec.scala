@@ -12,14 +12,14 @@ class CSVtoJsonUtilsSpec extends AnyWordSpec {
       val utils = new CSVtoJsonUtils()
       val testData = Map("closure period" -> "5")
       val result = utils.convertToJSONString(testData)
-      assert(result == """{"closure_period":5}""")
+      assert(result == """{"closure_period":[5]}""")
     }
 
     "return a JSON string when the input is not a `number`" in {
       val utils = new CSVtoJsonUtils()
       val testData = Map("closure period" -> "abc")
       val result = utils.convertToJSONString(testData)
-      assert(result == """{"closure_period":"abc"}""")
+      assert(result == """{"closure_period":["abc"]}""")
     }
 
     "correctly convert a split an array string to a JSON `array`" in {
