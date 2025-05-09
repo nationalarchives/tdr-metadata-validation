@@ -2,6 +2,7 @@ package uk.gov.nationalarchives.tdr.validation.utils
 
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
+import uk.gov.nationalarchives.tdr.validation.utils.ConfigUtils.ARRAY_SPLIT_CHAR
 
 class CSVtoJsonUtilsSpec extends AnyWordSpec {
 
@@ -23,7 +24,7 @@ class CSVtoJsonUtilsSpec extends AnyWordSpec {
 
     "correctly convert a split an array string to a JSON `array`" in {
       val utils = new CSVtoJsonUtils()
-      val testData = Map("foi exemption code" -> "37(1)(ab)|44")
+      val testData = Map("foi exemption code" -> s"37(1)(ab)${ARRAY_SPLIT_CHAR}44")
       val result = utils.convertToJSONString(testData)
       assert(result == """{"foi_exemption_code":["37(1)(ab)","44"]}""")
     }

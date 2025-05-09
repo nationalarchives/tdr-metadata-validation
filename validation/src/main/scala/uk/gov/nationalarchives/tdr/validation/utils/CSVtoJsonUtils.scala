@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import ujson.Value.Value
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
+import uk.gov.nationalarchives.tdr.validation.utils.ConfigUtils.ARRAY_SPLIT_CHAR
 
 import java.io.InputStream
 import scala.util.Try
@@ -11,6 +12,7 @@ import scala.util.Try
 class CSVtoJsonUtils {
 
   private case class ConvertedProperty(propertyName: String, convertValueFunc: String => Any)
+
   val nodeSchema: JsonNode = getJsonNodeFromStreamContent(getClass.getResourceAsStream(BASE_SCHEMA.schemaLocation))
   private val json: Value = ujson.read(nodeSchema.toPrettyString)
 
@@ -31,7 +33,7 @@ class CSVtoJsonUtils {
   private def convertValueFunction(propertyType: String): String => Any = {
     propertyType match {
       case "integer" => (str: String) => Try(str.toInt).getOrElse(str)
-      case "array"   => (str: String) => if (str.isEmpty) "" else str.split("\\|")
+      case "array"   => (str: String) => if (str.isEmpty) "" else str.split(ARRAY_SPLIT_CHAR)
       case "boolean" =>
         (str: String) =>
           str.toUpperCase match {

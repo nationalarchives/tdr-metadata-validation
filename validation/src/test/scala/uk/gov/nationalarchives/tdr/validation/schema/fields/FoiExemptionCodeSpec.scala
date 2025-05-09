@@ -5,6 +5,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationError
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.{SCHEMA_BASE, SCHEMA_CLOSURE_CLOSED, SCHEMA_CLOSURE_OPEN, SCHEMA_REQUIRED}
 import uk.gov.nationalarchives.tdr.validation.schema.helpers.TestHelper._
+import uk.gov.nationalarchives.tdr.validation.utils.ConfigUtils.ARRAY_SPLIT_CHAR
 
 class FoiExemptionCodeSpec extends AnyWordSpecLike {
 
@@ -26,24 +27,24 @@ class FoiExemptionCodeSpec extends AnyWordSpecLike {
     }
 
     "success if two valid values are provided" in {
-      val closedTestFileRow = closedMetadataFileRow(foiCodes = Some("38|EIR 12(5)(c)"))
+      val closedTestFileRow = closedMetadataFileRow(foiCodes = Some(s"38${ARRAY_SPLIT_CHAR}EIR 12(5)(c)"))
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
     "success if all possible valid values are provided" in {
       val closedTestFileRow = closedMetadataFileRow(foiCodes =
         Some(
-          "23|24|26|27(1)|27(2)|28|29|30(1)|30(2)|31|32|33|34|35(1)(a)" +
-            "|35(1)(b)|35(1)(c)|35(1)(d)|36|37(1)(a)|37(1)(aa)|37(1)(ab)|37(1)(ac)" +
-            "|37(1)(ad)|37(1)(b)|38|39|40(2)|41|42|43(1)|43(2)|44|EIR 12(5)(a)|" +
-            "EIR 12(5)(b)|EIR 12(5)(c)|EIR 12(5)(d)|EIR 12(5)(e)|EIR 12(5)(f)|EIR 12(5)(g)"
+          s"23${ARRAY_SPLIT_CHAR}24${ARRAY_SPLIT_CHAR}26${ARRAY_SPLIT_CHAR}27(1)${ARRAY_SPLIT_CHAR}27(2)${ARRAY_SPLIT_CHAR}28${ARRAY_SPLIT_CHAR}29${ARRAY_SPLIT_CHAR}30(1)${ARRAY_SPLIT_CHAR}30(2)${ARRAY_SPLIT_CHAR}31${ARRAY_SPLIT_CHAR}32${ARRAY_SPLIT_CHAR}33${ARRAY_SPLIT_CHAR}34${ARRAY_SPLIT_CHAR}35(1)(a)" +
+            s"${ARRAY_SPLIT_CHAR}35(1)(b)${ARRAY_SPLIT_CHAR}35(1)(c)${ARRAY_SPLIT_CHAR}35(1)(d)${ARRAY_SPLIT_CHAR}36${ARRAY_SPLIT_CHAR}37(1)(a)${ARRAY_SPLIT_CHAR}37(1)(aa)${ARRAY_SPLIT_CHAR}37(1)(ab)${ARRAY_SPLIT_CHAR}37(1)(ac)" +
+            s"${ARRAY_SPLIT_CHAR}37(1)(ad)${ARRAY_SPLIT_CHAR}37(1)(b)${ARRAY_SPLIT_CHAR}38${ARRAY_SPLIT_CHAR}39${ARRAY_SPLIT_CHAR}40(2)${ARRAY_SPLIT_CHAR}41${ARRAY_SPLIT_CHAR}42${ARRAY_SPLIT_CHAR}43(1)${ARRAY_SPLIT_CHAR}43(2)${ARRAY_SPLIT_CHAR}44${ARRAY_SPLIT_CHAR}EIR 12(5)(a)${ARRAY_SPLIT_CHAR}" +
+            s"EIR 12(5)(b)${ARRAY_SPLIT_CHAR}EIR 12(5)(c)${ARRAY_SPLIT_CHAR}EIR 12(5)(d)${ARRAY_SPLIT_CHAR}EIR 12(5)(e)${ARRAY_SPLIT_CHAR}EIR 12(5)(f)${ARRAY_SPLIT_CHAR}EIR 12(5)(g)"
         )
       )
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
-    "succeeds if a single value is followed by a pipe" in {
-      val closedTestFileRow = closedMetadataFileRow(foiCodes = Some("39|"))
+    "succeeds if a single value is followed by a separator" in {
+      val closedTestFileRow = closedMetadataFileRow(foiCodes = Some(s"39$ARRAY_SPLIT_CHAR"))
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
@@ -127,8 +128,8 @@ class FoiExemptionCodeSpec extends AnyWordSpecLike {
       )
     }
 
-    "error(s) if a pipe is at the front of a list" in {
-      val closedTestFileRow = closedMetadataFileRow(foiCodes = Some("|44|38"))
+    "error(s) if a separator is at the front of a list" in {
+      val closedTestFileRow = closedMetadataFileRow(foiCodes = Some(";44;38"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
         ValidationError(
           SCHEMA_BASE,

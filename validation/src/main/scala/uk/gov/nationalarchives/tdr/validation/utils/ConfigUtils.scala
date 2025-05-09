@@ -11,6 +11,8 @@ import scala.util.Using
 
 object ConfigUtils {
 
+  val ARRAY_SPLIT_CHAR = ";"
+
   private lazy val configParameters: ConfigParameters = ConfigParameters(loadBaseSchema, loadConfigFile)
   private val baseSchemaPropertiesKey = "properties"
   private val baseSchemaAlternateKeysKey = "alternateKeys"

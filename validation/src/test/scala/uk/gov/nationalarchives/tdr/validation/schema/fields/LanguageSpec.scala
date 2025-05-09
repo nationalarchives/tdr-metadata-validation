@@ -5,6 +5,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationError
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.SCHEMA_BASE
 import uk.gov.nationalarchives.tdr.validation.schema.helpers.TestHelper._
+import uk.gov.nationalarchives.tdr.validation.utils.ConfigUtils.ARRAY_SPLIT_CHAR
 
 class LanguageSpec extends AnyWordSpecLike {
 
@@ -25,16 +26,16 @@ class LanguageSpec extends AnyWordSpecLike {
     }
 
     "success if the value is English AND Welsh" in {
-      val openTestFileRow = openMetadataFileRow(language = Some("English|Welsh"))
+      val openTestFileRow = openMetadataFileRow(language = Some(s"English${ARRAY_SPLIT_CHAR}Welsh"))
       validationErrors(openTestFileRow).size shouldBe 0
-      val closedTestFileRow = closedMetadataFileRow(language = Some("English|Welsh"))
+      val closedTestFileRow = closedMetadataFileRow(language = Some(s"English${ARRAY_SPLIT_CHAR}Welsh"))
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
-    "succeeds if a single value is followed by a pipe" in {
-      val openTestFileRow = openMetadataFileRow(language = Some("English|"))
+    "succeeds if a single value is followed by a separator" in {
+      val openTestFileRow = openMetadataFileRow(language = Some(s"English$ARRAY_SPLIT_CHAR"))
       validationErrors(openTestFileRow).size shouldBe 0
-      val closedTestFileRow = closedMetadataFileRow(language = Some("Welsh|"))
+      val closedTestFileRow = closedMetadataFileRow(language = Some(s"Welsh$ARRAY_SPLIT_CHAR"))
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
@@ -159,8 +160,8 @@ class LanguageSpec extends AnyWordSpecLike {
       )
     }
 
-    "error(s) if a pipe is at the front of a list" in {
-      val openTestFileRow = openMetadataFileRow(language = Some("|English"))
+    "error(s) if a separator is at the front of a list" in {
+      val openTestFileRow = openMetadataFileRow(language = Some(s"${ARRAY_SPLIT_CHAR}English"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
         ValidationError(
           SCHEMA_BASE,
@@ -171,9 +172,9 @@ class LanguageSpec extends AnyWordSpecLike {
           SCHEMA_BASE,
           "language",
           "type"
-        ) // Language must be capitalised English or Welsh, if a record is in both languages you must use a pipe separated list, ie. English|Welsh
+        ) // Language must be capitalised English or Welsh, if a record is in both languages you must use a separated list, ie. English|Welsh
       )
-      val closedTestFileRow = closedMetadataFileRow(language = Some("|English|Welsh"))
+      val closedTestFileRow = closedMetadataFileRow(language = Some(s"${ARRAY_SPLIT_CHAR}English${ARRAY_SPLIT_CHAR}Welsh"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
         ValidationError(
           SCHEMA_BASE,
