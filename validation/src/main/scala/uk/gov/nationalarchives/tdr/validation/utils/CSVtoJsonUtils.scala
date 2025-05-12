@@ -2,6 +2,7 @@ package uk.gov.nationalarchives.tdr.validation.utils
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import ujson.Obj
 import ujson.Value.Value
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
 import uk.gov.nationalarchives.tdr.validation.utils.ConfigUtils.ARRAY_SPLIT_CHAR
@@ -49,21 +50,30 @@ class CSVtoJsonUtils {
     mapper.readTree(content)
   }
 
-  // Extracts type from JSON value
   private def getPropertyType(propertyValue: ujson.Obj): String = {
     propertyValue.obj.get("type") match {
+      case Some(ujson.Str("array")) =>
+        val itemsType: Option[String] = getItemsType(propertyValue)
+        s"array${itemsType.map("_" + _).getOrElse("")}"
       case Some(ujson.Str(singleType)) => singleType
       case Some(ujson.Arr(types)) if types.nonEmpty =>
-        val itemsType = propertyValue.obj.get("items").flatMap(_.obj.get("type")).map(_.str)
-        s"${types.head.str}${itemsType.map("_" + _).getOrElse("")}"
+        val filteredTypes = types.filterNot(_.str == "null")
+        val itemsType = getItemsType(propertyValue)
+        s"${filteredTypes.headOption.map(_.str).getOrElse("")}${itemsType.map("_" + _).getOrElse("")}"
       case _ => "unknown"
     }
+  }
+
+  private def getItemsType(propertyValue: Obj) = {
+    val itemsType = propertyValue.obj.get("items").collect { case obj: Obj =>
+      getPropertyType(obj)
+    }
+    itemsType
   }
 
   private def convertValueFunction(propertyType: String): String => Any = {
     propertyType match {
       case "integer"       => (str: String) => Try(str.toInt).getOrElse(str)
-      case "array"         => (str: String) => if (str.isEmpty) "" else str.split(ARRAY_SPLIT_CHAR)
       case "array_string"  => (str: String) => if (str.isEmpty) "" else str.split(ARRAY_SPLIT_CHAR)
       case "array_integer" => (str: String) => if (str.isEmpty) "" else str.split(ARRAY_SPLIT_CHAR).map(s => Try(s.toInt).getOrElse(s))
       case "boolean" =>

@@ -5,6 +5,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import uk.gov.nationalarchives.tdr.validation.schema.helpers.TestHelper._
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationError
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.{SCHEMA_BASE, SCHEMA_CLOSURE_CLOSED, SCHEMA_CLOSURE_OPEN, SCHEMA_REQUIRED}
+import uk.gov.nationalarchives.tdr.validation.utils.ConfigUtils.ARRAY_SPLIT_CHAR
 
 class ClosurePeriodSpec extends AnyWordSpecLike {
 
@@ -20,9 +21,22 @@ class ClosurePeriodSpec extends AnyWordSpecLike {
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
+    "success if there are two correct values 1 and 150 for a closed record" in {
+      val closedTestFileRow = closedMetadataFileRow(closurePeriod = Some(s"1${{ ARRAY_SPLIT_CHAR }}150"))
+      validationErrors(closedTestFileRow).size shouldBe 0
+    }
+
     "success if the value is missing for an open record" in {
       val openTestFileRow = openMetadataFileRow(closurePeriod = Some(""))
       validationErrors(openTestFileRow).size shouldBe 0
+    }
+
+    "errors if there are two values 1 and 160 and 160 is above maximum closed record" in {
+      val closedTestFileRow = closedMetadataFileRow(closurePeriod = Some(s"1${ARRAY_SPLIT_CHAR}160"))
+      validationErrors(closedTestFileRow).size shouldBe 1
+      validationErrors(closedTestFileRow) should contain theSameElementsAs List(
+        ValidationError(SCHEMA_BASE, "closure_period", "maximum") // Must be a number between 1 and 150
+      )
     }
 
     "error(s) if the column is missing" in {
