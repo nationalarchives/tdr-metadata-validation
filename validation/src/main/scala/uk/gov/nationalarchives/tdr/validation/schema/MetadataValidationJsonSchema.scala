@@ -71,7 +71,9 @@ object MetadataValidationJsonSchema {
   }
 
   private def convertValidationMessageToError(message: ValidationMessage, validationProcess: ValidationProcess): ValidationError = {
-    val propertyName = Option(message.getProperty).getOrElse(message.getInstanceLocation.getName(0))
+    val propertyName = Option(message.getProperty)
+      .map(_.replaceAll("\\[\\d+]$", ""))
+      .getOrElse(message.getInstanceLocation.getName(0))
     ValidationError(validationProcess, propertyName, message.getMessageKey)
   }
 
