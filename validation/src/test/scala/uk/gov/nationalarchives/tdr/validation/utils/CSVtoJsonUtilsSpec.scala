@@ -29,6 +29,13 @@ class CSVtoJsonUtilsSpec extends AnyWordSpec {
       assert(result == """{"foi_exemption_code":["37(1)(ab)","44"]}""")
     }
 
+    "correctly convert and split an array string of integers to a JSON `array`" in {
+      val utils = new CSVtoJsonUtils()
+      val testData = Map("closure period" -> s"130${ARRAY_SPLIT_CHAR}2")
+      val result = utils.convertToJSONString(testData)
+      assert(result == """{"closure_period":[130,2]}""")
+    }
+
     "return a JSON string when the input array cannot be split" in {
       val utils = new CSVtoJsonUtils()
       val testData = Map("foi exemption code" -> "37(1)(ab)+44")
