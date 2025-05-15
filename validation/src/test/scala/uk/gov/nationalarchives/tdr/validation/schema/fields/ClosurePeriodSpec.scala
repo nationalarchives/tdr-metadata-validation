@@ -39,6 +39,15 @@ class ClosurePeriodSpec extends AnyWordSpecLike {
       )
     }
 
+    "errors if there are two values YES and 150" in {
+      val closedTestFileRow = closedMetadataFileRow(closurePeriod = Some(s"YES${ARRAY_SPLIT_CHAR}150"))
+      validationErrors(closedTestFileRow).size shouldBe 2
+      validationErrors(closedTestFileRow) should contain theSameElementsAs List(
+        ValidationError(SCHEMA_BASE, "closure_period", "type"), // Must be a number between 1 and 150
+        ValidationError(SCHEMA_CLOSURE_CLOSED, "closure_period", "type")
+      )
+    }
+
     "error(s) if the column is missing" in {
       val openTestFileRow = openMetadataFileRow(closurePeriod = None)
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
