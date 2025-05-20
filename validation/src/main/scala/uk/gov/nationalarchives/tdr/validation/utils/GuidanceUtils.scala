@@ -19,14 +19,14 @@ object GuidanceUtils {
         case None =>
           c.value.asNumber match {
             case Some(n) => Right(n.toString)
-            case None => Left(DecodingFailure("Expected string or number", c.history))
+            case None    => Left(DecodingFailure("Expected string or number", c.history))
           }
       }
     }
   }
 
   implicit val decodeGuidanceItem: Decoder[GuidanceItem] = deriveDecoder[GuidanceItem]
-  
+
   def loadGuidanceFile: Either[io.circe.Error, Seq[GuidanceItem]] = {
     val nodeSchema = getClass.getResourceAsStream(METADATA_GUIDANCE_LOCATION)
     val source = Source.fromInputStream(nodeSchema)
@@ -35,6 +35,6 @@ object GuidanceUtils {
     val data = mapper.readTree(jsonString).toPrettyString
     decode[List[GuidanceItem]](data)
   }
-  
+
   case class GuidanceItem(property: String, details: String, format: String, tdrRequirement: String, example: String)
 }
