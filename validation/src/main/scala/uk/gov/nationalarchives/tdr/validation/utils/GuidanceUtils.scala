@@ -10,7 +10,7 @@ import scala.io.Source
 import scala.util.Using
 
 object GuidanceUtils {
-  val METADATA_GUIDANCE_LOCATION = "/guidance/metadata-template.json"
+  private val METADATA_GUIDANCE_LOCATION = "/guidance/metadata-template.json"
 
   implicit val decodeExample: Decoder[String] = new Decoder[String] {
     final def apply(c: HCursor): Decoder.Result[String] = {
