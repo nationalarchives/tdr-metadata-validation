@@ -5,7 +5,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 class GuidanceUtilsSpec extends AnyFlatSpec with Matchers {
-  
+
   import GuidanceUtils._
   "decodeExample" should "decode string values correctly" in {
     val json = Json.fromString("test string")
@@ -30,13 +30,15 @@ class GuidanceUtilsSpec extends AnyFlatSpec with Matchers {
       "example" -> Json.fromString("N/A")
     )
 
-    decodeGuidanceItem.decodeJson(json) shouldBe Right(GuidanceItem(
-      property = "file_path",
-      details = "This is the file path/folder structure extracted upon upload, do not modify",
-      format = "Do not modify",
-      tdrRequirement = "Mandatory",
-      example = "N/A"
-    ))
+    decodeGuidanceItem.decodeJson(json) shouldBe Right(
+      GuidanceItem(
+        property = "file_path",
+        details = "This is the file path/folder structure extracted upon upload, do not modify",
+        format = "Do not modify",
+        tdrRequirement = "Mandatory",
+        example = "N/A"
+      )
+    )
   }
 
   it should "decode GuidanceItem with numeric example" in {
@@ -47,12 +49,14 @@ class GuidanceUtilsSpec extends AnyFlatSpec with Matchers {
       "tdrRequirement" -> Json.fromString("Mandatory for closed record"),
       "example" -> Json.fromInt(20)
     )
-    decodeGuidanceItem.decodeJson(json) shouldBe Right(GuidanceItem(
-      property = "closure_period",
-      details = "Closed record: Provide the number of years that the record will remain closed",
-      format = "Number (1-150)",
-      tdrRequirement = "Mandatory for closed record",
-      example = "20"
-    ))
+    decodeGuidanceItem.decodeJson(json) shouldBe Right(
+      GuidanceItem(
+        property = "closure_period",
+        details = "Closed record: Provide the number of years that the record will remain closed",
+        format = "Number (1-150)",
+        tdrRequirement = "Mandatory for closed record",
+        example = "20"
+      )
+    )
   }
 }
