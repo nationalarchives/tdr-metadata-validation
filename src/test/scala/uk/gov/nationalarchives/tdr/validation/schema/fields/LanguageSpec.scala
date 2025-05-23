@@ -5,7 +5,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationError
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.SCHEMA_BASE
 import uk.gov.nationalarchives.tdr.validation.schema.helpers.TestHelper._
-import uk.gov.nationalarchives.tdr.validation.utils.ConfigUtils.ARRAY_SPLIT_CHAR
+import uk.gov.nationalarchives.tdr.schemautils.ConfigUtils.ARRAY_SPLIT_CHAR
 
 class LanguageSpec extends AnyWordSpecLike {
 

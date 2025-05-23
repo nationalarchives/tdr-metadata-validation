@@ -28,8 +28,8 @@ class DaBeforeToday extends AbstractKeyword("daBeforeToday") {
           .messageKey("daBeforeToday")
 
         val validationMessages = Try(DateTime.parse(node.textValue())) match {
-          case Success(date) if DateTime.now() isBefore date => HashSet(validationMessageBuilder.build())
-          case _                                             => HashSet[ValidationMessage]()
+          case Success(date) if DateTime.now().isBefore(date) => HashSet(validationMessageBuilder.build())
+          case _                                              => HashSet[ValidationMessage]()
         }
         validationMessages.asJava
       }

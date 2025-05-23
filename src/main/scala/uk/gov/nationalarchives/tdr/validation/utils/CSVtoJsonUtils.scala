@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import ujson.Obj
 import ujson.Value.Value
+import uk.gov.nationalarchives.tdr.schemautils.ConfigUtils
+import uk.gov.nationalarchives.tdr.schemautils.ConfigUtils.{ARRAY_SPLIT_CHAR, MetadataConfiguration}
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.BASE_SCHEMA
-import uk.gov.nationalarchives.tdr.validation.utils.ConfigUtils.ARRAY_SPLIT_CHAR
 
 import java.io.InputStream
 import scala.util.Try
@@ -14,19 +15,13 @@ class CSVtoJsonUtils {
 
   val nodeSchema: JsonNode = getJsonNodeFromStreamContent(getClass.getResourceAsStream(BASE_SCHEMA.schemaLocation))
   private val json: Value = ujson.read(nodeSchema.toPrettyString)
-  private val propertyValueConverterMap: Map[String, ConvertedProperty] = (for {
+  private lazy val metadataConfiguration: MetadataConfiguration = ConfigUtils.loadConfiguration
+
+  private lazy val propertyValueConverterMap: Map[String, ConvertedProperty] = (for {
     (propertyName, propertyValue) <- json("properties").obj
     propertyTypes = getPropertyType(propertyValue.obj)
-    // Use propertyName if alternateKeys is absent
-    headerMappings = propertyValue.obj.get("alternateKeys") match {
-      case Some(alternateKeys) =>
-        for {
-          alternateKey <- alternateKeys.arr
-          header <- alternateKey.obj.get("tdrFileHeader").toSeq
-        } yield header.str -> ConvertedProperty(propertyName, convertValueFunction(propertyType = propertyTypes))
-      case None =>
-        Seq(propertyName -> ConvertedProperty(propertyName, convertValueFunction(propertyType = propertyTypes)))
-    }
+    headerName = metadataConfiguration.propertyToOutputMapper("tdrFileHeader")(propertyName)
+    headerMappings = Seq(headerName -> ConvertedProperty(propertyName, convertValueFunction(propertyType = propertyTypes)))
     headerMapping <- headerMappings
   } yield headerMapping).toMap
 
