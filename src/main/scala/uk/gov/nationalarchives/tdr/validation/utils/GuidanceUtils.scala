@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.circe.generic.semiauto.deriveDecoder
 import io.circe.jawn.decode
 import io.circe.{Decoder, DecodingFailure, HCursor}
+import io.circe.generic.auto._
 
 import scala.io.Source
 import scala.util.Using
