@@ -503,10 +503,11 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       val errors: Map[String, Seq[ValidationError]] =
         MetadataValidationJsonSchema.validate(Set(REQUIRED_SCHEMA), List(fileRow1))
       errors.size shouldBe 1
-      errors("file_a").size shouldBe 3
+      errors("file_a").size shouldBe 4
       errors("file_a") should contain(ValidationError(SCHEMA_REQUIRED, "file_path", "required"))
       errors("file_a") should contain(ValidationError(SCHEMA_REQUIRED, "end_date", "required"))
       errors("file_a") should contain(ValidationError(SCHEMA_REQUIRED, "description", "required"))
+      errors("file_a") should contain(ValidationError(SCHEMA_REQUIRED, "rights_copyright", "required"))
     }
   }
   "MetadataValidationJsonSchema with RELATIONSHIP_SCHEMA" should {

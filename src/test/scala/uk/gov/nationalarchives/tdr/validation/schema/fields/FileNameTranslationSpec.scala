@@ -31,10 +31,10 @@ class FileNameTranslationSpec extends AnyWordSpecLike {
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
-    "succeeds if a 8,000 char file name translation is provided " in {
-      val openTestFileRow = openMetadataFileRow(translatedTitleOfRecord = Some(eightThousandCharString))
+    "succeeds if a 255 char file name translation is provided " in {
+      val openTestFileRow = openMetadataFileRow(translatedTitleOfRecord = Some(twoHundredAndFiftyFiveCharString))
       validationErrors(openTestFileRow).size shouldBe 0
-      val closedTestFileRow = closedMetadataFileRow(translatedTitleOfRecord = Some(eightThousandCharString))
+      val closedTestFileRow = closedMetadataFileRow(translatedTitleOfRecord = Some(twoHundredAndFiftyFiveCharString))
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 

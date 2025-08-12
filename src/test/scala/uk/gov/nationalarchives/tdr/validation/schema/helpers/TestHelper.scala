@@ -19,6 +19,7 @@ object TestHelper {
       titleClosed: Option[String] = Some("No"),
       titleAlternative: Option[String] = Some(""),
       descriptionAlternative: Option[String] = Some(""),
+      rightsCopyright: Option[String] = Some("Crown copyright"),
       // not required
       fileName: Option[String] = Some("file1"),
       dateLastModified: Option[String] = Some("2024-12-25"),
@@ -41,6 +42,7 @@ object TestHelper {
       titleClosed = titleClosed,
       titleAlternative = titleAlternative,
       descriptionAlternative = descriptionAlternative,
+      rightsCopyright = rightsCopyright,
       // not required
       fileName = fileName,
       dateLastModified = dateLastModified,
@@ -65,6 +67,7 @@ object TestHelper {
       titleClosed: Option[String] = Some("No"),
       titleAlternative: Option[String] = Some(""),
       descriptionAlternative: Option[String] = Some(""),
+      rightsCopyright: Option[String] = Some("Crown copyright"),
       // not required
       fileName: Option[String] = Some("file1"),
       dateLastModified: Option[String] = Some("2024-12-25"),
@@ -87,6 +90,7 @@ object TestHelper {
       titleClosed = titleClosed,
       titleAlternative = titleAlternative,
       descriptionAlternative = descriptionAlternative,
+      rightsCopyright = rightsCopyright,
       // not required
       fileName = fileName,
       dateLastModified = dateLastModified,
@@ -112,6 +116,7 @@ object TestHelper {
       titleClosed: Option[String] = None,
       titleAlternative: Option[String] = None,
       descriptionAlternative: Option[String] = None,
+      rightsCopyright: Option[String] = None,
       // not required
       fileName: Option[String] = None,
       dateLastModified: Option[String] = None,
@@ -135,6 +140,7 @@ object TestHelper {
       titleClosed.map(Metadata("is filename closed", _)), // title_closed
       titleAlternative.map(Metadata("alternate filename", _)), // title_alternative
       descriptionAlternative.map(Metadata("alternate description", _)), // description_alternate
+      rightsCopyright.map(Metadata("copyright", _)), // rights_copyright
       // not required
       fileName.map(Metadata("filename", _)),
       dateLastModified.map(Metadata("date last modified", _)),
