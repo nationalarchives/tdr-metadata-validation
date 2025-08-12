@@ -116,7 +116,7 @@ object TestHelper {
       titleClosed: Option[String] = None,
       titleAlternative: Option[String] = None,
       descriptionAlternative: Option[String] = None,
-      rightsCopyright: Option[String] = None,
+      rightsCopyRight: Option[String] = Some("Crown copyright"),
       // not required
       fileName: Option[String] = None,
       dateLastModified: Option[String] = None,
