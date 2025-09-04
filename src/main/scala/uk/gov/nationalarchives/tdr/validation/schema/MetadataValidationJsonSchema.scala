@@ -79,6 +79,6 @@ object MetadataValidationJsonSchema {
 
   private def mapToJson: ObjectMetadata => JsonData = (data: ObjectMetadata) => {
     val mapData = data.metadata.foldLeft(Map.empty[String, String])((acc, metadata) => acc + (metadata.name -> metadata.value))
-    JsonData(data.identifier, csvToJsonUtils.convertToJSONString(mapData).replaceAll("\"\"", "null"))
+    JsonData(data.identifier, csvToJsonUtils.convertToJSONString(mapData))
   }
 }

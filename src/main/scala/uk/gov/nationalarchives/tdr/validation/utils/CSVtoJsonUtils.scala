@@ -69,8 +69,8 @@ class CSVtoJsonUtils {
   private def convertValueFunction(propertyType: String): String => Any = {
     propertyType match {
       case "integer"       => (str: String) => Try(str.toInt).getOrElse(str)
-      case "array_string"  => (str: String) => if (str.isEmpty) "" else str.split(ARRAY_SPLIT_CHAR)
-      case "array_integer" => (str: String) => if (str.isEmpty) "" else str.split(ARRAY_SPLIT_CHAR).map(s => Try(s.toInt).getOrElse(s))
+      case "array_string"  => (str: String) => if (str.isEmpty) null else str.split(ARRAY_SPLIT_CHAR)
+      case "array_integer" => (str: String) => if (str.isEmpty) null else str.split(ARRAY_SPLIT_CHAR).map(s => Try(s.toInt).getOrElse(s))
       case "boolean" =>
         (str: String) =>
           str.toUpperCase match {
@@ -78,7 +78,7 @@ class CSVtoJsonUtils {
             case "NO"  => false
             case _     => str
           }
-      case _ => (str: String) => str
+      case _ => (str: String) => if (str.isEmpty) null else str
     }
   }
 
