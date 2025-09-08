@@ -135,8 +135,7 @@ class FoiExemptionCodeSpec extends AnyWordSpecLike {
           SCHEMA_BASE,
           "foi_exemption_code",
           "enum"
-        ), // Must be a pipe delimited list of valid FOI codes, (eg. 31|33). Please see the guidance for more detail on valid codes
-        ValidationError(SCHEMA_BASE, "foi_exemption_code", "type") // This must be a pipe delimited list of valid FOI codes, please see the guidance for more detail on valid codes
+        ) // Must be a pipe delimited list of valid FOI codes, (eg. 31|33). Please see the guidance for more detail on valid codes
       )
     }
 

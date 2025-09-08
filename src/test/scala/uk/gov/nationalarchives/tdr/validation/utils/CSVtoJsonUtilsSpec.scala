@@ -43,11 +43,11 @@ class CSVtoJsonUtilsSpec extends AnyWordSpec {
       assert(result == """{"foi_exemption_code":["37(1)(ab)+44"]}""")
     }
 
-    "return a empty JSON string when the input array is empty" in {
+    "return null when array input is an empty string" in {
       val utils = new CSVtoJsonUtils()
       val testData = Map("language" -> "")
       val result = utils.convertToJSONString(testData)
-      assert(result == """{"language":""}""")
+      assert(result == """{"language":null}""")
     }
 
     "correctly convert a boolean string to a JSON `boolean`" in {
