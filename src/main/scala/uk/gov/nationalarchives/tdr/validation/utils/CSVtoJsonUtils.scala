@@ -74,9 +74,9 @@ class CSVtoJsonUtils {
       case "boolean" =>
         (str: String) =>
           str.toUpperCase match {
-            case "YES" => true
-            case "NO"  => false
-            case _     => str
+            case "YES" | "TRUE" => true
+            case "NO" | "FALSE" => false
+            case _              => str
           }
       case _ => (str: String) => if (str.isEmpty) null else str
     }
