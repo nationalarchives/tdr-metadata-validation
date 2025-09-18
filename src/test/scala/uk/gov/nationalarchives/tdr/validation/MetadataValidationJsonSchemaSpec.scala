@@ -12,6 +12,15 @@ import uk.gov.nationalarchives.tdr.validation.schema.{MetadataValidationJsonSche
 class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataValidationJsonSchemaSpec")) with ImplicitSender with AnyWordSpecLike {
 
   "MetadataValidationJsonSchema with BASE_SCHEMA" should {
+    "validate boolean field with true/false value" in {
+      val objectMetadata = Set(ObjectMetadata("file1", Set(
+        Metadata("judgment_type", "judgment"),
+        Metadata("judgment_update", "true")
+      )))
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, objectMetadata)
+      validationErrors("file1").size shouldBe 0
+    }
+
     "validate incorrect value in enumerated array" in {
       val data: Set[ObjectMetadata] = dataBuilder("language", "Unknown")
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
