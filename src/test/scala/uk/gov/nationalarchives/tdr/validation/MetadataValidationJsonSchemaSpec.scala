@@ -13,10 +13,15 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
 
   "MetadataValidationJsonSchema with BASE_SCHEMA" should {
     "validate boolean field with true/false value" in {
-      val objectMetadata = Set(ObjectMetadata("file1", Set(
-        Metadata("judgment_type", "judgment"),
-        Metadata("judgment_update", "true")
-      )))
+      val objectMetadata = Set(
+        ObjectMetadata(
+          "file1",
+          Set(
+            Metadata("judgment_type", "judgment"),
+            Metadata("judgment_update", "true")
+          )
+        )
+      )
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, objectMetadata)
       validationErrors("file1").size shouldBe 0
     }
