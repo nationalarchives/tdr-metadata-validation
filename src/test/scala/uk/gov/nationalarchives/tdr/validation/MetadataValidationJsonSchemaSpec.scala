@@ -177,6 +177,56 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       singleErrorCheck(validationErrors, "title_alternate", "pattern", SCHEMA_BASE)
     }
 
+    "validate copyright can contain single valid value" in {
+      val data: Set[ObjectMetadata] = dataBuilder(
+        "copyright",
+        "Third party"
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 0
+    }
+
+    "validate copyright can contain multiple valid values" in {
+      val data: Set[ObjectMetadata] = dataBuilder(
+        "copyright",
+        "Crown copyright;Third party"
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 0
+    }
+
+    "validate copyright must contain a correct value" in {
+      val data: Set[ObjectMetadata] = dataBuilder(
+        "copyright",
+        "some random value"
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 1
+      singleErrorCheck(validationErrors, "rights_copyright", "enum", SCHEMA_BASE)
+    }
+
+    "validate restrictions_on_use can be empty" in {
+      val data: Set[ObjectMetadata] = dataBuilder(
+        "restrictions_on_use",
+        ""
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 0
+    }
+
+    "validate restrictions_on_use cannot be more than 500 characters" in {
+      val data: Set[ObjectMetadata] = dataBuilder(
+        "restrictions_on_use",
+        "more than 500 characters more than 500 characters more than 500 characters more than 500 characters more than 500 characters" +
+          " more than 500 characters more than 500 characters more than 500 characters more than 500 characters" +
+          " more than 500 characters more than 500 characters more than 500 characters more than 500 characters " +
+          "more than 500 characters more than 500 characters more than 500 characters more than 500 characters more than 500 characters" +
+          " more than 500 characters more than 500 characters more than 500 characters"
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 1
+      singleErrorCheck(validationErrors, "restrictions_on_use", "maxLength", SCHEMA_BASE)
+    }
   }
 
   "MetadataValidationJsonSchema with CLOSURE_SCHEMA" should {
