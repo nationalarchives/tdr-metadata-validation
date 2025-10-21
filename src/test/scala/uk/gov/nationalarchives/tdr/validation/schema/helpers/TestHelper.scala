@@ -27,7 +27,8 @@ object TestHelper {
       language: Option[String] = Some("English"),
       translatedTitleOfRecord: Option[String] = Some(""),
       invalidColumnTitle: Option[String] = None,
-      uuid: Option[String] = None
+      uuid: Option[String] = None,
+      evidenceProvidedBy: Option[String] = None
   ): FileRow = {
     metadataFileRowBuilder(
       filePath = filePath,
@@ -49,7 +50,8 @@ object TestHelper {
       language = language,
       translatedTitleOfRecord = translatedTitleOfRecord,
       invalidColumnTitle = invalidColumnTitle,
-      uuid = uuid
+      uuid = uuid,
+      evidenceProvidedBy = evidenceProvidedBy
     )
   }
 
@@ -121,7 +123,8 @@ object TestHelper {
       language: Option[String] = None,
       translatedTitleOfRecord: Option[String] = None,
       invalidColumnTitle: Option[String] = None,
-      uuid: Option[String] = None
+      uuid: Option[String] = None,
+      evidenceProvidedBy: Option[String] = None
   ): FileRow = {
     val metadata = List(
       // required
@@ -145,7 +148,8 @@ object TestHelper {
       language.map(Metadata("language", _)),
       translatedTitleOfRecord.map(Metadata("translated filename", _)),
       invalidColumnTitle.map(Metadata("AN INVALID COLUMN TITLE", _)),
-      uuid.map(Metadata("UUID", _))
+      uuid.map(Metadata("UUID", _)),
+      evidenceProvidedBy.map(Metadata("evidence provided by", _))
     ).flatten
     FileRow("file1", metadata)
   }
