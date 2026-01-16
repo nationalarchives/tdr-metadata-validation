@@ -50,7 +50,7 @@ class CSVtoJsonUtils {
       case Some(ujson.Str("array")) =>
         val itemsType: Option[String] = getItemsType(propertyValue)
         s"array${itemsType.map("_" + _).getOrElse("")}"
-      case Some(ujson.Str(singleType)) => singleType
+      case Some(ujson.Str(singleType))              => singleType
       case Some(ujson.Arr(types)) if types.nonEmpty =>
         val filteredTypes = types.filterNot(_.str == "null")
         val itemsType = getItemsType(propertyValue)
@@ -71,7 +71,7 @@ class CSVtoJsonUtils {
       case "integer"       => (str: String) => Try(str.toInt).getOrElse(str)
       case "array_string"  => (str: String) => if (str.isEmpty) null else str.split(ARRAY_SPLIT_CHAR)
       case "array_integer" => (str: String) => if (str.isEmpty) null else str.split(ARRAY_SPLIT_CHAR).map(s => Try(s.toInt).getOrElse(s))
-      case "boolean" =>
+      case "boolean"       =>
         (str: String) =>
           str.toUpperCase match {
             case "YES" | "TRUE" => true
