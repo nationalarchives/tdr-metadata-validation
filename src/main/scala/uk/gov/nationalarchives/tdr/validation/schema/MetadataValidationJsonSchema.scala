@@ -14,7 +14,7 @@ object MetadataValidationJsonSchema {
 
   case class ObjectMetadata(identifier: String, metadata: Set[Metadata])
 
-  private case class ValidationErrorWithValidationMessages(jsonValidationErrorReason: ValidationProcess, identifier: String, errors: Set[Error])
+  private case class ValidationProcessWithValidatorErrors(jsonValidationErrorReason: ValidationProcess, identifier: String, errors: Set[Error])
 
   private case class JsonData(identifier: String, json: String)
 
@@ -33,8 +33,8 @@ object MetadataValidationJsonSchema {
     validationProgram.unsafeRunSync()
   }
 
-  private def parallelSchemaValidation(schema: Set[JsonSchemaDefinition], jsonData: Seq[JsonData]): IO[Seq[Seq[ValidationErrorWithValidationMessages]]] = {
-    val validations: Seq[IO[Seq[ValidationErrorWithValidationMessages]]] =
+  private def parallelSchemaValidation(schema: Set[JsonSchemaDefinition], jsonData: Seq[JsonData]): IO[Seq[Seq[ValidationProcessWithValidatorErrors]]] = {
+    val validations: Seq[IO[Seq[ValidationProcessWithValidatorErrors]]] =
       schema.toSeq.map(schemaDefinition => IO(jsonData.map(json => validateWithSchema(schemaDefinition)(json))))
     validations.parSequence
   }
@@ -52,15 +52,15 @@ object MetadataValidationJsonSchema {
     validationProgram.unsafeRunSync()
   }
 
-  private def validateWithSchema(schemaDefinition: JsonSchemaDefinition): JsonData => ValidationErrorWithValidationMessages = { (jsonData: JsonData) =>
+  private def validateWithSchema(schemaDefinition: JsonSchemaDefinition): JsonData => ValidationProcessWithValidatorErrors = { (jsonData: JsonData) =>
     val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
-    ValidationErrorWithValidationMessages(schemaDefinition.validationProcess, jsonData.identifier, errors)
+    ValidationProcessWithValidatorErrors(schemaDefinition.validationProcess, jsonData.identifier, errors)
   }
 
   /*
    What we want to use for the errors has yet to be defined
    */
-  private def convertSchemaValidatorError(errors: Seq[ValidationErrorWithValidationMessages]): IO[Seq[(String, List[ValidationError])]] = {
+  private def convertSchemaValidatorError(errors: Seq[ValidationProcessWithValidatorErrors]): IO[Seq[(String, List[ValidationError])]] = {
     IO(errors.map(error => error.identifier -> error.errors.map(validationMessage => generateValidationError(validationMessage, error.jsonValidationErrorReason)).toList))
   }
 

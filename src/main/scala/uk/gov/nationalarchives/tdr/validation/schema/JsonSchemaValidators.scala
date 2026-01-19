@@ -11,11 +11,11 @@ import scala.jdk.CollectionConverters._
 object JsonSchemaValidators {
 
   private lazy val baseJsonSchemaValidator: Schema =
-    getJsonSchema(BASE_SCHEMA, Map("daBeforeToday" -> new DaBeforeToday, "matchEndDateOrDateLastModified" -> new MatchEndDateOrDateLastModified))
-  private lazy val closureClosedJsonSchemaValidator: Schema = getJsonSchema(CLOSURE_SCHEMA_CLOSED)
-  private lazy val closureOpenJsonSchemaValidator: Schema = getJsonSchema(CLOSURE_SCHEMA_OPEN)
-  private lazy val requiredJsonSchemaValidator: Schema = getJsonSchema(REQUIRED_SCHEMA)
-  private lazy val relationshipJsonSchemaValidator: Schema = getJsonSchema(RELATIONSHIP_SCHEMA)
+    getSchema(BASE_SCHEMA, Map("daBeforeToday" -> new DaBeforeToday, "matchEndDateOrDateLastModified" -> new MatchEndDateOrDateLastModified))
+  private lazy val closureClosedJsonSchemaValidator: Schema = getSchema(CLOSURE_SCHEMA_CLOSED)
+  private lazy val closureOpenJsonSchemaValidator: Schema = getSchema(CLOSURE_SCHEMA_OPEN)
+  private lazy val requiredJsonSchemaValidator: Schema = getSchema(REQUIRED_SCHEMA)
+  private lazy val relationshipJsonSchemaValidator: Schema = getSchema(RELATIONSHIP_SCHEMA)
   private val validators: Map[JsonSchemaDefinition, Schema] =
     Map(
       BASE_SCHEMA -> baseJsonSchemaValidator,
@@ -36,7 +36,7 @@ object JsonSchemaValidators {
       .toSet
   }
 
-  private def getJsonSchema(jsonSchemaDefinition: JsonSchemaDefinition, customSchemaKeywords: Map[String, Keyword] = Map.empty): Schema = {
+  private def getSchema(jsonSchemaDefinition: JsonSchemaDefinition, customSchemaKeywords: Map[String, Keyword] = Map.empty): Schema = {
     val schemaInputStream = getClass.getResourceAsStream(jsonSchemaDefinition.schemaLocation)
 
     val defaultDialect = Specification.getDialect(SpecificationVersion.DRAFT_2020_12)
