@@ -27,7 +27,7 @@ case object DateTime extends DataType with Product with Serializable {
     value match {
       case "" if criteria.required  => Some(EMPTY_VALUE_ERROR)
       case "" if !criteria.required => None
-      case v =>
+      case v                        =>
         val dateTime = allCatch.opt(Timestamp.valueOf(v).toLocalDateTime).orElse(allCatch.opt(LocalDate.parse(v, format).atStartOfDay()))
         if (dateTime.isEmpty) {
           val date = v.replaceAll("[T ]", ":").split("[/:]")
