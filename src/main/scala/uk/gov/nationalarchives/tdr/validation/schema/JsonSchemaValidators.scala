@@ -1,17 +1,21 @@
 package uk.gov.nationalarchives.tdr.validation.schema
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.networknt.schema._
 import com.networknt.schema.dialect.Dialect
 import com.networknt.schema.keyword.Keyword
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN, RELATIONSHIP_SCHEMA, REQUIRED_SCHEMA}
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition._
 import uk.gov.nationalarchives.tdr.validation.schema.extensions.{DaBeforeToday, MatchEndDateOrDateLastModified}
 
 import scala.jdk.CollectionConverters._
 
 object JsonSchemaValidators {
 
-  private val mapper = new ObjectMapper()
+  private lazy val baseJsonSchemaValidator: Schema =
+    getJsonSchema(BASE_SCHEMA, Map("daBeforeToday" -> new DaBeforeToday, "matchEndDateOrDateLastModified" -> new MatchEndDateOrDateLastModified))
+  private lazy val closureClosedJsonSchemaValidator: Schema = getJsonSchema(CLOSURE_SCHEMA_CLOSED)
+  private lazy val closureOpenJsonSchemaValidator: Schema = getJsonSchema(CLOSURE_SCHEMA_OPEN)
+  private lazy val requiredJsonSchemaValidator: Schema = getJsonSchema(REQUIRED_SCHEMA)
+  private lazy val relationshipJsonSchemaValidator: Schema = getJsonSchema(RELATIONSHIP_SCHEMA)
   private val validators: Map[JsonSchemaDefinition, Schema] =
     Map(
       BASE_SCHEMA -> baseJsonSchemaValidator,
@@ -20,13 +24,6 @@ object JsonSchemaValidators {
       REQUIRED_SCHEMA -> requiredJsonSchemaValidator,
       RELATIONSHIP_SCHEMA -> relationshipJsonSchemaValidator
     )
-
-  private lazy val baseJsonSchemaValidator: Schema =
-    getJsonSchema(BASE_SCHEMA, Map("daBeforeToday" -> new DaBeforeToday, "matchEndDateOrDateLastModified" -> new MatchEndDateOrDateLastModified))
-  private lazy val closureClosedJsonSchemaValidator: Schema = getJsonSchema(CLOSURE_SCHEMA_CLOSED)
-  private lazy val closureOpenJsonSchemaValidator: Schema = getJsonSchema(CLOSURE_SCHEMA_OPEN)
-  private lazy val requiredJsonSchemaValidator: Schema = getJsonSchema(REQUIRED_SCHEMA)
-  private lazy val relationshipJsonSchemaValidator: Schema = getJsonSchema(RELATIONSHIP_SCHEMA)
 
   def validateJson(jsonSchemaDefinitions: JsonSchemaDefinition, json: String): Set[Error] = {
     validators(jsonSchemaDefinitions)

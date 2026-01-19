@@ -1,14 +1,11 @@
 package uk.gov.nationalarchives.tdr.validation.schema.extensions
 
-import tools.jackson.databind.JsonNode
 import com.networknt.schema._
 import com.networknt.schema.keyword.{AbstractKeyword, AbstractKeywordValidator, KeywordValidator}
 import com.networknt.schema.path.NodePath
 import org.joda.time.DateTime
+import tools.jackson.databind.JsonNode
 
-import java.util
-import scala.collection.immutable.HashSet
-import scala.jdk.CollectionConverters.SetHasAsJava
 import scala.util.{Success, Try}
 
 class DaBeforeToday extends AbstractKeyword("daBeforeToday") {
@@ -27,7 +24,7 @@ class DaBeforeToday extends AbstractKeyword("daBeforeToday") {
           .instanceLocation(instanceLocation)
           .messageKey("daBeforeToday")
 
-        Try(DateTime.parse(node.textValue())) match {
+        Try(DateTime.parse(node.asString())) match {
           case Success(date) if DateTime.now().isBefore(date) =>
             executionContext.addError(validationMessageBuilder.build())
           case _ =>

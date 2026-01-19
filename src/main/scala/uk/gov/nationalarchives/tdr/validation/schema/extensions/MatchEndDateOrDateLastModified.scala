@@ -1,14 +1,11 @@
 package uk.gov.nationalarchives.tdr.validation.schema.extensions
 
-import tools.jackson.databind.JsonNode
 import com.networknt.schema._
 import com.networknt.schema.keyword.{AbstractKeyword, AbstractKeywordValidator, KeywordValidator}
 import com.networknt.schema.path.NodePath
 import org.joda.time.DateTime
+import tools.jackson.databind.JsonNode
 
-import java.util
-import scala.collection.immutable.HashSet
-import scala.jdk.CollectionConverters.SetHasAsJava
 import scala.util.{Success, Try}
 
 class MatchEndDateOrDateLastModified extends AbstractKeyword("matchEndDateOrDateLastModified") {
@@ -32,7 +29,7 @@ class MatchEndDateOrDateLastModified extends AbstractKeyword("matchEndDateOrDate
         def isDec31(date: DateTime, year: Int): Boolean =
           date.getYear == year && date.getMonthOfYear == 12 && date.getDayOfMonth == 31
 
-        def getValue(field: String): String = if (rootNode.has(field)) rootNode.get(field).textValue() else ""
+        def getValue(field: String): String = if (rootNode.has(field)) rootNode.get(field).asString() else ""
 
         def validateDate(closureStartDate: DateTime, dateToMatch: String): Boolean = {
           parseDate(dateToMatch) match {
@@ -41,10 +38,11 @@ class MatchEndDateOrDateLastModified extends AbstractKeyword("matchEndDateOrDate
           }
         }
 
-        parseDate(node.textValue()) match {
+        parseDate(node.asString()) match {
           case Success(closureDate) =>
-            if (getValue("end_date") != null) {
-              if (!validateDate(closureDate, getValue("end_date"))) {
+            val endDate = getValue("end_date")
+            if (endDate != null && endDate.nonEmpty) {
+              if (!validateDate(closureDate, endDate)) {
                 executionContext.addError(validationMessageBuilder.build())
               }
             } else {
