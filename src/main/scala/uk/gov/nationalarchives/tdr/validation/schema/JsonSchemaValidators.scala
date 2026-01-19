@@ -30,8 +30,10 @@ object JsonSchemaValidators {
 
   def validateJson(jsonSchemaDefinitions: JsonSchemaDefinition, json: String): Set[Error] = {
     validators(jsonSchemaDefinitions)
-      .validate(json, InputFormat.JSON, (executionContext: ExecutionContext) =>
-        executionContext.executionConfig((builder: ExecutionConfig.Builder) => builder.formatAssertionsEnabled(true))
+      .validate(
+        json,
+        InputFormat.JSON,
+        (executionContext: ExecutionContext) => executionContext.executionConfig((builder: ExecutionConfig.Builder) => builder.formatAssertionsEnabled(true))
       )
       .asScala
       .toSet
