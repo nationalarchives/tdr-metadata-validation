@@ -11,10 +11,10 @@ import scala.util.{Success, Try}
 class MatchEndDateOrDateLastModified extends AbstractKeyword("matchEndDateOrDateLastModified") {
 
   override def newValidator(
-       schemaLocation: SchemaLocation,
-       jsonNode: JsonNode,
-       schema: Schema,
-       schemaContext: SchemaContext
+      schemaLocation: SchemaLocation,
+      jsonNode: JsonNode,
+      schema: Schema,
+      schemaContext: SchemaContext
   ): KeywordValidator = {
 
     new AbstractKeywordValidator(this, jsonNode, schemaLocation) {
