@@ -16,7 +16,7 @@ object GuidanceUtils {
     final def apply(c: HCursor): Decoder.Result[String] = {
       c.value.asString match {
         case Some(s) => Right(s)
-        case None =>
+        case None    =>
           c.value.asNumber match {
             case Some(n) => Right(n.toString)
             case None    => Left(DecodingFailure("Expected string or number", c.history))

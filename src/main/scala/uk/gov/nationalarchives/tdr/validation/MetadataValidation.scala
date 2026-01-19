@@ -48,7 +48,7 @@ class MetadataValidation(closureMetadataCriteria: MetadataCriteria, descriptiveM
           val value = metadata.value
           val errorCode = criteria.dataType match {
             case Integer | Decimal => Integer.checkValue(value, criteria)
-            case Boolean =>
+            case Boolean           =>
               Boolean.checkValue(value, criteria, criteria.requiredProperty.flatMap(p => input.find(_.name == p))) match {
                 case None if value.nonEmpty =>
                   criteria.dependencies
