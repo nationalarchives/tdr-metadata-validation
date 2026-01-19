@@ -3,7 +3,7 @@ package uk.gov.nationalarchives.tdr.validation.schema
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import cats.syntax.all._
-import com.networknt.schema.ValidationMessage
+import com.networknt.schema.Error
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess._
 import uk.gov.nationalarchives.tdr.validation.utils.CSVtoJsonUtils
 import uk.gov.nationalarchives.tdr.validation.{FileRow, Metadata}
@@ -14,7 +14,7 @@ object MetadataValidationJsonSchema {
 
   case class ObjectMetadata(identifier: String, metadata: Set[Metadata])
 
-  private case class ValidationErrorWithValidationMessages(jsonValidationErrorReason: ValidationProcess, identifier: String, errors: Set[ValidationMessage])
+  private case class ValidationErrorWithValidationMessages(jsonValidationErrorReason: ValidationProcess, identifier: String, errors: Set[Error])
 
   private case class JsonData(identifier: String, json: String)
 
@@ -70,7 +70,7 @@ object MetadataValidationJsonSchema {
     })
   }
 
-  private def convertValidationMessageToError(message: ValidationMessage, validationProcess: ValidationProcess): ValidationError = {
+  private def convertValidationMessageToError(message: Error, validationProcess: ValidationProcess): ValidationError = {
     val propertyName = Option(message.getProperty)
       .map(_.replaceAll("\\[\\d+]$", ""))
       .getOrElse(message.getInstanceLocation.getName(0))

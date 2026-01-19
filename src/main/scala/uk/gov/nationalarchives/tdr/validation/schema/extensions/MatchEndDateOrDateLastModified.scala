@@ -1,7 +1,9 @@
 package uk.gov.nationalarchives.tdr.validation.schema.extensions
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import com.networknt.schema._
+import com.networknt.schema.keyword.{AbstractKeyword, AbstractKeywordValidator, KeywordValidator}
+import com.networknt.schema.path.NodePath
 import org.joda.time.DateTime
 
 import java.util
@@ -13,18 +15,16 @@ class MatchEndDateOrDateLastModified extends AbstractKeyword("matchEndDateOrDate
 
   override def newValidator(
       schemaLocation: SchemaLocation,
-      evaluationPath: JsonNodePath,
       schemaNode: JsonNode,
-      parentSchema: JsonSchema,
-      validationContext: ValidationContext
-  ): JsonValidator = {
+      schema: Schema,
+      validationContext: SchemaContext
+  ): KeywordValidator = {
 
-    new AbstractJsonValidator(schemaLocation, evaluationPath, this, schemaNode) {
-      override def validate(executionContext: ExecutionContext, node: JsonNode, rootNode: JsonNode, instanceLocation: JsonNodePath): util.Set[ValidationMessage] = {
-        val validationMessageBuilder = ValidationMessage
+    new AbstractKeywordValidator(this, schemaNode, schemaLocation) {
+      override def validate(executionContext: ExecutionContext, node: JsonNode, rootNode: JsonNode, instanceLocation: NodePath): Unit = {
+        val validationMessageBuilder = Error
           .builder()
           .instanceLocation(instanceLocation)
-          .message("matchEndDateOrDateLastModified")
           .messageKey("matchEndDateOrDateLastModified")
 
         def parseDate(dateStr: String): Try[DateTime] = Try(DateTime.parse(dateStr))
@@ -41,24 +41,19 @@ class MatchEndDateOrDateLastModified extends AbstractKeyword("matchEndDateOrDate
           }
         }
 
-        val validationMessages = parseDate(node.textValue()) match {
+        parseDate(node.textValue()) match {
           case Success(closureDate) =>
             if (getValue("end_date") != null) {
-              if (validateDate(closureDate, getValue("end_date"))) {
-                HashSet[ValidationMessage]()
-              } else {
-                HashSet(validationMessageBuilder.build())
+              if (!validateDate(closureDate, getValue("end_date"))) {
+                executionContext.addError(validationMessageBuilder.build())
               }
             } else {
-              if (validateDate(closureDate, getValue("date_last_modified"))) {
-                HashSet[ValidationMessage]()
-              } else {
-                HashSet(validationMessageBuilder.build())
+              if (!validateDate(closureDate, getValue("date_last_modified"))) {
+                executionContext.addError(validationMessageBuilder.build())
               }
             }
-          case _ => HashSet[ValidationMessage]()
+          case _ =>
         }
-        validationMessages.asJava
       }
     }
   }

@@ -1,7 +1,9 @@
 package uk.gov.nationalarchives.tdr.validation.schema.extensions
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import com.networknt.schema._
+import com.networknt.schema.keyword.{AbstractKeyword, AbstractKeywordValidator, KeywordValidator}
+import com.networknt.schema.path.NodePath
 import org.joda.time.DateTime
 
 import java.util
@@ -13,25 +15,23 @@ class DaBeforeToday extends AbstractKeyword("daBeforeToday") {
 
   override def newValidator(
       schemaLocation: SchemaLocation,
-      evaluationPath: JsonNodePath,
       schemaNode: JsonNode,
-      parentSchema: JsonSchema,
-      validationContext: ValidationContext
-  ): JsonValidator = {
+      schema: Schema,
+      validationContext: SchemaContext
+  ): KeywordValidator = {
 
-    new AbstractJsonValidator(schemaLocation, evaluationPath, this, schemaNode) {
-      override def validate(executionContext: ExecutionContext, node: JsonNode, rootNode: JsonNode, instanceLocation: JsonNodePath): util.Set[ValidationMessage] = {
-        val validationMessageBuilder = ValidationMessage
+    new AbstractKeywordValidator(this, schemaNode, schemaLocation) {
+      override def validate(executionContext: ExecutionContext, node: JsonNode, rootNode: JsonNode, instanceLocation: NodePath): Unit = {
+        val validationMessageBuilder = Error
           .builder()
           .instanceLocation(instanceLocation)
-          .message("daBeforeToday")
           .messageKey("daBeforeToday")
 
-        val validationMessages = Try(DateTime.parse(node.textValue())) match {
-          case Success(date) if DateTime.now().isBefore(date) => HashSet(validationMessageBuilder.build())
-          case _                                              => HashSet[ValidationMessage]()
+        Try(DateTime.parse(node.textValue())) match {
+          case Success(date) if DateTime.now().isBefore(date) =>
+            executionContext.addError(validationMessageBuilder.build())
+          case _ =>
         }
-        validationMessages.asJava
       }
     }
   }
