@@ -61,7 +61,7 @@ object MetadataValidationJsonSchema {
    What we want to use for the errors has yet to be defined
    */
   private def convertSchemaValidatorError(errors: Seq[ValidationErrorWithValidationMessages]): IO[Seq[(String, List[ValidationError])]] = {
-    IO(errors.map(error => error.identifier -> error.errors.map(validationMessage => convertValidationMessageToError(validationMessage, error.jsonValidationErrorReason)).toList))
+    IO(errors.map(error => error.identifier -> error.errors.map(validationMessage => generateValidationError(validationMessage, error.jsonValidationErrorReason)).toList))
   }
 
   private def combineErrors(errors: Seq[(String, List[ValidationError])]) = {
@@ -70,11 +70,11 @@ object MetadataValidationJsonSchema {
     })
   }
 
-  private def convertValidationMessageToError(message: Error, validationProcess: ValidationProcess): ValidationError = {
-    val propertyName = Option(message.getProperty)
+  private def generateValidationError(validatorError: Error, validationProcess: ValidationProcess): ValidationError = {
+    val propertyName = Option(validatorError.getProperty)
       .map(_.replaceAll("\\[\\d+]$", ""))
-      .getOrElse(message.getInstanceLocation.getName(0))
-    ValidationError(validationProcess, propertyName, message.getMessageKey)
+      .getOrElse(validatorError.getInstanceLocation.getName(0))
+    ValidationError(validationProcess, propertyName, validatorError.getMessageKey)
   }
 
   private def mapToJson: ObjectMetadata => JsonData = (data: ObjectMetadata) => {

@@ -11,13 +11,13 @@ import scala.util.{Success, Try}
 class DaBeforeToday extends AbstractKeyword("daBeforeToday") {
 
   override def newValidator(
-      schemaLocation: SchemaLocation,
-      schemaNode: JsonNode,
-      schema: Schema,
-      validationContext: SchemaContext
+       schemaLocation: SchemaLocation,
+       jsonNode: JsonNode,
+       schema: Schema,
+       schemaContext: SchemaContext
   ): KeywordValidator = {
 
-    new AbstractKeywordValidator(this, schemaNode, schemaLocation) {
+    new AbstractKeywordValidator(this, jsonNode, schemaLocation) {
       override def validate(executionContext: ExecutionContext, node: JsonNode, rootNode: JsonNode, instanceLocation: NodePath): Unit = {
         val validationMessageBuilder = Error
           .builder()
