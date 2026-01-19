@@ -14,7 +14,7 @@ object MetadataValidationJsonSchema {
 
   case class ObjectMetadata(identifier: String, metadata: Set[Metadata])
 
-  private case class ValidationProcessWithValidatorErrors(jsonValidationErrorReason: ValidationProcess, identifier: String, errors: Set[Error])
+  private case class ValidationProcessWithValidatorErrors(jsonValidationProcess: ValidationProcess, identifier: String, errors: Set[Error])
 
   private case class JsonData(identifier: String, json: String)
 
@@ -61,7 +61,7 @@ object MetadataValidationJsonSchema {
    What we want to use for the errors has yet to be defined
    */
   private def convertSchemaValidatorError(errors: Seq[ValidationProcessWithValidatorErrors]): IO[Seq[(String, List[ValidationError])]] = {
-    IO(errors.map(error => error.identifier -> error.errors.map(validationMessage => generateValidationError(validationMessage, error.jsonValidationErrorReason)).toList))
+    IO(errors.map(error => error.identifier -> error.errors.map(validationMessage => generateValidationError(validationMessage, error.jsonValidationProcess)).toList))
   }
 
   private def combineErrors(errors: Seq[(String, List[ValidationError])]) = {
