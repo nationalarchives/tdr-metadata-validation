@@ -3,7 +3,7 @@ package uk.gov.nationalarchives.tdr.validation.schema
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import cats.syntax.all._
-import com.networknt.schema.ValidationMessage
+import com.networknt.schema.Error
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess._
 import uk.gov.nationalarchives.tdr.validation.utils.CSVtoJsonUtils
 import uk.gov.nationalarchives.tdr.validation.{FileRow, Metadata}
@@ -14,7 +14,7 @@ object MetadataValidationJsonSchema {
 
   case class ObjectMetadata(identifier: String, metadata: Set[Metadata])
 
-  private case class ValidationErrorWithValidationMessages(jsonValidationErrorReason: ValidationProcess, identifier: String, errors: Set[ValidationMessage])
+  private case class ValidationProcessWithValidatorErrors(jsonValidationProcess: ValidationProcess, identifier: String, errors: Set[Error])
 
   private case class JsonData(identifier: String, json: String)
 
@@ -33,8 +33,8 @@ object MetadataValidationJsonSchema {
     validationProgram.unsafeRunSync()
   }
 
-  private def parallelSchemaValidation(schema: Set[JsonSchemaDefinition], jsonData: Seq[JsonData]): IO[Seq[Seq[ValidationErrorWithValidationMessages]]] = {
-    val validations: Seq[IO[Seq[ValidationErrorWithValidationMessages]]] =
+  private def parallelSchemaValidation(schema: Set[JsonSchemaDefinition], jsonData: Seq[JsonData]): IO[Seq[Seq[ValidationProcessWithValidatorErrors]]] = {
+    val validations: Seq[IO[Seq[ValidationProcessWithValidatorErrors]]] =
       schema.toSeq.map(schemaDefinition => IO(jsonData.map(json => validateWithSchema(schemaDefinition)(json))))
     validations.parSequence
   }
@@ -52,16 +52,16 @@ object MetadataValidationJsonSchema {
     validationProgram.unsafeRunSync()
   }
 
-  private def validateWithSchema(schemaDefinition: JsonSchemaDefinition): JsonData => ValidationErrorWithValidationMessages = { (jsonData: JsonData) =>
+  private def validateWithSchema(schemaDefinition: JsonSchemaDefinition): JsonData => ValidationProcessWithValidatorErrors = { (jsonData: JsonData) =>
     val errors = JsonSchemaValidators.validateJson(schemaDefinition, jsonData.json)
-    ValidationErrorWithValidationMessages(schemaDefinition.validationProcess, jsonData.identifier, errors)
+    ValidationProcessWithValidatorErrors(schemaDefinition.validationProcess, jsonData.identifier, errors)
   }
 
   /*
    What we want to use for the errors has yet to be defined
    */
-  private def convertSchemaValidatorError(errors: Seq[ValidationErrorWithValidationMessages]): IO[Seq[(String, List[ValidationError])]] = {
-    IO(errors.map(error => error.identifier -> error.errors.map(validationMessage => convertValidationMessageToError(validationMessage, error.jsonValidationErrorReason)).toList))
+  private def convertSchemaValidatorError(errors: Seq[ValidationProcessWithValidatorErrors]): IO[Seq[(String, List[ValidationError])]] = {
+    IO(errors.map(error => error.identifier -> error.errors.map(validationMessage => generateValidationError(validationMessage, error.jsonValidationProcess)).toList))
   }
 
   private def combineErrors(errors: Seq[(String, List[ValidationError])]) = {
@@ -70,11 +70,11 @@ object MetadataValidationJsonSchema {
     })
   }
 
-  private def convertValidationMessageToError(message: ValidationMessage, validationProcess: ValidationProcess): ValidationError = {
-    val propertyName = Option(message.getProperty)
+  private def generateValidationError(validatorError: Error, validationProcess: ValidationProcess): ValidationError = {
+    val propertyName = Option(validatorError.getProperty)
       .map(_.replaceAll("\\[\\d+]$", ""))
-      .getOrElse(message.getInstanceLocation.getName(0))
-    ValidationError(validationProcess, propertyName, message.getMessageKey)
+      .getOrElse(validatorError.getInstanceLocation.getName(0))
+    ValidationError(validationProcess, propertyName, validatorError.getMessageKey)
   }
 
   private def mapToJson: ObjectMetadata => JsonData = (data: ObjectMetadata) => {

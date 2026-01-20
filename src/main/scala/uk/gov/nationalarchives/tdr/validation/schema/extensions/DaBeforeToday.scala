@@ -1,37 +1,34 @@
 package uk.gov.nationalarchives.tdr.validation.schema.extensions
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.networknt.schema._
+import com.networknt.schema.keyword.{AbstractKeyword, AbstractKeywordValidator, KeywordValidator}
+import com.networknt.schema.path.NodePath
 import org.joda.time.DateTime
+import tools.jackson.databind.JsonNode
 
-import java.util
-import scala.collection.immutable.HashSet
-import scala.jdk.CollectionConverters.SetHasAsJava
 import scala.util.{Success, Try}
 
 class DaBeforeToday extends AbstractKeyword("daBeforeToday") {
 
   override def newValidator(
       schemaLocation: SchemaLocation,
-      evaluationPath: JsonNodePath,
-      schemaNode: JsonNode,
-      parentSchema: JsonSchema,
-      validationContext: ValidationContext
-  ): JsonValidator = {
+      jsonNode: JsonNode,
+      schema: Schema,
+      schemaContext: SchemaContext
+  ): KeywordValidator = {
 
-    new AbstractJsonValidator(schemaLocation, evaluationPath, this, schemaNode) {
-      override def validate(executionContext: ExecutionContext, node: JsonNode, rootNode: JsonNode, instanceLocation: JsonNodePath): util.Set[ValidationMessage] = {
-        val validationMessageBuilder = ValidationMessage
+    new AbstractKeywordValidator(this, jsonNode, schemaLocation) {
+      override def validate(executionContext: ExecutionContext, node: JsonNode, rootNode: JsonNode, instanceLocation: NodePath): Unit = {
+        val validationMessageBuilder = Error
           .builder()
           .instanceLocation(instanceLocation)
-          .message("daBeforeToday")
           .messageKey("daBeforeToday")
 
-        val validationMessages = Try(DateTime.parse(node.textValue())) match {
-          case Success(date) if DateTime.now().isBefore(date) => HashSet(validationMessageBuilder.build())
-          case _                                              => HashSet[ValidationMessage]()
+        Try(DateTime.parse(node.asString())) match {
+          case Success(date) if DateTime.now().isBefore(date) =>
+            executionContext.addError(validationMessageBuilder.build())
+          case _ =>
         }
-        validationMessages.asJava
       }
     }
   }
