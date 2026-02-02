@@ -10,12 +10,14 @@ import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.{
   ValidationProcess
 }
 
-sealed abstract class JsonSchemaDefinition(val schemaLocation: String, val validationProcess: ValidationProcess)
+sealed abstract class JsonSchemaDefinition(schemaPath: String, val validationProcess: ValidationProcess) {
+  val schemaLocation: String = mapToMetadataEnvironmentFile(schemaPath)
+}
 
 object JsonSchemaDefinition {
-  case object BASE_SCHEMA extends JsonSchemaDefinition(mapToMetadataEnvironmentFile("/metadata-schema/baseSchema.schema.json"), SCHEMA_BASE)
-  case object CLOSURE_SCHEMA_CLOSED extends JsonSchemaDefinition(mapToMetadataEnvironmentFile("/metadata-schema/closureSchemaClosed.schema.json"), SCHEMA_CLOSURE_CLOSED)
-  case object CLOSURE_SCHEMA_OPEN extends JsonSchemaDefinition(mapToMetadataEnvironmentFile("/metadata-schema/closureSchemaOpen.schema.json"), SCHEMA_CLOSURE_OPEN)
-  case object REQUIRED_SCHEMA extends JsonSchemaDefinition(mapToMetadataEnvironmentFile("/metadata-schema/requiredSchema.schema.json"), SCHEMA_REQUIRED)
-  case object RELATIONSHIP_SCHEMA extends JsonSchemaDefinition(mapToMetadataEnvironmentFile("/metadata-schema/relationshipSchema.schema.json"), SCHEMA_RELATIONSHIP)
+  case object BASE_SCHEMA extends JsonSchemaDefinition("/metadata-schema/baseSchema.schema.json", SCHEMA_BASE)
+  case object CLOSURE_SCHEMA_CLOSED extends JsonSchemaDefinition("/metadata-schema/closureSchemaClosed.schema.json", SCHEMA_CLOSURE_CLOSED)
+  case object CLOSURE_SCHEMA_OPEN extends JsonSchemaDefinition("/metadata-schema/closureSchemaOpen.schema.json", SCHEMA_CLOSURE_OPEN)
+  case object REQUIRED_SCHEMA extends JsonSchemaDefinition("/metadata-schema/requiredSchema.schema.json", SCHEMA_REQUIRED)
+  case object RELATIONSHIP_SCHEMA extends JsonSchemaDefinition("/metadata-schema/relationshipSchema.schema.json", SCHEMA_RELATIONSHIP)
 }
