@@ -167,12 +167,7 @@ class LanguageSpec extends AnyWordSpecLike {
           SCHEMA_BASE,
           "language",
           "enum"
-        ), // Language must be one of a valid list, please refer to guidance for details of allowed values. If you cannot see the language you need in this list, please contact your Digital Transfer Advisor.
-        ValidationError(
-          SCHEMA_BASE,
-          "language",
-          "type"
-        ) // Language must be capitalised English or Welsh, if a record is in both languages you must use a separated list, ie. English|Welsh
+        ) // Language must be one of a valid list, please refer to guidance for details of allowed values. If you cannot see the language you need in this list, please contact your Digital Transfer Advisor.
       )
       val closedTestFileRow = closedMetadataFileRow(language = Some(s"${ARRAY_SPLIT_CHAR}English${ARRAY_SPLIT_CHAR}Welsh"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
@@ -180,12 +175,7 @@ class LanguageSpec extends AnyWordSpecLike {
           SCHEMA_BASE,
           "language",
           "enum"
-        ), // Language must be one of a valid list, please refer to guidance for details of allowed values. If you cannot see the language you need in this list, please contact your Digital Transfer Advisor.
-        ValidationError(
-          SCHEMA_BASE,
-          "language",
-          "type"
-        ) // Language must be capitalised English or Welsh, if a record is in both languages you must use a pipe separated list, ie. English|Welsh
+        ) // Language must be one of a valid list, please refer to guidance for details of allowed values. If you cannot see the language you need in this list, please contact your Digital Transfer Advisor.
       )
     }
 

@@ -12,6 +12,20 @@ import uk.gov.nationalarchives.tdr.validation.schema.{MetadataValidationJsonSche
 class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataValidationJsonSchemaSpec")) with ImplicitSender with AnyWordSpecLike {
 
   "MetadataValidationJsonSchema with BASE_SCHEMA" should {
+    "validate boolean field with true/false value" in {
+      val objectMetadata = Set(
+        ObjectMetadata(
+          "file1",
+          Set(
+            Metadata("judgment_type", "judgment"),
+            Metadata("judgment_update", "true")
+          )
+        )
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, objectMetadata)
+      validationErrors("file1").size shouldBe 0
+    }
+
     "validate incorrect value in enumerated array" in {
       val data: Set[ObjectMetadata] = dataBuilder("language", "Unknown")
       val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
@@ -163,6 +177,56 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
       singleErrorCheck(validationErrors, "title_alternate", "pattern", SCHEMA_BASE)
     }
 
+    "validate copyright can contain single valid value" in {
+      val data: Set[ObjectMetadata] = dataBuilder(
+        "copyright",
+        "Third party"
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 0
+    }
+
+    "validate copyright can contain multiple valid values" in {
+      val data: Set[ObjectMetadata] = dataBuilder(
+        "copyright",
+        "Crown copyright;Third party"
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 0
+    }
+
+    "validate copyright must contain a correct value" in {
+      val data: Set[ObjectMetadata] = dataBuilder(
+        "copyright",
+        "some random value"
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 1
+      singleErrorCheck(validationErrors, "rights_copyright", "enum", SCHEMA_BASE)
+    }
+
+    "validate restrictions_on_use can be empty" in {
+      val data: Set[ObjectMetadata] = dataBuilder(
+        "restrictions_on_use",
+        ""
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 0
+    }
+
+    "validate restrictions_on_use cannot be more than 500 characters" in {
+      val data: Set[ObjectMetadata] = dataBuilder(
+        "restrictions_on_use",
+        "more than 500 characters more than 500 characters more than 500 characters more than 500 characters more than 500 characters" +
+          " more than 500 characters more than 500 characters more than 500 characters more than 500 characters" +
+          " more than 500 characters more than 500 characters more than 500 characters more than 500 characters " +
+          "more than 500 characters more than 500 characters more than 500 characters more than 500 characters more than 500 characters" +
+          " more than 500 characters more than 500 characters more than 500 characters"
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(BASE_SCHEMA, data)
+      validationErrors("file1").size shouldBe 1
+      singleErrorCheck(validationErrors, "restrictions_on_use", "maxLength", SCHEMA_BASE)
+    }
   }
 
   "MetadataValidationJsonSchema with CLOSURE_SCHEMA" should {
