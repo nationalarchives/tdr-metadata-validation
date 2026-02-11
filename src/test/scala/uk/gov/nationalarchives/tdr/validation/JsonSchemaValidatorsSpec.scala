@@ -6,7 +6,6 @@ import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaValidators
 
 class JsonSchemaValidatorsSpec extends AnyWordSpec with Matchers {
-
   "JsonSchemaValidators" when {
     "validating using base schema" should {
       "produce a type error for foi_exemption_code that is not in the FOI code definitions" in {

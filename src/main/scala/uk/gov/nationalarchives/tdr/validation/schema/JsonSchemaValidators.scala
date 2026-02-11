@@ -1,14 +1,22 @@
 package uk.gov.nationalarchives.tdr.validation.schema
 
 import com.networknt.schema._
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN, RELATIONSHIP_SCHEMA, REQUIRED_SCHEMA}
+import com.networknt.schema.dialect.Dialect
+import com.networknt.schema.keyword.Keyword
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition._
 import uk.gov.nationalarchives.tdr.validation.schema.extensions.{DaBeforeToday, MatchEndDateOrDateLastModified}
 
 import scala.jdk.CollectionConverters._
 
 object JsonSchemaValidators {
 
-  private val validators: Map[JsonSchemaDefinition, JsonSchema] =
+  private lazy val baseJsonSchemaValidator: Schema =
+    getSchema(BASE_SCHEMA, Map("daBeforeToday" -> new DaBeforeToday, "matchEndDateOrDateLastModified" -> new MatchEndDateOrDateLastModified))
+  private lazy val closureClosedJsonSchemaValidator: Schema = getSchema(CLOSURE_SCHEMA_CLOSED)
+  private lazy val closureOpenJsonSchemaValidator: Schema = getSchema(CLOSURE_SCHEMA_OPEN)
+  private lazy val requiredJsonSchemaValidator: Schema = getSchema(REQUIRED_SCHEMA)
+  private lazy val relationshipJsonSchemaValidator: Schema = getSchema(RELATIONSHIP_SCHEMA)
+  private val validators: Map[JsonSchemaDefinition, Schema] =
     Map(
       BASE_SCHEMA -> baseJsonSchemaValidator,
       CLOSURE_SCHEMA_CLOSED -> closureClosedJsonSchemaValidator,
@@ -17,29 +25,26 @@ object JsonSchemaValidators {
       RELATIONSHIP_SCHEMA -> relationshipJsonSchemaValidator
     )
 
-  private lazy val baseJsonSchemaValidator: JsonSchema =
-    getJsonSchema(BASE_SCHEMA, Map("daBeforeToday" -> new DaBeforeToday, "matchEndDateOrDateLastModified" -> new MatchEndDateOrDateLastModified))
-  private lazy val closureClosedJsonSchemaValidator: JsonSchema = getJsonSchema(CLOSURE_SCHEMA_CLOSED)
-  private lazy val closureOpenJsonSchemaValidator: JsonSchema = getJsonSchema(CLOSURE_SCHEMA_OPEN)
-  private lazy val requiredJsonSchemaValidator: JsonSchema = getJsonSchema(REQUIRED_SCHEMA)
-  private lazy val relationshipJsonSchemaValidator: JsonSchema = getJsonSchema(RELATIONSHIP_SCHEMA)
-
-  def validateJson(jsonSchemaDefinitions: JsonSchemaDefinition, json: String): Set[ValidationMessage] = {
-    validators(jsonSchemaDefinitions).validate(json, InputFormat.JSON).asScala.toSet
+  def validateJson(jsonSchemaDefinitions: JsonSchemaDefinition, json: String): Set[Error] = {
+    validators(jsonSchemaDefinitions)
+      .validate(
+        json,
+        InputFormat.JSON,
+        (executionContext: ExecutionContext) => executionContext.executionConfig((builder: ExecutionConfig.Builder) => builder.formatAssertionsEnabled(true))
+      )
+      .asScala
+      .toSet
   }
 
-  private def getJsonSchema(jsonSchemaDefinition: JsonSchemaDefinition, customSchemaKeywords: Map[String, Keyword] = Map.empty): JsonSchema = {
+  private def getSchema(jsonSchemaDefinition: JsonSchemaDefinition, customSchemaKeywords: Map[String, Keyword] = Map.empty): Schema = {
     val schemaInputStream = getClass.getResourceAsStream(jsonSchemaDefinition.schemaLocation)
-    val schema = JsonMetaSchema.getV202012
 
-    schema.getKeywords.putAll(customSchemaKeywords.asJava)
-    val jsonSchemaFactory = new JsonSchemaFactory.Builder()
-      .defaultMetaSchemaIri(SchemaId.V202012)
-      .metaSchema(JsonMetaSchema.getV202012)
-      .build()
+    val defaultDialect = Specification.getDialect(SpecificationVersion.DRAFT_2020_12)
+    val dialectBuilder = Dialect.builder(defaultDialect)
+    customSchemaKeywords.values.foreach(k => dialectBuilder.keyword(k))
+    val dialect = dialectBuilder.build()
 
-    val schemaValidatorsConfig = SchemaValidatorsConfig.builder().formatAssertionsEnabled(true).build()
-
-    jsonSchemaFactory.getSchema(schemaInputStream, schemaValidatorsConfig)
+    val schemaRegistry = SchemaRegistry.withDefaultDialect(dialect)
+    schemaRegistry.getSchema(schemaInputStream)
   }
 }
