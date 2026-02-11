@@ -1,6 +1,7 @@
 queue_rules:
   - name: default
-    conditions:
+    batch_size: 1
+    queue_conditions:
       - "check-success=test"
       - "check-success=security/snyk (nationalarchives)"
 pull_request_rules:
@@ -21,4 +22,3 @@ pull_request_rules:
         name: default
 merge_queue:
   max_parallel_checks: 1
-
