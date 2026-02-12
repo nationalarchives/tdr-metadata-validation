@@ -72,6 +72,28 @@ class JsonSchemaValidatorsSpec extends AnyWordSpec with Matchers {
           error.getInstanceLocation.getName(0) shouldBe "description"
           error.getMessageKey shouldBe "type"
         }
+
+        "produce a type error for copyright_details when rights_copyright Unknown" in {
+          val json =
+            """{
+          "rights_copyright":"Unknown",
+          "copyright_details": "should be null"
+          }"""
+          val errors = JsonSchemaValidators.validateJson(RELATIONSHIP_SCHEMA, json)
+          val error = errors.iterator.next()
+          error.getInstanceLocation.getName(0) shouldBe "copyright_details"
+          error.getMessageKey shouldBe "type"
+        }
+
+        "produce no error for null copyright_details when rights_copyright Unknown" in {
+          val json =
+            """{
+          "rights_copyright":"Unknown",
+          "copyright_details": null
+          }"""
+          val errors = JsonSchemaValidators.validateJson(RELATIONSHIP_SCHEMA, json)
+          errors.size shouldBe 0
+        }
       }
     }
   }
