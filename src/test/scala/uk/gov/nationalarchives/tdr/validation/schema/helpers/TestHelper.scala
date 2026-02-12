@@ -19,7 +19,7 @@ object TestHelper {
       titleClosed: Option[String] = Some("No"),
       titleAlternative: Option[String] = Some(""),
       descriptionAlternative: Option[String] = Some(""),
-      rightsCopyRight: Option[String] = Some("Crown copyright"),
+      rightsCopyright: Option[String] = Some("Crown copyright"),
       fileName: Option[String] = Some("file1"),
       dateLastModified: Option[String] = Some("2024-12-25"),
       formerReference: Option[String] = Some(""),
@@ -42,7 +42,7 @@ object TestHelper {
       titleClosed = titleClosed,
       titleAlternative = titleAlternative,
       descriptionAlternative = descriptionAlternative,
-      rightsCopyRight = rightsCopyRight,
+      rightsCopyright = rightsCopyright,
       // not required
       fileName = fileName,
       dateLastModified = dateLastModified,
@@ -90,7 +90,7 @@ object TestHelper {
       titleClosed = titleClosed,
       titleAlternative = titleAlternative,
       descriptionAlternative = descriptionAlternative,
-      rightsCopyRight = Some("Crown copyright"),
+      rightsCopyright = Some("Crown copyright"),
       // not required
       fileName = fileName,
       dateLastModified = dateLastModified,
@@ -116,7 +116,7 @@ object TestHelper {
       titleClosed: Option[String] = None,
       titleAlternative: Option[String] = None,
       descriptionAlternative: Option[String] = None,
-      rightsCopyRight: Option[String] = None,
+      rightsCopyright: Option[String] = None,
       // not required
       fileName: Option[String] = None,
       dateLastModified: Option[String] = None,
@@ -141,7 +141,7 @@ object TestHelper {
       titleClosed.map(Metadata("is filename closed", _)), // title_closed
       titleAlternative.map(Metadata("alternate filename", _)), // title_alternative
       descriptionAlternative.map(Metadata("alternate description", _)), // description_alternate
-      rightsCopyRight.map(Metadata("copyright", _)),
+      rightsCopyright.map(Metadata("copyright", _)),
       // not required
       fileName.map(Metadata("filename", _)),
       dateLastModified.map(Metadata("date last modified", _)),
