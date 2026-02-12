@@ -19,8 +19,7 @@ object TestHelper {
       titleClosed: Option[String] = Some("No"),
       titleAlternative: Option[String] = Some(""),
       descriptionAlternative: Option[String] = Some(""),
-      rightsCopyRight: String = "Crown copyright",
-      // not required
+      rightsCopyRight: Option[String] = Some("Crown copyright"),
       fileName: Option[String] = Some("file1"),
       dateLastModified: Option[String] = Some("2024-12-25"),
       formerReference: Option[String] = Some(""),
@@ -43,6 +42,7 @@ object TestHelper {
       titleClosed = titleClosed,
       titleAlternative = titleAlternative,
       descriptionAlternative = descriptionAlternative,
+      rightsCopyRight = rightsCopyRight,
       // not required
       fileName = fileName,
       dateLastModified = dateLastModified,
@@ -90,6 +90,7 @@ object TestHelper {
       titleClosed = titleClosed,
       titleAlternative = titleAlternative,
       descriptionAlternative = descriptionAlternative,
+      rightsCopyRight = Some("Crown copyright"),
       // not required
       fileName = fileName,
       dateLastModified = dateLastModified,
@@ -115,7 +116,7 @@ object TestHelper {
       titleClosed: Option[String] = None,
       titleAlternative: Option[String] = None,
       descriptionAlternative: Option[String] = None,
-      rightsCopyRight: Option[String] = Some("Crown copyright"),
+      rightsCopyRight: Option[String] = None,
       // not required
       fileName: Option[String] = None,
       dateLastModified: Option[String] = None,
