@@ -4,7 +4,7 @@ object Dependencies {
   private val pekkoVersion = "1.4.0"
 
   lazy val commonsLang3 = "org.apache.commons" % "commons-lang3" % "3.20.0"
-  lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.19"
+  lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.20"
   lazy val ujson = "com.lihaoyi" % "ujson_native0.5_2.13" % "4.4.3"
   lazy val jacksonModule = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.21.2"
   lazy val metadataSchema = "uk.gov.nationalarchives" %% "da-metadata-schema" % "0.0.124"
