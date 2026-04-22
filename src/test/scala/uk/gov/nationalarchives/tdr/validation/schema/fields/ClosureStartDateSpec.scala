@@ -40,6 +40,16 @@ class ClosureStartDateSpec extends AnyWordSpecLike {
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
+    "success if the closure_start_date is 2006-12-31 even when it doesn't match end_date (temporary exception)" in {
+      val closedTestFileRow = closedMetadataFileRow(closureStartDate = Some("2006-12-31"), dateOfRecord = Some("2024-12-25"))
+      validationErrors(closedTestFileRow).size shouldBe 0
+    }
+
+    "success if the closure_start_date is 2006-12-31 even when it doesn't match date_last_modified (temporary exception)" in {
+      val closedTestFileRow = closedMetadataFileRow(closureStartDate = Some("2006-12-31"), dateLastModified = Some("2024-05-25"))
+      validationErrors(closedTestFileRow).size shouldBe 0
+    }
+
     "error(s) if the closure_start_date doesn't match the end_date but matches the date_last_modified" in {
       val closedTestFileRow = closedMetadataFileRow(closureStartDate = Some("2024-12-25"), dateOfRecord = Some("2023-02-25"), dateLastModified = Some("2024-12-25"))
       validationErrors(closedTestFileRow).size shouldBe 1
