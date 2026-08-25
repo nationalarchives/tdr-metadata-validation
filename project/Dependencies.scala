@@ -1,19 +1,19 @@
 import sbt.*
 
 object Dependencies {
-  private val pekkoVersion = "1.6.0"
+  private val pekkoVersion = "1.7.0"
 
   lazy val commonsLang3 = "org.apache.commons" % "commons-lang3" % "3.20.0"
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.20"
   lazy val ujson = "com.lihaoyi" % "ujson_native0.5_2.13" % "4.4.3"
-  lazy val jacksonModule = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.22.0"
-  lazy val metadataSchema = "uk.gov.nationalarchives" %% "da-metadata-schema" % "0.0.133"
-  lazy val jsonSchemaValidator = "com.networknt" % "json-schema-validator" % "3.0.4"
+  lazy val jacksonModule = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.22.2"
+  lazy val metadataSchema = "uk.gov.nationalarchives" %% "da-metadata-schema" % "0.0.139"
+  lazy val jsonSchemaValidator = "com.networknt" % "json-schema-validator" % "3.0.7"
   lazy val pekkoActor = "org.apache.pekko" %% "pekko-actor-typed" % pekkoVersion
   lazy val pekkoConnectors = "org.apache.pekko" %% "pekko-connectors-csv" % pekkoVersion
   lazy val pekkoStream = "org.apache.pekko" %% "pekko-stream" % pekkoVersion
   lazy val pekkoTestKit = "org.apache.pekko" %% "pekko-testkit" % pekkoVersion
-  lazy val catsEffect = "org.typelevel" %% "cats-effect" % "3.7.0"
+  lazy val catsEffect = "org.typelevel" %% "cats-effect" % "3.7.1"
   lazy val nscalaTime = "com.github.nscala-time" %% "nscala-time" % "3.0.0"
   lazy val circeCore = "io.circe" %% "circe-core" % "0.14.15"
   val circeGeneric = "io.circe" %% "circe-generic" % "0.14.15"
