@@ -24,8 +24,17 @@ class MetadataValidation(closureMetadataCriteria: MetadataCriteria, descriptiveM
           List.empty
         }
       case Some(Metadata(_, "Closed")) => validateMetadata(input, closureMetadataCriteria.dependencies.flatMap(_.get("Closed")).getOrElse(Nil))
-      case Some(Metadata(_, _))        => List(Error(closureType, UNDEFINED_VALUE_ERROR))
-      case None                        => List(Error(closureType, CLOSURE_STATUS_IS_MISSING))
+      // Assumption that 'Retained' currently does not have closure metadata associated with it, as per 'Open'
+      // This may change in the future
+      case Some(Metadata(_, "Retained")) =>
+        val hasAnyClosureMetadata = hasClosureMetadata(input, closureMetadataCriteria.dependencies.flatMap(_.get("Closed")))
+        if (hasAnyClosureMetadata) {
+          List(Error(closureType, CLOSURE_METADATA_EXISTS_WHEN_FILE_IS_RETAINED))
+        } else {
+          List.empty
+        }
+      case Some(Metadata(_, _)) => List(Error(closureType, UNDEFINED_VALUE_ERROR))
+      case None                 => List(Error(closureType, CLOSURE_STATUS_IS_MISSING))
     }
   }
 
