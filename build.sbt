@@ -2,6 +2,8 @@ import Dependencies.*
 import sbt.url
 import sbtrelease.ReleaseStateTransformations.*
 
+import java.net.URI
+
 ThisBuild / organization := "uk.gov.nationalarchives"
 ThisBuild / organizationName := "National Archives"
 
@@ -25,7 +27,7 @@ developers := List(
 )
 
 ThisBuild / description := "A library to validate input metadata for Transfer Digital Records"
-ThisBuild / licenses := List("MIT" -> new URL("https://choosealicense.com/licenses/mit/"))
+ThisBuild / licenses := List("MIT" -> URI.create("https://choosealicense.com/licenses/mit/").toURL)
 ThisBuild / homepage := Some(url("https://github.com/nationalarchives/tdr-metadata-validation"))
 
 useGpgPinentry := true

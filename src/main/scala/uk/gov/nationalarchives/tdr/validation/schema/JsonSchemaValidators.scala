@@ -14,6 +14,7 @@ object JsonSchemaValidators {
     getSchema(BASE_SCHEMA, Map("daBeforeToday" -> new DaBeforeToday, "matchEndDateOrDateLastModified" -> new MatchEndDateOrDateLastModified))
   private lazy val closureClosedJsonSchemaValidator: Schema = getSchema(CLOSURE_SCHEMA_CLOSED)
   private lazy val closureOpenJsonSchemaValidator: Schema = getSchema(CLOSURE_SCHEMA_OPEN)
+  private lazy val closureRetainedJsonSchemaValidator: Schema = getSchema(CLOSURE_SCHEMA_RETAINED)
   private lazy val requiredJsonSchemaValidator: Schema = getSchema(REQUIRED_SCHEMA)
   private lazy val relationshipJsonSchemaValidator: Schema = getSchema(RELATIONSHIP_SCHEMA)
   private val validators: Map[JsonSchemaDefinition, Schema] =
@@ -21,6 +22,7 @@ object JsonSchemaValidators {
       BASE_SCHEMA -> baseJsonSchemaValidator,
       CLOSURE_SCHEMA_CLOSED -> closureClosedJsonSchemaValidator,
       CLOSURE_SCHEMA_OPEN -> closureOpenJsonSchemaValidator,
+      CLOSURE_SCHEMA_RETAINED -> closureRetainedJsonSchemaValidator,
       REQUIRED_SCHEMA -> requiredJsonSchemaValidator,
       RELATIONSHIP_SCHEMA -> relationshipJsonSchemaValidator
     )

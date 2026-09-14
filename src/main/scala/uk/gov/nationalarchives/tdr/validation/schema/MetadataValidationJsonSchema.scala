@@ -6,8 +6,9 @@ import cats.syntax.all._
 import com.networknt.schema.Error
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess._
 import uk.gov.nationalarchives.tdr.validation.utils.CSVtoJsonUtils
-import uk.gov.nationalarchives.tdr.validation.{FileRow, Metadata}
 
+case class FileRow(matchIdentifier: String, metadata: List[Metadata])
+case class Metadata(name: String, value: String)
 case class ValidationError(validationProcess: ValidationProcess, property: String, errorKey: String)
 
 object MetadataValidationJsonSchema {
