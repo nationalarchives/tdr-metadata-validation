@@ -2,10 +2,10 @@ package uk.gov.nationalarchives.tdr.validation.schema.fields
 
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpecLike
-import uk.gov.nationalarchives.tdr.validation.schema.helpers.TestHelper._
-import uk.gov.nationalarchives.tdr.validation.schema.ValidationError
-import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.{SCHEMA_BASE, SCHEMA_CLOSURE_CLOSED, SCHEMA_CLOSURE_OPEN, SCHEMA_REQUIRED}
 import uk.gov.nationalarchives.tdr.schemautils.ConfigUtils.ARRAY_SPLIT_CHAR
+import uk.gov.nationalarchives.tdr.validation.schema.ValidationError
+import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.{SCHEMA_BASE, SCHEMA_CLOSURE_CLOSED, SCHEMA_CLOSURE_OPEN, SCHEMA_CLOSURE_RETAINED, SCHEMA_REQUIRED}
+import uk.gov.nationalarchives.tdr.validation.schema.helpers.TestHelper._
 
 class ClosurePeriodSpec extends AnyWordSpecLike {
 
@@ -29,6 +29,11 @@ class ClosurePeriodSpec extends AnyWordSpecLike {
     "success if the value is missing for an open record" in {
       val openTestFileRow = openMetadataFileRow(closurePeriod = Some(""))
       validationErrors(openTestFileRow).size shouldBe 0
+    }
+
+    "success if the value is missing for a 'Retained for security' record" in {
+      val retainedTestFileRow = retainedMetadataFileRow(closurePeriod = Some(""))
+      validationErrors(retainedTestFileRow).size shouldBe 0
     }
 
     "errors if there are two values 1 and 160 and 160 is above maximum closed record" in {
@@ -106,6 +111,13 @@ class ClosurePeriodSpec extends AnyWordSpecLike {
       val openTestFileRow = openMetadataFileRow(closurePeriod = Some("99"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
         ValidationError(SCHEMA_CLOSURE_OPEN, "closure_period", "type") // Must be empty for an open record
+      )
+    }
+
+    "error(s) if the value is present for a 'Retained for security' record" in {
+      val retainedTestFileRow = retainedMetadataFileRow(closurePeriod = Some("99"))
+      validationErrors(retainedTestFileRow) should contain theSameElementsAs List(
+        ValidationError(SCHEMA_CLOSURE_RETAINED, "closure_period", "type") // Must be empty for a retained for security record
       )
     }
 

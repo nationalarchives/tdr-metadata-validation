@@ -66,15 +66,15 @@ class ClosureTypeSpec extends AnyWordSpecLike {
       )
     }
 
-    "error(s) if the value is invalid (neither Open nor Closed) for an open record" in {
-      val openTestFileRow = openMetadataFileRow(closureType = Some("neither Open nor Closed"))
+    "error(s) if the value is invalid (neither Open or Closed or Retained for security) for an open record" in {
+      val openTestFileRow = openMetadataFileRow(closureType = Some("Invalid"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
         ValidationError(SCHEMA_BASE, "closure_type", "enum") // Must be Open, Closed or 'Retained for security'
       )
     }
 
-    "error(s) if the value is invalid (neither Open nor Closed) for a closed record" in {
-      val closedTestFileRow = closedMetadataFileRow(closureType = Some("neither Open nor Closed"))
+    "error(s) if the value is invalid (neither Open or Closed or Retained for security) for a closed record" in {
+      val closedTestFileRow = closedMetadataFileRow(closureType = Some("Invalid"))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
         ValidationError(SCHEMA_BASE, "closure_type", "enum") // Must be Open, Closed or 'Retained for security'
       )

@@ -15,6 +15,11 @@ class DescriptionClosedSpec extends AnyWordSpecLike {
       validationErrors(openTestFileRow).size shouldBe 0
     }
 
+    "success if the value is No for a 'Retained for security' record" in {
+      val retainedTestFileRow = retainedMetadataFileRow(descriptionClosed = Some("No"))
+      validationErrors(retainedTestFileRow).size shouldBe 0
+    }
+
     "success if the value is no for an open record (it does not need a capital N)" in {
       val openTestFileRow = openMetadataFileRow(descriptionClosed = Some("no"))
       validationErrors(openTestFileRow).size shouldBe 0
