@@ -27,7 +27,7 @@ developers := List(
 )
 
 ThisBuild / description := "A library to validate input metadata for Transfer Digital Records"
-ThisBuild / licenses := List("MIT" -> URI.create("https://choosealicense.com/licenses/mit/").toURL)
+ThisBuild / licenses := List(License.MIT)
 ThisBuild / homepage := Some(url("https://github.com/nationalarchives/tdr-metadata-validation"))
 
 useGpgPinentry := true
