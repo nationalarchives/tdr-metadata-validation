@@ -1,8 +1,7 @@
 package uk.gov.nationalarchives.tdr.validation.schema.helpers
 
-import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN, REQUIRED_SCHEMA}
-import uk.gov.nationalarchives.tdr.validation.schema.{MetadataValidationJsonSchema, ValidationError}
-import uk.gov.nationalarchives.tdr.validation.{FileRow, Metadata}
+import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition.{BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN, CLOSURE_SCHEMA_RETAINED, REQUIRED_SCHEMA}
+import uk.gov.nationalarchives.tdr.validation.schema.{FileRow, Metadata, MetadataValidationJsonSchema, ValidationError}
 
 object TestHelper {
 
@@ -102,6 +101,53 @@ object TestHelper {
     )
   }
 
+  def retainedMetadataFileRow(
+      filePath: Option[String] = Some("content/file1"),
+      dateOfRecord: Option[String] = Some(""),
+      description: Option[String] = Some(""),
+      closureType: Option[String] = Some("Retained for security"),
+      closurePeriod: Option[String] = Some(""),
+      closureStartDate: Option[String] = Some(""),
+      descriptionClosed: Option[String] = Some("No"),
+      foiExemptionAsserted: Option[String] = Some(""),
+      foiCodes: Option[String] = Some(""),
+      titleClosed: Option[String] = Some("No"),
+      titleAlternative: Option[String] = Some(""),
+      descriptionAlternative: Option[String] = Some(""),
+      // not required
+      fileName: Option[String] = Some("file1"),
+      dateLastModified: Option[String] = Some("2024-12-25"),
+      formerReference: Option[String] = Some(""),
+      language: Option[String] = Some("English"),
+      translatedTitleOfRecord: Option[String] = Some(""),
+      invalidColumnTitle: Option[String] = None,
+      uuid: Option[String] = None
+  ): FileRow = {
+    metadataFileRowBuilder(
+      filePath = filePath,
+      dateOfRecord = dateOfRecord,
+      description = description,
+      closureType = closureType,
+      closurePeriod = closurePeriod,
+      closureStartDate = closureStartDate,
+      descriptionClosed = descriptionClosed,
+      foiExemptionAsserted = foiExemptionAsserted,
+      foiCodes = foiCodes,
+      titleClosed = titleClosed,
+      titleAlternative = titleAlternative,
+      descriptionAlternative = descriptionAlternative,
+      rightsCopyright = Some("Crown copyright"),
+      // not required
+      fileName = fileName,
+      dateLastModified = dateLastModified,
+      formerReference = formerReference,
+      language = language,
+      translatedTitleOfRecord = translatedTitleOfRecord,
+      invalidColumnTitle = invalidColumnTitle,
+      uuid = uuid
+    )
+  }
+
   private def metadataFileRowBuilder(
       // required
       filePath: Option[String] = None,
@@ -161,7 +207,7 @@ object TestHelper {
       requiredSchemaErrors("file1")
     } else {
       val validationErrors: Map[String, Seq[ValidationError]] =
-        MetadataValidationJsonSchema.validate(Set(REQUIRED_SCHEMA, BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN), Seq(testFileRow))
+        MetadataValidationJsonSchema.validate(Set(REQUIRED_SCHEMA, BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED, CLOSURE_SCHEMA_OPEN, CLOSURE_SCHEMA_RETAINED), Seq(testFileRow))
       validationErrors("file1")
     }
   }

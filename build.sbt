@@ -1,6 +1,7 @@
 import Dependencies.*
-import sbt.url
 import sbtrelease.ReleaseStateTransformations.*
+
+import java.net.URI
 
 ThisBuild / organization := "uk.gov.nationalarchives"
 ThisBuild / organizationName := "National Archives"
@@ -10,7 +11,7 @@ version := version.value
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
-    url("https://github.com/nationalarchives/tdr-metadata-validation"),
+    URI("https://github.com/nationalarchives/tdr-metadata-validation"),
     "git@github.com:nationalarchives/tdr-metadata-validation.git"
   )
 )
@@ -20,13 +21,13 @@ developers := List(
     id = "tna-da-bot",
     name = "TNA Digital Archiving",
     email = "s-GitHubDABot@nationalarchives.gov.uk",
-    url = url("https://github.com/nationalarchives/tdr-metadata-validation")
+    url = URI("https://github.com/nationalarchives/tdr-metadata-validation")
   )
 )
 
 ThisBuild / description := "A library to validate input metadata for Transfer Digital Records"
 ThisBuild / licenses := List(License.MIT)
-ThisBuild / homepage := Some(url("https://github.com/nationalarchives/tdr-metadata-validation"))
+ThisBuild / homepage := Some(URI("https://github.com/nationalarchives/tdr-metadata-validation"))
 
 useGpgPinentry := true
 publishTo := {
