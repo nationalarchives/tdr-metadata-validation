@@ -3,7 +3,7 @@ package uk.gov.nationalarchives.tdr.validation.schema.fields
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpecLike
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationError
-import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.{SCHEMA_BASE, SCHEMA_CLOSURE_CLOSED, SCHEMA_CLOSURE_OPEN, SCHEMA_REQUIRED}
+import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.{SCHEMA_BASE, SCHEMA_CLOSURE_CLOSED, SCHEMA_CLOSURE_OPEN, SCHEMA_CLOSURE_RETAINED, SCHEMA_REQUIRED}
 import uk.gov.nationalarchives.tdr.validation.schema.helpers.TestHelper._
 
 class ExemptionAssertedSpec extends AnyWordSpecLike {
@@ -13,6 +13,11 @@ class ExemptionAssertedSpec extends AnyWordSpecLike {
     "success if no value is provided for an open record" in {
       val openTestFileRow = openMetadataFileRow(foiExemptionAsserted = Some(""))
       validationErrors(openTestFileRow).size shouldBe 0
+    }
+
+    "success if no value is provided for a 'Retained for security' record" in {
+      val retainedTestFileRow = retainedMetadataFileRow(foiExemptionAsserted = Some(""))
+      validationErrors(retainedTestFileRow).size shouldBe 0
     }
 
     "success if a value in the past is provided for a closed record" in {
@@ -35,6 +40,13 @@ class ExemptionAssertedSpec extends AnyWordSpecLike {
       val openTestFileRow = openMetadataFileRow(foiExemptionAsserted = Some("2024-12-25"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
         ValidationError(SCHEMA_CLOSURE_OPEN, "foi_exemption_asserted", "type") // Must be empty for an open record
+      )
+    }
+
+    "error(s) if a value is provided for a 'Retained for security' record" in {
+      val retainedTestFileRow = retainedMetadataFileRow(foiExemptionAsserted = Some("2024-12-25"))
+      validationErrors(retainedTestFileRow) should contain theSameElementsAs List(
+        ValidationError(SCHEMA_CLOSURE_RETAINED, "foi_exemption_asserted", "type") // Must be empty for a 'Retained for security' record
       )
     }
 

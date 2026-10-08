@@ -20,6 +20,16 @@ class TitleAlternateSpec extends AnyWordSpecLike {
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
+    "success if the value is not provided for a 'Retained for security' record" in {
+      val retainedTestFileRow = retainedMetadataFileRow(titleAlternative = Some(""))
+      validationErrors(retainedTestFileRow).size shouldBe 0
+    }
+
+    "success if the value is provided for a 'Retained for security' record with a closed title" in {
+      val retainedTestFileRow = retainedMetadataFileRow(titleClosed = Some("Yes"), titleAlternative = Some("alt title"))
+      validationErrors(retainedTestFileRow).size shouldBe 0
+    }
+
     "success if no value is provided for closed record with a open title" in {
       val closedTestFileRow = closedMetadataFileRow(titleClosed = Some("No"), titleAlternative = Some(""))
       validationErrors(closedTestFileRow).size shouldBe 0

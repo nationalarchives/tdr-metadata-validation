@@ -15,6 +15,16 @@ class DescriptionAlternateSpec extends AnyWordSpecLike {
       validationErrors(openTestFileRow).size shouldBe 0
     }
 
+    "success if the value is not provided for a 'Retained for security' record" in {
+      val retainedTestFileRow = retainedMetadataFileRow(descriptionAlternative = Some(""))
+      validationErrors(retainedTestFileRow).size shouldBe 0
+    }
+
+    "success if the value is provided for a 'Retained for security' record with a description" in {
+      val retainedTestFileRow = retainedMetadataFileRow(descriptionClosed = Some("Yes"), descriptionAlternative = Some("alt descr"))
+      validationErrors(retainedTestFileRow).size shouldBe 0
+    }
+
     "success if the value is provided for closed record with a closed description" in {
       val closedTestFileRow = closedMetadataFileRow(descriptionClosed = Some("Yes"), descriptionAlternative = Some("alt descr"))
       validationErrors(closedTestFileRow).size shouldBe 0

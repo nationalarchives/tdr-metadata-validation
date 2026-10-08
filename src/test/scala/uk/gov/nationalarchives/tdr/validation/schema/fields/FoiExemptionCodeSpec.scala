@@ -3,7 +3,7 @@ package uk.gov.nationalarchives.tdr.validation.schema.fields
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpecLike
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationError
-import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.{SCHEMA_BASE, SCHEMA_CLOSURE_CLOSED, SCHEMA_CLOSURE_OPEN, SCHEMA_REQUIRED}
+import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.{SCHEMA_BASE, SCHEMA_CLOSURE_CLOSED, SCHEMA_CLOSURE_OPEN, SCHEMA_CLOSURE_RETAINED, SCHEMA_REQUIRED}
 import uk.gov.nationalarchives.tdr.validation.schema.helpers.TestHelper._
 import uk.gov.nationalarchives.tdr.schemautils.ConfigUtils.ARRAY_SPLIT_CHAR
 
@@ -14,6 +14,11 @@ class FoiExemptionCodeSpec extends AnyWordSpecLike {
     "success if the value is missing for an open record" in {
       val openTestFileRow = openMetadataFileRow(foiCodes = Some(""))
       validationErrors(openTestFileRow).size shouldBe 0
+    }
+
+    "success if the value is missing for a 'Retained for security' record" in {
+      val retainedTestFileRow = retainedMetadataFileRow(foiCodes = Some(""))
+      validationErrors(retainedTestFileRow).size shouldBe 0
     }
 
     "success if a single value is valid" in {
@@ -63,6 +68,13 @@ class FoiExemptionCodeSpec extends AnyWordSpecLike {
       val openTestFileRow = openMetadataFileRow(foiCodes = Some("44"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
         ValidationError(SCHEMA_CLOSURE_OPEN, "foi_exemption_code", "type") // Must be empty for an open record
+      )
+    }
+
+    "error(s) if there a value is provided for a 'Retained for security' record" in {
+      val retainedTestFileRow = retainedMetadataFileRow(foiCodes = Some("44"))
+      validationErrors(retainedTestFileRow) should contain theSameElementsAs List(
+        ValidationError(SCHEMA_CLOSURE_RETAINED, "foi_exemption_code", "type") // Must be empty for a 'Retained for security' record
       )
     }
 

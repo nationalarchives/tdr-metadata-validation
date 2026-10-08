@@ -7,7 +7,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import uk.gov.nationalarchives.tdr.validation.schema.JsonSchemaDefinition._
 import uk.gov.nationalarchives.tdr.validation.schema.MetadataValidationJsonSchema.ObjectMetadata
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.{SCHEMA_BASE, _}
-import uk.gov.nationalarchives.tdr.validation.schema.{MetadataValidationJsonSchema, ValidationError}
+import uk.gov.nationalarchives.tdr.validation.schema.{FileRow, Metadata, MetadataValidationJsonSchema, ValidationError}
 
 class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataValidationJsonSchemaSpec")) with ImplicitSender with AnyWordSpecLike {
 
@@ -480,6 +480,32 @@ class MetadataValidationJsonSchemaSpec extends TestKit(ActorSystem("MetadataVali
         ValidationError(SCHEMA_CLOSURE_CLOSED, "title_closed", "const"),
         ValidationError(SCHEMA_CLOSURE_CLOSED, "description_closed", "const")
       )
+    }
+
+    "return no errors when closure_type is Retained and the retained closure fields are valid" in {
+      val data: Set[ObjectMetadata] = closureDataBuilder(
+        closureType = Some("Retained for security"),
+        titleClosed = Some("Yes"),
+        titleAlternative = Some("alternate filename"),
+        descriptionClosed = Some("Yes"),
+        descriptionAlternative = Some("alternate description")
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_RETAINED, data)
+      validationErrors("file1").size shouldBe 0
+    }
+
+    "return retained schema errors when closure_type is Retained and closure fields are invalid" in {
+      val data: Set[ObjectMetadata] = closureDataBuilder(
+        closureType = Some("Retained for security"),
+        closurePeriod = Some("151"),
+        titleClosed = Some("No"),
+        descriptionClosed = Some("No"),
+        descriptionAlternative = Some("alternate description")
+      )
+      val validationErrors = MetadataValidationJsonSchema.validateWithSingleSchema(CLOSURE_SCHEMA_RETAINED, data)
+      validationErrors("file1").size shouldBe 2
+      validationErrors("file1") should contain(ValidationError(SCHEMA_CLOSURE_RETAINED, "closure_period", "type"))
+      validationErrors("file1") should contain(ValidationError(SCHEMA_CLOSURE_RETAINED, "description_closed", "const"))
     }
 
     "MetadataValidationJsonSchema validate with both BASE_SCHEMA, CLOSURE_SCHEMA_CLOSED and CLOSURE_SCHEMA_OPEN" should {

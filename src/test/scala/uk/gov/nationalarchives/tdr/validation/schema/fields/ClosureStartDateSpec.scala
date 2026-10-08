@@ -4,7 +4,7 @@ import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpecLike
 import uk.gov.nationalarchives.tdr.validation.schema.helpers.TestHelper._
 import uk.gov.nationalarchives.tdr.validation.schema.ValidationError
-import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.{SCHEMA_BASE, SCHEMA_REQUIRED, SCHEMA_CLOSURE_OPEN, SCHEMA_CLOSURE_CLOSED}
+import uk.gov.nationalarchives.tdr.validation.schema.ValidationProcess.{SCHEMA_BASE, SCHEMA_CLOSURE_CLOSED, SCHEMA_CLOSURE_OPEN, SCHEMA_CLOSURE_RETAINED, SCHEMA_REQUIRED}
 
 class ClosureStartDateSpec extends AnyWordSpecLike {
 
@@ -13,6 +13,11 @@ class ClosureStartDateSpec extends AnyWordSpecLike {
     "success if no value is provided for an open record" in {
       val openTestFileRow = openMetadataFileRow(closureStartDate = Some(""))
       validationErrors(openTestFileRow).size shouldBe 0
+    }
+
+    "success if no value is provided for a 'Retained for security' record" in {
+      val retainedTestFileRow = retainedMetadataFileRow(closureStartDate = Some(""))
+      validationErrors(retainedTestFileRow).size shouldBe 0
     }
 
     "success if a value in the past is provided for a closed record" in {
@@ -89,6 +94,13 @@ class ClosureStartDateSpec extends AnyWordSpecLike {
       val openTestFileRow = openMetadataFileRow(closureStartDate = Some("2024-12-25"))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
         ValidationError(SCHEMA_CLOSURE_OPEN, "closure_start_date", "type") // Must be empty for an open record
+      )
+    }
+
+    "error(s) if a value is provided for a 'Retained for security' record" in {
+      val retainedTestFileRow = retainedMetadataFileRow(closureStartDate = Some("2024-12-25"))
+      validationErrors(retainedTestFileRow) should contain theSameElementsAs List(
+        ValidationError(SCHEMA_CLOSURE_RETAINED, "closure_start_date", "type") // Must be empty for a 'Retained for security' record
       )
     }
 
