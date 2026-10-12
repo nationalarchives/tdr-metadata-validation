@@ -20,14 +20,14 @@ class CataloguePlacementSpec extends AnyWordSpecLike {
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
-    "succeeds if the cell itself is empty" in {
+    "success if the cell itself is empty" in {
       val openTestFileRow = openMetadataFileRow(cataloguePlacement = Some(""))
       validationErrors(openTestFileRow).size shouldBe 0
       val closedTestFileRow = closedMetadataFileRow(cataloguePlacement = Some(""))
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
-    "succeeds if whole column is missing" in {
+    "success if whole column is missing" in {
       val openTestFileRow = openMetadataFileRow(cataloguePlacement = None)
       validationErrors(openTestFileRow).size shouldBe 0
       val closedTestFileRow = closedMetadataFileRow(cataloguePlacement = None)
@@ -46,6 +46,7 @@ class CataloguePlacementSpec extends AnyWordSpecLike {
       "/YHC",
       "!/YHC"
     )
+
     Inspectors.forAll(valueTable)(value => {
       s"errors if catalogue placement is not in the right format - $value" in {
         val test1 = openMetadataFileRow(cataloguePlacement = Some(value))
@@ -53,21 +54,21 @@ class CataloguePlacementSpec extends AnyWordSpecLike {
       }
     })
 
-    "succeeds if a 50 char catalogue placement is provided " in {
+    "success if a 50 char catalogue placement is provided " in {
       val openTestFileRow = openMetadataFileRow(cataloguePlacement = Some("YHC/CL/JO1" + "A" * 40))
       validationErrors(openTestFileRow).size shouldBe 0
       val closedTestFileRow = closedMetadataFileRow(cataloguePlacement = Some("YHC/CL/JO1" + "A" * 40))
       validationErrors(closedTestFileRow).size shouldBe 0
     }
 
-    "errors if a long catalogue placement is provided (this tests 51 char)" in {
+    "errors if a catalogue placement has more than 50 characters" in {
       val openTestFileRow = openMetadataFileRow(cataloguePlacement = Some("YHC/CL/JO1" + "A" * 41))
       validationErrors(openTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "catalogue_placement", "maxLength") // More than 50 characters, this field has a maximum length of 50 characters
+        ValidationError(SCHEMA_BASE, "catalogue_placement", "maxLength")
       )
       val closedTestFileRow = closedMetadataFileRow(cataloguePlacement = Some("YHC/CL/JO1" + "A" * 41))
       validationErrors(closedTestFileRow) should contain theSameElementsAs List(
-        ValidationError(SCHEMA_BASE, "catalogue_placement", "maxLength") // More than 50 characters, this field has a maximum length of 50 characters
+        ValidationError(SCHEMA_BASE, "catalogue_placement", "maxLength")
       )
     }
   }
