@@ -26,7 +26,9 @@ object TestHelper {
       translatedTitleOfRecord: Option[String] = Some(""),
       invalidColumnTitle: Option[String] = None,
       uuid: Option[String] = None,
-      evidenceProvidedBy: Option[String] = None
+      evidenceProvidedBy: Option[String] = None,
+      formerFilePath: Option[String] = None,
+      cataloguePlacement: Option[String] = None
   ): FileRow = {
     metadataFileRowBuilder(
       filePath = filePath,
@@ -50,7 +52,9 @@ object TestHelper {
       translatedTitleOfRecord = translatedTitleOfRecord,
       invalidColumnTitle = invalidColumnTitle,
       uuid = uuid,
-      evidenceProvidedBy = evidenceProvidedBy
+      evidenceProvidedBy = evidenceProvidedBy,
+      formerFilePath = formerFilePath,
+      cataloguePlacement = cataloguePlacement
     )
   }
 
@@ -74,7 +78,9 @@ object TestHelper {
       language: Option[String] = Some("English"),
       translatedTitleOfRecord: Option[String] = Some(""),
       invalidColumnTitle: Option[String] = None,
-      uuid: Option[String] = None
+      uuid: Option[String] = None,
+      formerFilePath: Option[String] = None,
+      cataloguePlacement: Option[String] = None
   ): FileRow = {
     metadataFileRowBuilder(
       filePath = filePath,
@@ -97,7 +103,9 @@ object TestHelper {
       language = language,
       translatedTitleOfRecord = translatedTitleOfRecord,
       invalidColumnTitle = invalidColumnTitle,
-      uuid = uuid
+      uuid = uuid,
+      formerFilePath = formerFilePath,
+      cataloguePlacement = cataloguePlacement
     )
   }
 
@@ -121,7 +129,9 @@ object TestHelper {
       language: Option[String] = Some("English"),
       translatedTitleOfRecord: Option[String] = Some(""),
       invalidColumnTitle: Option[String] = None,
-      uuid: Option[String] = None
+      uuid: Option[String] = None,
+      formerFilePath: Option[String] = None,
+      cataloguePlacement: Option[String] = None
   ): FileRow = {
     metadataFileRowBuilder(
       filePath = filePath,
@@ -144,7 +154,9 @@ object TestHelper {
       language = language,
       translatedTitleOfRecord = translatedTitleOfRecord,
       invalidColumnTitle = invalidColumnTitle,
-      uuid = uuid
+      uuid = uuid,
+      formerFilePath = formerFilePath,
+      cataloguePlacement = cataloguePlacement
     )
   }
 
@@ -171,7 +183,9 @@ object TestHelper {
       translatedTitleOfRecord: Option[String] = None,
       invalidColumnTitle: Option[String] = None,
       uuid: Option[String] = None,
-      evidenceProvidedBy: Option[String] = None
+      evidenceProvidedBy: Option[String] = None,
+      formerFilePath: Option[String] = None,
+      cataloguePlacement: Option[String] = None
   ): FileRow = {
     val metadata = List(
       // required
@@ -196,7 +210,9 @@ object TestHelper {
       translatedTitleOfRecord.map(Metadata("translated filename", _)),
       invalidColumnTitle.map(Metadata("AN INVALID COLUMN TITLE", _)),
       uuid.map(Metadata("UUID", _)),
-      evidenceProvidedBy.map(Metadata("evidence provided by", _))
+      evidenceProvidedBy.map(Metadata("evidence provided by", _)),
+      formerFilePath.map(Metadata("former filepath", _)),
+      cataloguePlacement.map(Metadata("catalogue placement", _))
     ).flatten
     FileRow("file1", metadata)
   }
@@ -216,6 +232,8 @@ object TestHelper {
     "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890" +
       "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890" +
       "1234567890123456789012345678901234567890123456789012345"
+
+  val thousandCharString: String = "A" * 1000
 
   val eightThousandCharString: String =
     "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890" +
