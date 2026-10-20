@@ -6,7 +6,7 @@ import java.net.URI
 ThisBuild / organization := "uk.gov.nationalarchives"
 ThisBuild / organizationName := "National Archives"
 
-scalaVersion := "3.10.0"
+scalaVersion := "2.13.18"
 version := version.value
 
 ThisBuild / scmInfo := Some(
