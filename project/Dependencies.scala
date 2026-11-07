@@ -1,7 +1,7 @@
 import sbt.*
 
 object Dependencies {
-  private val pekkoVersion = "1.7.1"
+  private val pekkoVersion = "2.0.0"
   private val circeVersion = "0.14.17"
 
   lazy val commonsLang3 = "org.apache.commons" % "commons-lang3" % "3.21.0"
