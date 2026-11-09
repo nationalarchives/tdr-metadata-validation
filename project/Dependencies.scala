@@ -1,7 +1,7 @@
 import sbt.*
 
 object Dependencies {
-  private val pekkoVersion = "1.7.1"
+  private val pekkoVersion = "2.0.0"
   private val circeVersion = "0.14.17"
 
   lazy val commonsLang3 = "org.apache.commons" % "commons-lang3" % "3.21.0"
@@ -9,7 +9,7 @@ object Dependencies {
   lazy val ujson = "com.lihaoyi" % "ujson_native0.5_2.13" % "4.4.3"
   lazy val jacksonModule = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.22.4"
   lazy val metadataSchema = "uk.gov.nationalarchives" %% "da-metadata-schema" % "0.0.153"
-  lazy val jsonSchemaValidator = "com.networknt" % "json-schema-validator" % "3.0.8"
+  lazy val jsonSchemaValidator = "com.networknt" % "json-schema-validator" % "3.0.9"
   lazy val pekkoActor = "org.apache.pekko" %% "pekko-actor-typed" % pekkoVersion
   lazy val pekkoConnectors = "org.apache.pekko" %% "pekko-connectors-csv" % pekkoVersion
   lazy val pekkoStream = "org.apache.pekko" %% "pekko-stream" % pekkoVersion
