@@ -39,10 +39,7 @@ class MatchEndDateOrDateLastModified extends AbstractKeyword("matchEndDateOrDate
         }
 
         parseDate(node.asString()) match {
-          // Temporary exception: allow a specific closure_start_date of 2006-12-31 to bypass the
-          // matchEndDateOrDateLastModified validation.
-          case Success(closureDate) if closureDate.isEqual(DateTime.parse("2006-12-31")) =>
-          case Success(closureDate)                                                      =>
+          case Success(closureDate) =>
             val endDate = getValue("end_date")
             if (endDate != null && endDate.nonEmpty) {
               if (!validateDate(closureDate, endDate)) {
